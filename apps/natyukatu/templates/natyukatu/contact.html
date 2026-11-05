@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>お問い合わせ | 画面タイトル</title>
+  <style>
+    :root{--navy:#102b55;--blue:#0788f5;--line:#dce6f2;--teal:#08aaa8}*{box-sizing:border-box}body{margin:0;min-height:100vh;color:var(--navy);font-family:"Yu Gothic UI","Meiryo",system-ui,sans-serif;background:linear-gradient(135deg,#f7faff,#f1f7fc)}
+    .topbar{height:96px;display:flex;align-items:center;padding:0 26px;background:rgba(255,255,255,.97);border-bottom:1px solid #e8eef5;box-shadow:0 3px 14px #1431510d}.brand{display:flex;align-items:center;gap:25px;color:inherit;text-decoration:none}.logo{width:72px;height:54px;flex:none}.brand-title{border-left:2px solid #e3eaf3;padding-left:27px;font-size:27px;font-weight:800;letter-spacing:.02em;white-space:nowrap}.spacer{flex:1}.account{display:flex;align-items:center;gap:13px;padding:0 26px;border-left:1px solid var(--line);font-weight:800;white-space:nowrap}.avatar{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:#e8f1fb;flex:none}.avatar svg{width:25px;fill:none;stroke:#4c78ad;stroke-width:1.8}.chevron{width:9px;height:9px;border-right:2px solid var(--navy);border-bottom:2px solid var(--navy);transform:rotate(45deg);margin:-5px 0 0 2px}.logout{min-width:145px;padding:12px 22px;border:1.5px solid var(--blue);border-radius:9px;background:#fff;color:var(--blue);font-weight:800;text-align:center;text-decoration:none}
+    .layout{min-height:calc(100vh - 96px);display:grid;grid-template-columns:300px minmax(0,1fr)}.sidebar{padding:32px 12px;background:#ffffff80;border-right:1px solid var(--line)}.user-badge{display:flex;align-items:center;gap:14px;padding:0 18px 22px;font-size:18px;font-weight:800}.user-badge .avatar{width:46px;height:46px}.nav{display:grid;gap:7px}.nav-link{height:61px;display:flex;align-items:center;gap:19px;padding:0 24px;border-radius:8px;color:var(--navy);font-size:19px;font-weight:700;text-decoration:none}.nav-link.active{background:#eaf4ff;color:var(--blue);box-shadow:inset 4px 0 var(--blue)}.nav-link svg{width:25px;height:25px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}.divider{height:1px;background:var(--line);margin:14px 18px}
+    main{min-width:0;padding:28px 26px 34px}.page-title{margin:0 0 24px 3px;font-size:48px;line-height:1.2;font-weight:900}.form-card{padding:26px 33px 30px;border:1.5px solid #dce9f9;border-radius:14px;background:#ffffffdd;box-shadow:0 5px 20px #1d3f6705}.intro{margin:0 0 24px;color:#667f9f;font-size:21px;font-weight:700}.field{margin-bottom:24px}.field-label{display:block;margin:0 0 10px;font-size:23px;font-weight:900}.control{width:100%;min-height:66px;padding:13px 20px;border:1.5px solid #bdcde1;border-radius:9px;background:#fff;color:var(--navy);font:inherit;font-size:20px;outline:none;box-shadow:inset 0 1px 2px #203c5c08}.control:focus{border-color:var(--blue);box-shadow:0 0 0 3px #0788f51a}.control::placeholder{color:#7188a8}.select{color:#7188a8}.select:valid{color:var(--navy)}.message-area{min-height:184px;resize:vertical}.submit-button{width:min(100%,532px);min-height:72px;display:block;margin:32px auto 0;border:0;border-radius:9px;background:linear-gradient(100deg,#0db9b1,#08aaa8);color:#fff;font:inherit;font-size:25px;font-weight:900;cursor:pointer}.submit-button:hover{filter:brightness(1.05)}.result{min-height:24px;margin:12px 0 0;text-align:center;color:#078568;font-weight:700}
+    @media(max-width:900px){.layout{grid-template-columns:240px minmax(0,1fr)}.sidebar{padding:26px 8px}.nav-link{padding:0 16px;font-size:16px;gap:13px}.page-title{font-size:40px}.form-card{padding:22px}.field-label{font-size:20px}.intro{font-size:18px}}
+    @media(max-width:700px){.topbar{height:74px;padding:0 14px}.brand{gap:12px}.logo{width:48px;height:40px}.brand-title{padding-left:12px;font-size:18px}.account{display:none}.logout{min-width:94px;padding:9px 12px}.layout{min-height:calc(100vh - 74px);grid-template-columns:58px minmax(0,1fr)}.sidebar{padding:16px 6px}.user-badge{padding:0 5px 17px;justify-content:center}.user-badge .avatar{width:36px;height:36px}.user-badge span{display:none}.nav-link{height:48px;justify-content:center;padding:0}.nav-link span{display:none}.nav-link svg{width:22px}.divider{margin:13px 5px}main{padding:20px 12px}.page-title{font-size:34px;margin-bottom:18px}.form-card{padding:19px 15px 20px}.intro{font-size:16px;margin-bottom:20px}.field{margin-bottom:18px}.field-label{font-size:17px;margin-bottom:8px}.control{min-height:52px;padding:11px 13px;font-size:16px}.message-area{min-height:150px}.submit-button{min-height:58px;margin-top:23px;font-size:19px}}
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="top.html" aria-label="トップ画面"><svg class="logo" viewBox="0 0 90 64" aria-hidden="true"><defs><linearGradient id="lb" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#168df2"/><stop offset="1" stop-color="#0066c9"/></linearGradient><linearGradient id="lt" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#08bcae"/><stop offset="1" stop-color="#008c8b"/></linearGradient></defs><path d="M7 31 31 7q4-4 8 0l20 20-24 24q-4 4-8 0L7 35q-2-2 0-4Z" fill="url(#lb)"/><path d="m34 31 24-24q4-4 8 0l20 20q3 3 0 6L62 57q-4 4-8 0L34 37q-3-3 0-6Z" fill="url(#lt)"/><path d="m37 29 9-9 15 15-9 9Z" fill="#fff" opacity=".88"/></svg><span class="brand-title">画面タイトル</span></a>
+    <div class="spacer"></div><div class="account"><span class="avatar"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c.5-4 3.2-6 8-6s7.5 2 8 6"/></svg></span><span>ログインユーザー名</span><i class="chevron"></i></div><a class="logout" href="logout-confirm.html">ログアウト</a>
+  </header>
+  <div class="layout">
+    <aside class="sidebar" aria-label="メインメニュー">
+      <div class="user-badge"><span class="avatar"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c.5-4 3.2-6 8-6s7.5 2 8 6"/></svg></span><span>称号</span></div>
+      <nav class="nav">
+        <a class="nav-link" href="top.html"><svg viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10h-6v-7H9v7H4v-9Z"/></svg><span>トップ画面</span></a>
+        <a class="nav-link" href="activity.html"><svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v9a2.5 2.5 0 0 1-2.5 2.5H10l-5 4v-4.5a2.5 2.5 0 0 1-1-2Z"/></svg><span>活動用画面</span></a>
+        <a class="nav-link active" href="contact.html"><svg viewBox="0 0 24 24"><path d="M5 20h14l1-11-5 3-3-7-3 7-5-3Z"/><path d="M7 20v2h10v-2"/></svg><span>お問い合わせ</span></a>
+        <a class="nav-link" href="#ranking"><svg viewBox="0 0 24 24"><path d="M5 20h14l1-11-5 3-3-7-3 7-5-3Z"/><path d="M7 20v2h10v-2"/></svg><span>ランキング</span></a>
+      </nav>
+      <div class="divider"></div><a class="nav-link" href="logout-confirm.html"><svg viewBox="0 0 24 24"><path d="M10 17l5-5-5-5M15 12H3"/><path d="M12 3h7a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-7"/></svg><span>ログアウト</span></a>
+    </aside>
+    <main>
+      <h1 class="page-title">お問い合わせ</h1>
+      <section class="form-card" aria-label="お問い合わせフォーム">
+        <p class="intro">お問い合わせ内容を入力してください。</p>
+        <form id="contactForm">
+          <div class="field"><label class="field-label" for="category">種別</label><select class="control select" id="category" name="category" required><option value="" selected disabled>選択してください</option><option>ご質問</option><option>不具合の報告</option><option>ご意見・ご要望</option><option>その他</option></select></div>
+          <div class="field"><label class="field-label" for="subject">タイトル</label><input class="control" id="subject" name="subject" required></div>
+          <div class="field"><label class="field-label" for="body">本文</label><textarea class="control message-area" id="body" name="body" required></textarea></div>
+          <button class="submit-button" type="submit">送信</button>
+          <p class="result" id="result" role="status" aria-live="polite"></p>
+        </form>
+      </section>
+    </main>
+  </div>
+  <script>
+    document.getElementById('contactForm').addEventListener('submit', event => {
+      event.preventDefault();
+      document.getElementById('result').textContent = 'お問い合わせを送信しました（画面見本）';
+      event.currentTarget.reset();
+    });
+  </script>
+</body>
+</html>
