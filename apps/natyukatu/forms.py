@@ -1,6 +1,6 @@
+from flask_wtf.form import FlaskForm
 
-from flask_wtf import FlaskForm
-from wtforms import (
+from wtforms.fields.simple import (
     StringField,
     PasswordField,
     TextAreaField,
@@ -205,7 +205,7 @@ class FavoriteForm(FlaskForm):
         validators=[DataRequired()]
     )
 
-    submit = SubmitField("お気に入り登録")
+    submit = SubmitField("❤")
 
 
 # =====================================
@@ -217,7 +217,7 @@ class MessageForm(FlaskForm):
         "メッセージ",
         validators=[
             DataRequired(),
-            Length(max=50)
+            Length(max=200)
         ]
     )
 
@@ -353,7 +353,7 @@ class RecruitmentUpdateForm(FlaskForm):
 
 
 # =====================================
-# ⑧ 参加・募集履歴更新フォーム
+# ⑧ 参加・募集履歴更新フォーム(分ける)
 # =====================================
 
 class HistoryUpdateForm(FlaskForm):
@@ -502,47 +502,12 @@ class UserUpdateForm(FlaskForm):
         ]
     )
 
-    emergency_contact = StringField(
-        "緊急連絡先",
+    phone_number = StringField(
+        "電話番号",
         validators=[
             Optional(),
             Length(max=30)
         ]
-    )
-
-    available_time = StringField(
-        "活動できる時間帯",
-        validators=[Optional()]
-    )
-
-    desired_area = StringField(
-        "希望地域",
-        validators=[Optional()]
-    )
-
-    interests = StringField(
-        "興味のある分野",
-        validators=[Optional()]
-    )
-
-    physical_ability = SelectField(
-        "体力について",
-        choices=[
-            ("自信がある", "自信がある"),
-            ("普通", "普通"),
-            ("自信がない", "自信がない")
-        ],
-        validators=[Optional()]
-    )
-
-    activity_type = SelectField(
-        "活動場所",
-        choices=[
-            ("屋外", "屋外"),
-            ("屋内", "屋内"),
-            ("どちらでも", "どちらでも")
-        ],
-        validators=[Optional()]
     )
 
     submit = SubmitField("変更を保存")
