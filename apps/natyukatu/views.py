@@ -98,12 +98,12 @@ def get_recruitment(active_id):
 # ① 募集一覧取得・検索・絞り込み
 # =====================================
 
-@natyukatu.route("/")
+@dt.route("/")
 def index():
     return render_template("natyukatu/top.html")
 
 
-@natyukatu.route("/activities", methods=["GET", "POST"])
+@dt.route("/activities", methods=["GET", "POST"])
 def activities():
     form = SearchForm()
 
@@ -165,7 +165,7 @@ def activities():
 # ② 募集詳細・閲覧履歴
 # =====================================
 
-@natyukatu.route("/activities/<active_id>")
+@dt.route("/activities/<active_id>")
 def activity_detail(active_id):
     recruitment = get_recruitment(active_id)
 
@@ -190,7 +190,7 @@ def activity_detail(active_id):
 # ③ お気に入り登録
 # =====================================
 
-@natyukatu.route("/favorites/add/<active_id>", methods=["POST"])
+@dt.route("/favorites/add/<active_id>", methods=["POST"])
 @login_required
 def add_favorite(active_id):
     recruitment = get_recruitment(active_id)
@@ -222,7 +222,7 @@ def add_favorite(active_id):
 # ④ お気に入り解除
 # =====================================
 
-@natyukatu.route("/favorites/delete/<favorite_id>", methods=["POST"])
+@dt.route("/favorites/delete/<favorite_id>", methods=["POST"])
 @login_required
 def delete_favorite(favorite_id):
     favorite = Like.query.filter_by(
@@ -242,7 +242,7 @@ def delete_favorite(favorite_id):
 # ⑤ お気に入り一覧取得
 # =====================================
 
-@natyukatu.route("/favorites")
+@dt.route("/favorites")
 @login_required
 def favorites():
     favorites = Like.query.filter_by(
@@ -259,7 +259,7 @@ def favorites():
 # ⑥ 閲覧履歴一覧取得
 # =====================================
 
-@natyukatu.route("/history/views")
+@dt.route("/history/views")
 @login_required
 def view_histories():
     histories = ViewHistory.query.filter_by(
@@ -278,7 +278,7 @@ def view_histories():
 # ⑦ 参加履歴・募集履歴取得
 # =====================================
 
-@natyukatu.route("/participations")
+@dt.route("/participations")
 @login_required
 def participations():
     histories = ParticipationHistory.query.filter_by(
@@ -291,7 +291,7 @@ def participations():
     )
 
 
-@natyukatu.route("/recruitments")
+@dt.route("/recruitments")
 @login_required
 def recruitments():
     histories = RecuruitmentHistory.query.filter_by(
@@ -308,7 +308,7 @@ def recruitments():
 # ⑧ 新規募集登録
 # =====================================
 
-@natyukatu.route("/recruitments/new", methods=["GET", "POST"])
+@dt.route("/recruitments/new", methods=["GET", "POST"])
 @login_required
 def create_recruitment():
     form = RecruitmentForm()
@@ -357,7 +357,7 @@ def create_recruitment():
 # ⑨ 募集情報更新
 # =====================================
 
-@natyukatu.route(
+@dt.route(
     "/recruitments/<active_id>/edit",
     methods=["GET", "POST"]
 )
@@ -426,7 +426,7 @@ def edit_recruitment(active_id):
 # ⑩ 募集削除
 # =====================================
 
-@natyukatu.route(
+@dt.route(
     "/recruitments/<active_id>/delete",
     methods=["POST"]
 )
@@ -449,7 +449,7 @@ def delete_recruitment(active_id):
 # ⑪ 参加申し込み
 # =====================================
 
-@natyukatu.route(
+@dt.route(
     "/activities/<active_id>/apply",
     methods=["GET", "POST"]
 )
@@ -495,7 +495,7 @@ def apply_activity(active_id):
 # ⑫ 申込完了画面
 # =====================================
 
-@natyukatu.route("/apply/complete")
+@dt.route("/apply/complete")
 @login_required
 def apply_complete():
     return render_template("natyukatu/apply_complete.html")
@@ -505,7 +505,7 @@ def apply_complete():
 # ⑬ 申込者一覧取得
 # =====================================
 
-@natyukatu.route(
+@dt.route(
     "/recruitments/<active_id>/applicants"
 )
 @login_required
@@ -530,7 +530,7 @@ def applicants(active_id):
 # ⑭ 申込状態変更（可・否）
 # =====================================
 
-@natyukatu.route(
+@dt.route(
     "/applicants/<applicant_id>/decision",
     methods=["POST"]
 )
@@ -565,7 +565,7 @@ def applicant_decision(applicant_id):
 # ⑮ 申込者を一覧から削除
 # =====================================
 
-@natyukatu.route(
+@dt.route(
     "/applicants/<applicant_id>/delete",
     methods=["POST"]
 )
@@ -595,7 +595,7 @@ def delete_applicant(applicant_id):
 # ⑯ 活動用メッセージ投稿
 # =====================================
 
-@natyukatu.route(
+@dt.route(
     "/messages/<active_id>",
     methods=["GET", "POST"]
 )
@@ -635,7 +635,7 @@ def messages(active_id):
 # ⑰ お問い合わせ
 # =====================================
 
-@natyukatu.route(
+@dt.route(
     "/contact",
     methods=["GET", "POST"]
 )
@@ -670,7 +670,7 @@ def contact():
 # ⑱ サンクスボタン
 # =====================================
 
-@natyukatu.route(
+@dt.route(
     "/thanks/<active_id>/<user_id>",
     methods=["POST"]
 )
@@ -703,7 +703,7 @@ def thanks(active_id, user_id):
 # ⑲ ランキング生成
 # =====================================
 
-@natyukatu.route("/ranking")
+@dt.route("/ranking")
 def ranking():
     results = db.session.query(
         ThanksPoint.user_id,
@@ -724,7 +724,7 @@ def ranking():
 # ⑳ ユーザー情報変更
 # =====================================
 
-@natyukatu.route(
+@dt.route(
     "/mypage/edit",
     methods=["GET", "POST"]
 )
@@ -766,7 +766,7 @@ def edit_profile():
 # ㉑ ユーザー退会
 # =====================================
 
-@natyukatu.route(
+@dt.route(
     "/mypage/withdrawal",
     methods=["GET", "POST"]
 )
@@ -806,7 +806,7 @@ def withdrawal():
 # ㉒ 管理者用削除
 # =====================================
 
-@natyukatu.route(
+@dt.route(
     "/admin/recruitments/<active_id>/delete",
     methods=["POST"]
 )
@@ -823,7 +823,7 @@ def admin_delete_recruitment(active_id):
     return redirect(url_for("natyukatu.admin"))
 
 
-@natyukatu.route("/admin")
+@dt.route("/admin")
 @login_required
 def admin():
     recruitments = Recuruitment.query.all()
