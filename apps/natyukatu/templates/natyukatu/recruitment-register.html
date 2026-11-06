@@ -3,17 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>新規募集登録 | 画面タイトル</title>
-  <style>
-    :root{--navy:#102b55;--blue:#0788f5;--line:#dce6f2;--red:#fa5555}
-    *{box-sizing:border-box}
-    body{margin:0;min-height:100vh;color:var(--navy);font-family:"Yu Gothic UI","Meiryo",system-ui,sans-serif;background:linear-gradient(135deg,#f7faff,#f1f7fc)}
-    .topbar{height:96px;display:flex;align-items:center;padding:0 26px;background:rgba(255,255,255,.97);border-bottom:1px solid #e8eef5;box-shadow:0 3px 14px #1431510d}.brand{display:flex;align-items:center;gap:25px;color:inherit;text-decoration:none}.logo{width:72px;height:54px;flex:none}.brand-title{border-left:2px solid #e3eaf3;padding-left:27px;font-size:27px;font-weight:800;letter-spacing:.02em;white-space:nowrap}.spacer{flex:1}.account{display:flex;align-items:center;gap:13px;padding:0 26px;border-left:1px solid var(--line);font-weight:800;white-space:nowrap}.avatar{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:#e8f1fb}.avatar svg{width:25px;fill:none;stroke:#4c78ad;stroke-width:1.8}.chevron{width:9px;height:9px;border-right:2px solid var(--navy);border-bottom:2px solid var(--navy);transform:rotate(45deg);margin:-5px 0 0 2px}.logout{min-width:145px;padding:12px 22px;border:1.5px solid var(--blue);border-radius:9px;background:#fff;color:var(--blue);font-weight:800;text-align:center;text-decoration:none}
-    .layout{min-height:calc(100vh - 96px);display:grid;grid-template-columns:300px minmax(0,1fr)}.sidebar{padding:32px 12px;background:#ffffff80;border-right:1px solid var(--line)}.user-badge{display:flex;align-items:center;gap:14px;padding:0 18px 22px;font-size:18px;font-weight:800}.user-badge .avatar{width:46px;height:46px}.nav{display:grid;gap:7px}.nav-link{height:61px;display:flex;align-items:center;gap:19px;padding:0 24px;border-radius:8px;color:var(--navy);font-size:19px;font-weight:700;text-decoration:none}.nav-link.active{background:#eaf4ff;color:var(--blue);box-shadow:inset 4px 0 var(--blue)}.nav-link svg{width:25px;height:25px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}.divider{height:1px;background:var(--line);margin:14px 18px}
-    main{min-width:0;padding:20px 26px 28px}.form-card{padding:22px 24px 20px;border:1px solid #dfebf6;border-radius:12px;background:#ffffffdf;box-shadow:0 8px 26px #1d3f6708}.page-title{margin:0 0 22px;font-size:31px;line-height:1.25;font-weight:800}.form-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px 38px}.form-column{display:flex;flex-direction:column;gap:22px;min-width:0}.field{min-width:0}.field-label{display:flex;align-items:center;gap:15px;margin:0 0 8px;font-size:18px;font-weight:800}.required{display:inline-flex;align-items:center;min-height:25px;padding:2px 10px;border-radius:5px;background:#ff6666;color:#fff;font-size:14px;font-weight:800}.control{width:100%;min-height:49px;padding:11px 17px;border:1.5px solid #cad6e5;border-radius:7px;background:#fff;color:var(--navy);font:inherit;font-size:16px;outline:none;box-shadow:inset 0 1px 2px #203c5c08}.control:focus{border-color:var(--blue);box-shadow:0 0 0 3px #0788f51a}.control::placeholder{color:#91a2b8}.textarea{min-height:161px;resize:vertical}.contact{min-height:74px;resize:vertical}.upload-box{min-height:290px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:22px;border:2px dashed #cbd9eb;border-radius:9px;background:#fbfdff;text-align:center;cursor:pointer}.upload-box:hover,.upload-box.dragover{border-color:var(--blue);background:#f4faff}.upload-icon{width:58px;height:58px;margin-bottom:18px;fill:none;stroke:var(--blue);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}.upload-main{font-size:18px;font-weight:800}.upload-sub{margin-top:8px;color:#8295af;font-size:16px}.upload-sub strong{color:var(--blue)}.file-input{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;clip-path:inset(50%)}.file-name{margin-top:12px;color:#526b8d;font-size:14px;font-weight:700}.register-button{width:100%;min-height:63px;margin-top:20px;border:0;border-radius:8px;background:linear-gradient(100deg,#087df0,#078ce9);color:#fff;font:inherit;font-size:20px;font-weight:800;cursor:pointer}.register-button:hover{filter:brightness(1.05)}.message{min-height:22px;margin:9px 0 0;color:#078568;text-align:center;font-weight:700}
-    @media(max-width:1050px){.layout{grid-template-columns:240px minmax(0,1fr)}.sidebar{padding:26px 8px}.nav-link{padding:0 16px;font-size:16px;gap:13px}.form-grid{gap:20px}.form-card{padding:20px}.upload-box{min-height:250px}}
-    @media(max-width:700px){.topbar{height:74px;padding:0 14px}.brand{gap:12px}.logo{width:48px;height:40px}.brand-title{padding-left:12px;font-size:18px}.account{display:none}.logout{min-width:94px;padding:9px 12px}.layout{min-height:calc(100vh - 74px);grid-template-columns:58px minmax(0,1fr)}.sidebar{padding:16px 6px}.user-badge{padding:0 5px 17px;justify-content:center}.user-badge .avatar{width:36px;height:36px}.user-badge span{display:none}.nav-link{height:48px;justify-content:center;padding:0}.nav-link span{display:none}.nav-link svg{width:22px}.divider{margin:13px 5px}main{padding:14px 10px 24px}.form-card{padding:17px 14px;border-radius:9px}.page-title{font-size:25px;margin-bottom:19px}.form-grid{grid-template-columns:1fr;gap:16px}.field-label{font-size:16px;gap:10px}.required{font-size:12px;min-height:22px}.control{min-height:47px;font-size:15px}.textarea{min-height:125px}.contact{min-height:72px}.upload-box{min-height:200px}.upload-main{font-size:16px}.upload-sub{font-size:14px}.register-button{min-height:56px;font-size:18px}}
-  </style>
+  <title>募集履歴 | 画面タイトル</title>
+  <link rel="stylesheet" href="recruitment-history.css">
 </head>
 <body>
   <header class="topbar">
@@ -30,63 +21,59 @@
   </header>
   <div class="layout">
     <aside class="sidebar" aria-label="メインメニュー">
-      <div class="user-badge"><span class="avatar" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c.5-4 3.2-6 8-6s7.5 2 8 6"/></svg></span><span>称号</span></div>
+      <div class="side-caption">称号</div>
       <nav class="nav">
-        <a class="nav-link" href="top.html"><svg viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1Z"/></svg><span>トップ画面</span></a>
+        <a class="nav-link active" href="top.html"><svg viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1Z"/></svg><span>トップ画面</span></a>
         <a class="nav-link" href="#contact"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="1.5"/><path d="m4 7 8 6 8-6"/></svg><span>お問い合わせ</span></a>
         <a class="nav-link" href="#ranking"><svg viewBox="0 0 24 24"><path d="M5 20h14l1-11-5 3-3-7-3 7-5-3Z"/><path d="M7 20v2h10v-2"/></svg><span>ランキング</span></a>
-        <a class="nav-link active" href="recruitment-register.html"><svg viewBox="0 0 24 24"><path d="M6 3h9l5 5v13H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"/><path d="M14 3v6h6M8 13h8M8 17h8"/></svg><span>新規募集登録</span></a>
       </nav>
       <div class="divider"></div>
       <a class="nav-link" href="logout-confirm.html"><svg viewBox="0 0 24 24"><path d="M10 17l5-5-5-5M15 12H3"/><path d="M12 3h7a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-7"/></svg><span>ログアウト</span></a>
     </aside>
     <main>
-      <section class="form-card" aria-labelledby="pageTitle">
-        <h1 class="page-title" id="pageTitle">新規募集登録</h1>
-        <form id="recruitmentForm">
-          <div class="form-grid">
-            <div class="form-column">
-              <div class="field"><label class="field-label" for="recruitmentName">募集名 <span class="required">必須</span></label><input class="control" id="recruitmentName" name="recruitmentName" required placeholder="募集名を入力してください"></div>
-              <div class="field"><label class="field-label" for="description">内容（手順説明など） <span class="required">必須</span></label><textarea class="control textarea" id="description" name="description" required placeholder="内容（手順説明など）を入力してください"></textarea></div>
-              <div class="field">
-                <label class="field-label" for="media">画像or動画 <span class="required">必須</span></label>
-                <label class="upload-box" id="uploadBox" for="media"><svg class="upload-icon" viewBox="0 0 64 64" aria-hidden="true"><path d="M18 45H14a11 11 0 0 1 0-22 17 17 0 0 1 33-3 13 13 0 0 1 3 25h-4M32 54V31m-9 9 9-9 9 9"/></svg><span class="upload-main">ここにファイルをドラッグ＆ドロップ</span><span class="upload-sub">または <strong>クリックしてファイルを選択</strong></span><span class="file-name" id="fileName">画像または動画を選択してください</span></label>
-                <input class="file-input" id="media" name="media" type="file" accept="image/*,video/*" required>
-              </div>
-            </div>
-            <div class="form-column">
-              <div class="field"><label class="field-label" for="eventDate">日時 <span class="required">必須</span></label><input class="control" id="eventDate" name="eventDate" type="datetime-local" required aria-label="日時を選択してください"></div>
-              <div class="field"><label class="field-label" for="location">場所 <span class="required">必須</span></label><input class="control" id="location" name="location" required placeholder="場所を入力してください"></div>
-              <div class="field"><label class="field-label" for="capacity">定員 <span class="required">必須</span></label><input class="control" id="capacity" name="capacity" type="number" min="1" required placeholder="定員を入力してください"></div>
-              <div class="field"><label class="field-label" for="targetAudience">対象者 <span class="required">必須</span></label><input class="control" id="targetAudience" name="targetAudience" required placeholder="対象者を入力してください"></div>
-              <div class="field"><label class="field-label" for="items">持ち物 <span class="required">必須</span></label><input class="control" id="items" name="items" required placeholder="持ち物を入力してください"></div>
-              <div class="field"><label class="field-label" for="contact">連絡事項 <span class="required">必須</span></label><textarea class="control contact" id="contact" name="contact" required placeholder="連絡事項を入力してください"></textarea></div>
-            </div>
-          </div>
-          <button class="register-button" type="submit">登録する</button>
-          <p class="message" id="formMessage" role="status" aria-live="polite"></p>
-        </form>
+      <h1 class="page-title">募集履歴</h1>
+      <section class="history-card" aria-label="募集履歴一覧">
+        <div class="table-wrap">
+          <table>
+            <colgroup><col class="date-col"><col class="name-col"><col class="detail-col"><col class="status-col"><col class="change-col"><col class="actions-col"></colgroup>
+            <thead><tr><th scope="col">開催日時</th><th scope="col">募集名</th><th scope="col">詳細</th><th scope="col">状態</th><th scope="col">状態変更</th><th scope="col">操作</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><span class="skeleton date-skeleton" aria-label="開催日時"></span></td><td><span class="skeleton name-skeleton" aria-label="募集名"></span></td><td><a class="detail-link" href="recruitment-detail.html">詳細を見る　›</a></td><td><span class="skeleton status-skeleton" aria-label="募集状態"></span></td>
+                <td><div class="state-control"><select class="state-select" aria-label="1件目の募集状態"><option value="">状態を選択</option><option>公開中</option><option>非公開</option><option>終了</option></select><button class="small-button update-row" type="button">更新</button></div></td>
+                <td><div class="row-actions"><a class="action-link" href="recruitment-change.html">募集情報変更</a><a class="action-link delete" href="recruitment-delete.html">活動削除</a><a class="action-link" href="application-management.html">申込受付管理</a></div></td>
+              </tr>
+              <tr>
+                <td><span class="skeleton date-skeleton" aria-label="開催日時"></span></td><td><span class="skeleton name-skeleton" aria-label="募集名"></span></td><td><a class="detail-link" href="recruitment-detail.html">詳細を見る　›</a></td><td><span class="skeleton status-skeleton" aria-label="募集状態"></span></td>
+                <td><div class="state-control"><select class="state-select" aria-label="2件目の募集状態"><option value="">状態を選択</option><option>公開中</option><option>非公開</option><option>終了</option></select><button class="small-button update-row" type="button">更新</button></div></td>
+                <td><div class="row-actions"><a class="action-link" href="recruitment-change.html">募集情報変更</a><a class="action-link delete" href="recruitment-delete.html">活動削除</a><a class="action-link" href="application-management.html">申込受付管理</a></div></td>
+              </tr>
+              <tr>
+                <td><span class="skeleton date-skeleton" aria-label="開催日時"></span></td><td><span class="skeleton name-skeleton" aria-label="募集名"></span></td><td><a class="detail-link" href="recruitment-detail.html">詳細を見る　›</a></td><td><span class="skeleton status-skeleton" aria-label="募集状態"></span></td>
+                <td><div class="state-control"><select class="state-select" aria-label="3件目の募集状態"><option value="">状態を選択</option><option>公開中</option><option>非公開</option><option>終了</option></select><button class="small-button update-row" type="button">更新</button></div></td>
+                <td><div class="row-actions"><a class="action-link" href="recruitment-change.html">募集情報変更</a><a class="action-link delete" href="recruitment-delete.html">活動削除</a><a class="action-link" href="application-management.html">申込受付管理</a></div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </section>
+      <p class="result" id="result" role="status" aria-live="polite"></p>
     </main>
   </div>
   <script>
-    const mediaInput = document.getElementById('media');
-    const uploadBox = document.getElementById('uploadBox');
-    mediaInput.addEventListener('change', () => {
-      document.getElementById('fileName').textContent = mediaInput.files.length ? Array.from(mediaInput.files).map(file => file.name).join('、') : '画像または動画を選択してください';
-    });
-    ['dragenter','dragover'].forEach(type => uploadBox.addEventListener(type, event => { event.preventDefault(); uploadBox.classList.add('dragover'); }));
-    ['dragleave','drop'].forEach(type => uploadBox.addEventListener(type, event => { event.preventDefault(); uploadBox.classList.remove('dragover'); }));
-    uploadBox.addEventListener('drop', event => {
-      const files = event.dataTransfer.files;
-      if (files.length) {
-        mediaInput.files = files;
-        mediaInput.dispatchEvent(new Event('change'));
-      }
-    });
-    document.getElementById('recruitmentForm').addEventListener('submit', event => {
-      event.preventDefault();
-      document.getElementById('formMessage').textContent = '登録内容を受け付けました（画面見本）';
+    document.querySelectorAll('.update-row').forEach((button) => {
+      button.addEventListener('click', () => {
+        const select = button.parentElement.querySelector('select');
+        const result = document.getElementById('result');
+        if (!select.value) {
+          result.textContent = '状態を選択してください。';
+          return;
+        }
+        const row = button.closest('tr');
+        row.querySelector('.status-skeleton').className = 'status';
+        row.querySelector('.status').textContent = select.value;
+        result.textContent = '募集状態を更新しました（画面見本）';
+      });
     });
   </script>
 </body>

@@ -143,3 +143,6 @@
       .recruit-card { grid-template-columns:88px minmax(0,1fr); gap:12px; padding:12px; }
       .media-placeholder { min-height:88px; }
     }
+
+.filter-button-apply{min-width:0;height:42px}
+

@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>トップ画面 | 画面タイトル</title>
-  <link rel="stylesheet" href="top.css">
+  <title>新規登録 | 画面タイトル</title>
+  <link rel="stylesheet" href="register.css">
 </head>
 <body>
   <header class="topbar">
@@ -12,12 +12,10 @@
       <svg class="logo" viewBox="0 0 90 64" role="img" aria-label="共通ロゴ">
         <defs>
           <linearGradient id="blue" x1="0" y1="0" x2="1" y2="1">
-            <stop stop-color="#168df2"/>
-            <stop offset="1" stop-color="#0066c9"/>
+            <stop stop-color="#168df2"/><stop offset="1" stop-color="#0066c9"/>
           </linearGradient>
           <linearGradient id="teal" x1="0" y1="0" x2="1" y2="1">
-            <stop stop-color="#08bcae"/>
-            <stop offset="1" stop-color="#008c8b"/>
+            <stop stop-color="#08bcae"/><stop offset="1" stop-color="#008c8b"/>
           </linearGradient>
         </defs>
         <path d="M7 31 31 7q4-4 8 0l20 20-24 24q-4 4-8 0L7 35q-2-2 0-4Z" fill="url(#blue)"/>
@@ -27,290 +25,65 @@
       <div class="brand-title">画面タイトル</div>
     </div>
     <div class="topbar-spacer"></div>
-    <div class="account">
-      <span class="avatar-small" aria-hidden="true">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-          <circle cx="12" cy="7" r="4"/>
-          <path d="M4 21c0-4.2 3.6-7 8-7s8 2.8 8 7"/>
-        </svg>
-      </span>
-      <span class="account-name">ログインユーザー名 <span aria-hidden="true">⌄</span></span>
-    </div>
-    <button class="logout" type="button" onclick="location.href='logout-confirm.html'">ログアウト</button>
+    <button class="header-login" type="button" onclick="location.href='login.html'">ログイン</button>
   </header>
 
-  <div class="layout">
-    <aside class="sidebar" aria-label="サイドバー">
-      <div class="rank-label">称号</div>
-      <a class="nav active" href="#top" aria-current="page">
-        <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
-          <path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-6v-7h-4v7H4a1 1 0 0 1-1-1z"/>
-        </svg>
-        トップ画面
-      </a>
-      <a class="nav" href="#contact">
-        <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
-          <rect x="2.5" y="4" width="19" height="16" rx="2"/>
-          <path d="m3 6 9 7 9-7"/>
-        </svg>
-        お問い合わせ
-      </a>
-      <a class="nav" href="#ranking">
-        <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
-          <path d="M5 20h14l1-11-5 4-3-8-3 8-5-4z"/>
-          <path d="M4 22h16"/>
-        </svg>
-        ランキング
-      </a>
-      <div class="nav-divider"></div>
-      <a class="nav" href="logout-confirm.html">
-        <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
-          <path d="M10 17l5-5-5-5M15 12H3"/>
-          <path d="M12 3h7a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-7"/>
-        </svg>
-        ログアウト
-      </a>
-    </aside>
-
-    <main id="top">
-      <h1>トップ画面</h1>
-
-      <section class="surface search-panel" aria-label="募集検索">
-        <label class="searchbox">
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2">
-            <circle cx="10.8" cy="10.8" r="7.3"/>
-            <path d="m16.2 16.2 5 5"/>
-          </svg>
-          <input id="query" type="search" placeholder="キーワードを入力してください" aria-label="キーワードを入力してください">
-        </label>
-        <div class="filter-wrap">
-          <button class="filter-button" id="filterToggle" type="button" aria-expanded="false">
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
-              <path d="M3 4h18l-7 8v7l-4 2v-9z"/>
-            </svg>
-            絞り込み <span>⌄</span>
-          </button>
-          <div class="filter-menu" id="filterMenu">
-            <label>日時
-              <select id="dateFilter">
-                <option value="">指定しない</option>
-                <option>開催予定</option>
-              </select>
-            </label>
-            <label>場所
-              <select id="placeFilter">
-                <option value="">指定しない</option>
-                <option>場所あり</option>
-              </select>
-            </label>
-            <button class="filter-button" type="button" id="applyFilter" style="min-width:0;height:42px">条件を適用</button>
+  <div class="page">
+    <aside class="empty-rail" aria-hidden="true"></aside>
+    <main class="main-area">
+      <form class="register-card" id="registerForm">
+        <h1>新規登録</h1>
+        <div class="fields">
+          <div class="field">
+            <div class="label-line"><label for="userName">ユーザー名</label><span class="required">必須</span></div>
+            <input id="userName" name="userName" type="text" placeholder="ユーザー名を入力してください" autocomplete="name" required>
+          </div>
+          <div class="field">
+            <div class="label-line"><label for="email">メールアドレス</label><span class="required">必須</span></div>
+            <input id="email" name="email" type="email" placeholder="メールアドレスを入力してください" autocomplete="email" required>
+          </div>
+          <div class="field">
+            <div class="label-line"><label for="password">パスワード</label><span class="required">必須</span></div>
+            <div class="password-wrap">
+              <input id="password" name="password" type="password" placeholder="パスワードを入力してください" autocomplete="new-password" required>
+              <button class="password-toggle" id="passwordToggle" type="button" aria-label="パスワードを表示" aria-pressed="false">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="field">
+            <div class="label-line"><label for="phone">電話番号</label><span class="required">必須</span></div>
+            <input id="phone" name="phone" type="tel" placeholder="電話番号を入力してください" autocomplete="tel" required>
+          </div>
+          <div class="field">
+            <div class="label-line"><label for="age">年齢</label><span class="required">必須</span></div>
+            <input id="age" name="age" type="number" min="0" placeholder="年齢を入力してください" required>
+          </div>
+          <div class="field">
+            <div class="label-line"><label for="nickname">ニックネーム</label><span class="required">必須</span></div>
+            <input id="nickname" name="nickname" type="text" placeholder="ニックネームを入力してください" required>
           </div>
         </div>
-        <button class="search-button" id="searchButton" type="button">
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2">
-            <circle cx="10.8" cy="10.8" r="7.3"/>
-            <path d="m16.2 16.2 5 5"/>
-          </svg>
-          検索
-        </button>
-      </section>
-
-      <section class="quick-grid" aria-label="ユーザー管理パネル">
-        <article class="surface quick-card" id="favorites">
-          <div class="quick-head">
-            <span class="quick-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2">
-                <path d="m12 2 3 6 6.6 1-4.8 4.7 1.1 6.6L12 17l-5.9 3.3 1.1-6.6L2.4 9 9 8z"/>
-              </svg>
-            </span>
-            <h2>お気に入り一覧</h2>
-            <span class="arrow">›</span>
-          </div>
-          <div class="quick-row">
-            <span class="thumb"></span>
-            <span class="quick-copy"><strong>募集タイトル 1</strong><small>募集情報</small></span>
-            <span class="row-arrow">›</span>
-          </div>
-          <div class="quick-row">
-            <span class="thumb"></span>
-            <span class="quick-copy"><strong>募集タイトル 2</strong><small>募集情報</small></span>
-            <span class="row-arrow">›</span>
-          </div>
-          <div class="quick-row">
-            <span class="thumb"></span>
-            <span class="quick-copy"><strong>募集タイトル 3</strong><small>募集情報</small></span>
-            <span class="row-arrow">›</span>
-          </div>
-        </article>
-
-        <article class="surface quick-card" id="search-history">
-          <div class="quick-head">
-            <span class="quick-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2">
-                <circle cx="12" cy="12" r="9"/>
-                <path d="M12 7v5l3 2"/>
-              </svg>
-            </span>
-            <h2>検索履歴</h2>
-            <span class="arrow">›</span>
-          </div>
-          <div class="quick-row">
-            <span class="thumb"></span>
-            <span class="quick-copy"><strong>キーワード 1</strong><small>検索条件</small></span>
-            <span class="row-arrow">›</span>
-          </div>
-          <div class="quick-row">
-            <span class="thumb"></span>
-            <span class="quick-copy"><strong>キーワード 2</strong><small>検索条件</small></span>
-            <span class="row-arrow">›</span>
-          </div>
-          <div class="quick-row">
-            <span class="thumb"></span>
-            <span class="quick-copy"><strong>キーワード 3</strong><small>検索条件</small></span>
-            <span class="row-arrow">›</span>
-          </div>
-        </article>
-
-        <article class="surface quick-card" id="view-history">
-          <div class="quick-head">
-            <span class="quick-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2">
-                <path d="M5 3h11l4 4v14H5z"/>
-                <path d="M15 3v5h5M8 12h8M8 16h8"/>
-              </svg>
-            </span>
-            <h2>閲覧履歴</h2>
-            <span class="arrow">›</span>
-          </div>
-          <div class="quick-row">
-            <span class="thumb"></span>
-            <span class="quick-copy"><strong>募集タイトル 1</strong><small>閲覧した募集</small></span>
-            <span class="row-arrow">›</span>
-          </div>
-          <div class="quick-row">
-            <span class="thumb"></span>
-            <span class="quick-copy"><strong>募集タイトル 2</strong><small>閲覧した募集</small></span>
-            <span class="row-arrow">›</span>
-          </div>
-          <div class="quick-row">
-            <span class="thumb"></span>
-            <span class="quick-copy"><strong>募集タイトル 3</strong><small>閲覧した募集</small></span>
-            <span class="row-arrow">›</span>
-          </div>
-        </article>
-      </section>
-
-      <section class="surface recruitments" aria-label="募集中の募集">
-        <h2>募集パネル</h2>
-        <div class="recruit-grid" id="recruitGrid">
-          <article class="recruit-card" data-search="募集タイトル 1 募集内容 場所 日時">
-            <div class="media-placeholder" aria-label="画像の仮表示">
-              <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3">
-                <circle cx="43" cy="18" r="7"/>
-                <path d="m7 52 17-22 11 13 7-9 15 18z"/>
-              </svg>
-            </div>
-            <div class="recruit-body">
-              <h3>募集タイトル 1</h3>
-              <p class="meta">日時・場所など</p>
-              <p class="meta">募集情報の仮表示</p>
-              <button class="favorite" type="button" aria-pressed="false">
-                <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2">
-                  <path d="m12 2 3 6 6.6 1-4.8 4.7 1.1 6.6L12 17l-5.9 3.3 1.1-6.6L2.4 9 9 8z"/>
-                </svg>
-                お気に入り
-              </button>
-            </div>
-          </article>
-
-          <article class="recruit-card" data-search="募集タイトル 2 募集内容 場所 日時">
-            <div class="media-placeholder" aria-label="画像の仮表示">
-              <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3">
-                <circle cx="43" cy="18" r="7"/>
-                <path d="m7 52 17-22 11 13 7-9 15 18z"/>
-              </svg>
-            </div>
-            <div class="recruit-body">
-              <h3>募集タイトル 2</h3>
-              <p class="meta">日時・場所など</p>
-              <p class="meta">募集情報の仮表示</p>
-              <button class="favorite" type="button" aria-pressed="false">
-                <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2">
-                  <path d="m12 2 3 6 6.6 1-4.8 4.7 1.1 6.6L12 17l-5.9 3.3 1.1-6.6L2.4 9 9 8z"/>
-                </svg>
-                お気に入り
-              </button>
-            </div>
-          </article>
-
-          <article class="recruit-card" data-search="募集タイトル 3 募集内容 場所 日時">
-            <div class="media-placeholder" aria-label="画像の仮表示">
-              <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3">
-                <circle cx="43" cy="18" r="7"/>
-                <path d="m7 52 17-22 11 13 7-9 15 18z"/>
-              </svg>
-            </div>
-            <div class="recruit-body">
-              <h3>募集タイトル 3</h3>
-              <p class="meta">日時・場所など</p>
-              <p class="meta">募集情報の仮表示</p>
-              <button class="favorite" type="button" aria-pressed="false">
-                <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2">
-                  <path d="m12 2 3 6 6.6 1-4.8 4.7 1.1 6.6L12 17l-5.9 3.3 1.1-6.6L2.4 9 9 8z"/>
-                </svg>
-                お気に入り
-              </button>
-            </div>
-          </article>
-        </div>
-        <p class="empty" id="emptyState">該当する募集はありません。</p>
-      </section>
+        <button class="submit" type="submit">登録する</button>
+        <p class="notice" id="notice" role="status">登録処理はまだ接続されていません。</p>
+      </form>
     </main>
   </div>
 
   <script>
-    const query = document.getElementById('query');
-    const cards = [...document.querySelectorAll('.recruit-card')];
-    const emptyState = document.getElementById('emptyState');
+    const passwordInput = document.getElementById('password');
+    const passwordToggle = document.getElementById('passwordToggle');
 
-    function search() {
-      const term = query.value.trim().toLowerCase();
-      let visible = 0;
-
-      cards.forEach(card => {
-        const match = card.dataset.search.toLowerCase().includes(term);
-        card.hidden = !match;
-        if (match) visible++;
-      });
-
-      emptyState.style.display = visible ? 'none' : 'block';
-    }
-
-    document.getElementById('searchButton').addEventListener('click', search);
-    query.addEventListener('keydown', event => {
-      if (event.key === 'Enter') search();
+    passwordToggle.addEventListener('click', () => {
+      const show = passwordInput.type === 'password';
+      passwordInput.type = show ? 'text' : 'password';
+      passwordToggle.setAttribute('aria-pressed', String(show));
+      passwordToggle.setAttribute('aria-label', show ? 'パスワードを隠す' : 'パスワードを表示');
     });
 
-    const toggle = document.getElementById('filterToggle');
-    const menu = document.getElementById('filterMenu');
-
-    toggle.addEventListener('click', () => {
-      const open = menu.classList.toggle('open');
-      toggle.setAttribute('aria-expanded', String(open));
-    });
-
-    document.getElementById('applyFilter').addEventListener('click', () => {
-      search();
-      menu.classList.remove('open');
-      toggle.setAttribute('aria-expanded', 'false');
-    });
-
-    document.querySelectorAll('.favorite').forEach(button => {
-      button.addEventListener('click', () => {
-        const active = button.classList.toggle('is-favorite');
-        button.setAttribute('aria-pressed', String(active));
-        button.lastChild.textContent = active ? 'お気に入り済み' : 'お気に入り';
-      });
+    document.getElementById('registerForm').addEventListener('submit', event => {
+      event.preventDefault();
+      location.href = 'top.html';
     });
   </script>
 </body>
