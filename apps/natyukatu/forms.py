@@ -1,6 +1,6 @@
 from flask_wtf.form import FlaskForm
-
-from wtforms.fields.simple import (
+from flask_wtf.file import FileRequired, FileAllowed
+from wtforms.fields import (
     StringField,
     PasswordField,
     TextAreaField,
@@ -20,7 +20,27 @@ from wtforms.validators import (
     Optional,
     EqualTo,
 )
-from flask_wtf.file import FileAllowed, FileRequired
+
+class SearchForm(FlaskForm):
+    # キーワード検索欄
+    keyword = StringField(
+        validators=[
+            Optional(),
+            Length(max=50)
+        ]
+    )
+    # タグ選択欄
+    tag_id = SelectField(
+
+        choices=[],
+        coerce=int
+    )
+    submit = SubmitField("検索する")
+
+
+#お気に入り
+class LikeForm(FlaskForm):
+    submit = SubmitField("❤")
 
 
 # =====================================
@@ -195,17 +215,7 @@ class ContactForm(FlaskForm):
     submit = SubmitField("送信する")
 
 
-# =====================================
-# ④ お気に入りフォーム
-# =====================================
 
-class FavoriteForm(FlaskForm):
-    active_id = HiddenField(
-        "募集ID",
-        validators=[DataRequired()]
-    )
-
-    submit = SubmitField("❤")
 
 
 # =====================================
@@ -381,48 +391,6 @@ class HistoryUpdateForm(FlaskForm):
     submit = SubmitField("履歴を更新")
 
 
-# =====================================
-# ⑨ 検索・絞り込みフォーム
-# =====================================
-
-class SearchForm(FlaskForm):
-    keyword = StringField(
-        "キーワード",
-        validators=[
-            Optional(),
-            Length(max=30)
-        ]
-    )
-
-    location_prefecture = StringField(
-        "都道府県",
-        validators=[
-            Optional(),
-            Length(max=5)
-        ]
-    )
-
-    location_city = StringField(
-        "市区町村",
-        validators=[
-            Optional(),
-            Length(max=10)
-        ]
-    )
-
-    tag_id = SelectField(
-        "活動タグ",
-        choices=[],
-        validators=[Optional()]
-    )
-
-    start_at = DateTimeLocalField(
-        "活動開始日時",
-        format="%Y-%m-%dT%H:%M",
-        validators=[Optional()]
-    )
-
-    submit = SubmitField("検索する")
 
 
 # =====================================
