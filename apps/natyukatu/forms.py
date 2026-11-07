@@ -31,7 +31,6 @@ class SearchForm(FlaskForm):
     )
     # タグ選択欄
     tag_id = SelectField(
-
         choices=[],
         coerce=int
     )
@@ -40,7 +39,8 @@ class SearchForm(FlaskForm):
 
 #お気に入り
 class LikeForm(FlaskForm):
-    submit = SubmitField("❤")
+    recruitment_id = HiddenField(validators=[DataRequired()])
+    submit = SubmitField("お気に入り登録/解除")
 
 
 # =====================================
