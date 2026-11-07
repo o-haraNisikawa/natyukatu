@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>募集履歴 | 画面タイトル</title>
-  <link rel="stylesheet" href="recruitment-history.css">
+  <title>新規募集登録 | 画面タイトル</title>
+  <link rel="stylesheet" href="recruitment-register.css">
 </head>
 <body>
   <header class="topbar">
@@ -21,59 +21,63 @@
   </header>
   <div class="layout">
     <aside class="sidebar" aria-label="メインメニュー">
-      <div class="side-caption">称号</div>
+      <div class="user-badge"><span class="avatar" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c.5-4 3.2-6 8-6s7.5 2 8 6"/></svg></span><span>称号</span></div>
       <nav class="nav">
-        <a class="nav-link active" href="top.html"><svg viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1Z"/></svg><span>トップ画面</span></a>
+        <a class="nav-link" href="top.html"><svg viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1Z"/></svg><span>トップ画面</span></a>
         <a class="nav-link" href="#contact"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="1.5"/><path d="m4 7 8 6 8-6"/></svg><span>お問い合わせ</span></a>
         <a class="nav-link" href="#ranking"><svg viewBox="0 0 24 24"><path d="M5 20h14l1-11-5 3-3-7-3 7-5-3Z"/><path d="M7 20v2h10v-2"/></svg><span>ランキング</span></a>
+        <a class="nav-link active" href="recruitment-register.html"><svg viewBox="0 0 24 24"><path d="M6 3h9l5 5v13H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"/><path d="M14 3v6h6M8 13h8M8 17h8"/></svg><span>新規募集登録</span></a>
       </nav>
       <div class="divider"></div>
       <a class="nav-link" href="logout-confirm.html"><svg viewBox="0 0 24 24"><path d="M10 17l5-5-5-5M15 12H3"/><path d="M12 3h7a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-7"/></svg><span>ログアウト</span></a>
     </aside>
     <main>
-      <h1 class="page-title">募集履歴</h1>
-      <section class="history-card" aria-label="募集履歴一覧">
-        <div class="table-wrap">
-          <table>
-            <colgroup><col class="date-col"><col class="name-col"><col class="detail-col"><col class="status-col"><col class="change-col"><col class="actions-col"></colgroup>
-            <thead><tr><th scope="col">開催日時</th><th scope="col">募集名</th><th scope="col">詳細</th><th scope="col">状態</th><th scope="col">状態変更</th><th scope="col">操作</th></tr></thead>
-            <tbody>
-              <tr>
-                <td><span class="skeleton date-skeleton" aria-label="開催日時"></span></td><td><span class="skeleton name-skeleton" aria-label="募集名"></span></td><td><a class="detail-link" href="recruitment-detail.html">詳細を見る　›</a></td><td><span class="skeleton status-skeleton" aria-label="募集状態"></span></td>
-                <td><div class="state-control"><select class="state-select" aria-label="1件目の募集状態"><option value="">状態を選択</option><option>公開中</option><option>非公開</option><option>終了</option></select><button class="small-button update-row" type="button">更新</button></div></td>
-                <td><div class="row-actions"><a class="action-link" href="recruitment-change.html">募集情報変更</a><a class="action-link delete" href="recruitment-delete.html">活動削除</a><a class="action-link" href="application-management.html">申込受付管理</a></div></td>
-              </tr>
-              <tr>
-                <td><span class="skeleton date-skeleton" aria-label="開催日時"></span></td><td><span class="skeleton name-skeleton" aria-label="募集名"></span></td><td><a class="detail-link" href="recruitment-detail.html">詳細を見る　›</a></td><td><span class="skeleton status-skeleton" aria-label="募集状態"></span></td>
-                <td><div class="state-control"><select class="state-select" aria-label="2件目の募集状態"><option value="">状態を選択</option><option>公開中</option><option>非公開</option><option>終了</option></select><button class="small-button update-row" type="button">更新</button></div></td>
-                <td><div class="row-actions"><a class="action-link" href="recruitment-change.html">募集情報変更</a><a class="action-link delete" href="recruitment-delete.html">活動削除</a><a class="action-link" href="application-management.html">申込受付管理</a></div></td>
-              </tr>
-              <tr>
-                <td><span class="skeleton date-skeleton" aria-label="開催日時"></span></td><td><span class="skeleton name-skeleton" aria-label="募集名"></span></td><td><a class="detail-link" href="recruitment-detail.html">詳細を見る　›</a></td><td><span class="skeleton status-skeleton" aria-label="募集状態"></span></td>
-                <td><div class="state-control"><select class="state-select" aria-label="3件目の募集状態"><option value="">状態を選択</option><option>公開中</option><option>非公開</option><option>終了</option></select><button class="small-button update-row" type="button">更新</button></div></td>
-                <td><div class="row-actions"><a class="action-link" href="recruitment-change.html">募集情報変更</a><a class="action-link delete" href="recruitment-delete.html">活動削除</a><a class="action-link" href="application-management.html">申込受付管理</a></div></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+      <section class="form-card" aria-labelledby="pageTitle">
+        <h1 class="page-title" id="pageTitle">新規募集登録</h1>
+        <form id="recruitmentForm">
+          <div class="form-grid">
+            <div class="form-column">
+              <div class="field"><label class="field-label" for="recruitmentName">募集名 <span class="required">必須</span></label><input class="control" id="recruitmentName" name="recruitmentName" required placeholder="募集名を入力してください"></div>
+              <div class="field"><label class="field-label" for="description">内容（手順説明など） <span class="required">必須</span></label><textarea class="control textarea" id="description" name="description" required placeholder="内容（手順説明など）を入力してください"></textarea></div>
+              <div class="field">
+                <label class="field-label" for="media">画像or動画 <span class="required">必須</span></label>
+                <label class="upload-box" id="uploadBox" for="media"><svg class="upload-icon" viewBox="0 0 64 64" aria-hidden="true"><path d="M18 45H14a11 11 0 0 1 0-22 17 17 0 0 1 33-3 13 13 0 0 1 3 25h-4M32 54V31m-9 9 9-9 9 9"/></svg><span class="upload-main">ここにファイルをドラッグ＆ドロップ</span><span class="upload-sub">または <strong>クリックしてファイルを選択</strong></span><span class="file-name" id="fileName">画像または動画を選択してください</span></label>
+                <input class="file-input" id="media" name="media" type="file" accept="image/*,video/*" required>
+              </div>
+            </div>
+            <div class="form-column">
+              <div class="field"><label class="field-label" for="eventDate">日時 <span class="required">必須</span></label><input class="control" id="eventDate" name="eventDate" type="datetime-local" required aria-label="日時を選択してください"></div>
+              <div class="field"><label class="field-label" for="location">場所 <span class="required">必須</span></label><input class="control" id="location" name="location" required placeholder="場所を入力してください"></div>
+              <div class="field"><label class="field-label" for="capacity">定員 <span class="required">必須</span></label><input class="control" id="capacity" name="capacity" type="number" min="1" required placeholder="定員を入力してください"></div>
+              <div class="field"><label class="field-label" for="targetAudience">対象者 <span class="required">必須</span></label><input class="control" id="targetAudience" name="targetAudience" required placeholder="対象者を入力してください"></div>
+              <div class="field"><label class="field-label" for="items">持ち物 <span class="required">必須</span></label><input class="control" id="items" name="items" required placeholder="持ち物を入力してください"></div>
+              <div class="field"><label class="field-label" for="contact">連絡事項 <span class="required">必須</span></label><textarea class="control contact" id="contact" name="contact" required placeholder="連絡事項を入力してください"></textarea></div>
+            </div>
+          </div>
+          <button class="register-button" type="submit">登録する</button>
+          <p class="message" id="formMessage" role="status" aria-live="polite"></p>
+        </form>
       </section>
-      <p class="result" id="result" role="status" aria-live="polite"></p>
     </main>
   </div>
   <script>
-    document.querySelectorAll('.update-row').forEach((button) => {
-      button.addEventListener('click', () => {
-        const select = button.parentElement.querySelector('select');
-        const result = document.getElementById('result');
-        if (!select.value) {
-          result.textContent = '状態を選択してください。';
-          return;
-        }
-        const row = button.closest('tr');
-        row.querySelector('.status-skeleton').className = 'status';
-        row.querySelector('.status').textContent = select.value;
-        result.textContent = '募集状態を更新しました（画面見本）';
-      });
+    const mediaInput = document.getElementById('media');
+    const uploadBox = document.getElementById('uploadBox');
+    mediaInput.addEventListener('change', () => {
+      document.getElementById('fileName').textContent = mediaInput.files.length ? Array.from(mediaInput.files).map(file => file.name).join('、') : '画像または動画を選択してください';
+    });
+    ['dragenter','dragover'].forEach(type => uploadBox.addEventListener(type, event => { event.preventDefault(); uploadBox.classList.add('dragover'); }));
+    ['dragleave','drop'].forEach(type => uploadBox.addEventListener(type, event => { event.preventDefault(); uploadBox.classList.remove('dragover'); }));
+    uploadBox.addEventListener('drop', event => {
+      const files = event.dataTransfer.files;
+      if (files.length) {
+        mediaInput.files = files;
+        mediaInput.dispatchEvent(new Event('change'));
+      }
+    });
+    document.getElementById('recruitmentForm').addEventListener('submit', event => {
+      event.preventDefault();
+      document.getElementById('formMessage').textContent = '登録内容を受け付けました（画面見本）';
     });
   </script>
 </body>
