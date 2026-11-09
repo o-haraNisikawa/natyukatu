@@ -19,6 +19,27 @@ class SignUpForm(FlaskForm):
     )
     password = PasswordField("パスワード",
         validators=[DataRequired("パスワードは必須です。")])
+    age = StringField(
+    "年齢",
+    validators=[
+        DataRequired("年齢は必須です。"),
+        Length(1, 30, ""),
+        ],
+    )
+    phone_number = StringField(
+    "電話番号",
+    validators=[
+        DataRequired("電話番号は必須です。"),
+        Length(1, 30, ""),
+        ],
+    )
+    nickname = StringField(
+    "ニックネーム",
+    validators=[
+        DataRequired("ニックネームは必須です。"),
+        Length(1, 30, "30文字以内で入力してください。"),
+            ],
+    )
     submit = SubmitField("新規登録")
 
 class LoginForm(FlaskForm):

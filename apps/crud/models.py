@@ -9,7 +9,7 @@ class User(db.Model, UserMixin):
     """ユーザーテーブル"""
     __tablename__ = "users"
  
-    user_id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(20), nullable=False)
     nickname = db.Column(db.String(20), nullable=False)
     age = db.Column(db.Integer, nullable=False)
@@ -21,8 +21,8 @@ class User(db.Model, UserMixin):
     create_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
     update_at = db.Column(db.DateTime, nullable=False, default=datetime.now, onupdate=datetime.now)
     title_id = db.Column(db.Integer,db.ForeignKey("titles.id"))  # FK
-    tanks_point = db.Column(db.String(20), nullable=False)
-    ranking_id = db.Column(db.String(10))
+    tanks_point = db.Column(db.Integer, nullable=False)
+    ranking_id = db.Column(db.Integer)
     group_name = db.Column(db.String(20), nullable=False)
     representative_name = db.Column(db.String(10), nullable=False)
     contact_email = db.Column(db.String(11), nullable=False)

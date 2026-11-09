@@ -29,14 +29,15 @@ class Recruitment(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
  
     user = db.relationship("User", back_populates="recruitments")
-    favorites = db.relationship("Like", back_populates="recruitment")
+    likes = db.relationship("Like", back_populates="recruitment")
     participants = db.relationship("Participants", back_populates="recruitment")
     view_histories = db.relationship("ViewHistory", back_populates="recruitment")
     tag = db.relationship("RecruitmentTag", back_populates="recruitments")
     search_tags = db.relationship("SearchTag", back_populates="recruitment")
     entries = db.relationship("Entry", back_populates="recruitment")
-    thanks_points = db.relationship("ThanksPoint", back_populates="recruitment")
- 
+    search_histories = db.relationship("SearchHistory", back_populates="recruitment")
+    participation_histories = db.relationship("ParticipationHistory", back_populates="recruitment")
+    recruitment_histories = db.relationship("RecruitmentHistory", back_populates="recruitment")
  
 class Like(db.Model):
     """お気に入りテーブル"""
@@ -176,7 +177,6 @@ class ActiveMessage(db.Model):
     message = db.Column(db.String(50))
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
     post_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
-    update_at = db.Column(db.DateTime, nullable=False, default=datetime.now, onupdate=datetime.now)
  
  
 class ThanksPoint(db.Model):
@@ -189,9 +189,7 @@ class ThanksPoint(db.Model):
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
  
     user = db.relationship("User", back_populates="thanks_points")
-    recruitment = db.relationship("Recruitment", back_populates="thanks_points")
- 
-#ランキングテーブル(いらんかも)
+    
 #class Ranking(db.Model):
 #    __tablename__ = "rankings"
  
@@ -207,4 +205,4 @@ class ContactHistory(db.Model):
     subject = db.Column(db.String(30), nullable=False)
     body = db.Column(db.Text, nullable=False)
  
-    user = db.relationship("User", back_populates="contact_histories")
+   

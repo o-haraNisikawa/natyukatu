@@ -23,6 +23,9 @@ def signup():
             username=form.username.data,
             email=form.email.data,
             password=form.password.data,
+            age=form.age.data,
+            phone_number=form.phone_number.data,
+            nickname=form.nickname.data,
         )
 
     # メールアドレス重複チェックをする
