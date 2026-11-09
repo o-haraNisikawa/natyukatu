@@ -31,6 +31,24 @@
         {% for error in form.password.errors %}
         <span style="color: red;">{{ error }}</span>
         {% endfor %}
+        <p>
+            {{ form.age.label }} {{ form.age(placeholder="年齢") }}
+        </p>
+        {% for error in form.age.errors %}
+        <span style="color: red;">{{ error }}</span>
+        {% endfor %}
+        <p>
+            {{ form.phone_number.label }} {{ form.phone_number(placeholder="電話番号") }}
+        </p>
+        {% for error in form.phone_number.errors %}
+        <span style="color: red;">{{ error }}</span>
+        {% endfor %}
+        <p>
+            {{ form.nickname.label }} {{ form.nickname(placeholder="ニックネーム") }}
+        </p>
+        {% for error in form.nickname.errors %}
+        <span style="color: red;">{{ error }}</span>
+        {% endfor %}
         <p>{{ form.submit() }}</p>
     </form>
 </body>

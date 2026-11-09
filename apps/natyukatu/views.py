@@ -1,13 +1,10 @@
 from datetime import datetime
-from uuid import uuid4
 import os
 import numpy as np
 from pathlib import Path
 from apps.app import db
 from apps.crud.models import User
-from apps.natyukatu.models import JON
 from flask import Blueprint,render_template,current_app,send_from_directory
-from apps.natyukatu.forms import JON
 import pandas as pd
 import joblib
 from sqlalchemy import desc
@@ -26,26 +23,24 @@ from flask import(
 )
  
 from apps.natyukatu.models import (
-    Recuruitment,
+    Recruitment,
     Like,
     Participants,
     ViewHistory,
-    RecuruitmentTag,
+    RecruitmentTag,
     Entry,
-    ActiveMessagae,
+    ActiveMessage,
     ThanksPoint,
-    Ranking,
     ContactHistory,
     ParticipationHistory,
-    RecuruitmentHistory,
+    RecruitmentHistory,
 )
- 
  
 from apps.natyukatu.forms import (
     ParticipationForm,
     RecruitmentForm,
     ContactForm,
-    FavoriteForm,
+    LikeForm,
     MessageForm,
     RecruitmentDeleteForm,
     RecruitmentUpdateForm,
@@ -54,6 +49,7 @@ from apps.natyukatu.forms import (
     ApplicantDecisionForm,
     WithdrawalForm,
     UserUpdateForm,
+ 
 )
  
 from flask_login import current_user,login_required
@@ -67,31 +63,152 @@ dt = Blueprint("natyukatu",
                 template_folder="templates",
                 static_folder="static",)
  
- 
-# =====================================
-# 共通処理
-# =====================================
- 
-def make_id():
-    """IDを生成する"""
-    return uuid4().hex[:20]
- 
- 
+#ユーザーIDを取得
 def get_user_id():
-    """ログインユーザーのIDを取得する"""
-    return current_user.user_id
+    if current_user.is_authenticated:
+        # Userモデルの属性名に合わせて user_id または id を取得
+        return getattr(current_user, 'user_id', getattr(current_user, 'id', None))
+    return None
  
- 
-def get_recruitment(active_id):
-    """募集情報を1件取得する"""
-    recruitment = Recuruitment.query.filter_by(
-        active_id=active_id
+#募集情報を取得
+def get_recruitment(recruitment_id):
+    recruitment = Recruitment.query.filter_by(
+        id=recruitment_id
     ).first()
  
     if recruitment is None:
         abort(404)
  
     return recruitment
+ 
+#トップ画面表示
+@dt.route("/", methods=["GET", "POST"])
+def top():
+
+#各メソッドを持ってくる
+    #ユーザーID取得
+    user_id = get_user_id()
+
+    #検索フォーム(prefixを使っているので複数のformsを区別してる)
+    search_form = SearchForm(prefix="search")
+    #タグ検索用
+    set_tag_choices(search_form)
+
+    #お気に入りフォーム
+    like_form = LikeForm(prefix="like")
+
+    # POSTリクエスト時の処理
+    if request.method == "POST":
+
+        #お気に入りボタンが押された場合
+        if "like-submit" in request.form and like_form.validate_on_submit():
+            recruitment_id = int(like_form.recruitment_id.data)
+            
+            existing_like = Like.query.filter_by(
+                user_id=user_id, 
+                recruitment_id=recruitment_id
+            ).first()
+            
+            if existing_like:
+                delete_like(user_id, recruitment_id)
+            else:
+                add_like(user_id, recruitment_id)
+                
+            return redirect(url_for("dt.top"))
+
+    #入力されたタグIDを取得
+    selected_tag_id = search_form.tag_id.data
+    #入力された検索ワード取得
+    keyword = search_form.keyword.data if hasattr(search_form, 'keyword') else None
+    # 絞り込み条件を反映した募集一覧を取得
+    recruitments = get_recruitment_list(keyword=keyword,tag_id=selected_tag_id)
+    #お気に入り一覧取得
+    like_list = get_like_list(user_id)
+    #閲覧履歴取得
+    view_history_list = get_view_history_list(user_id)
+
+    return render_template(
+        "natyukatu/top.html",
+        form=search_form,
+        like_form=like_form,
+        recruitments=recruitments,
+        like_list=like_list,
+        view_history_list=view_history_list,
+        )
+ 
+# 募集一覧取得（タグとワードで絞り込み有）
+def get_recruitment_list(keyword=None, tag_id=None):
+    query = db.session.query(Recruitment)
+    
+    # キーワード検索がある場合
+    if keyword:
+        query = query.filter(Recruitment.title.like(f"%{keyword}%"))
+        
+    # タグIDが指定されており、「すべて」（0やNoneなど）ではない場合
+    if tag_id and tag_id != 0:
+        query = query.filter(Recruitment.tag_id == tag_id)
+        
+    recruitments = query.order_by(desc(Recruitment.created_at)).all()
+    return recruitments
+
+#タグ取得
+def set_tag_choices(form):
+    form.tag_id.choices = [(0, "すべて")] + [
+        (tag.tag_id, tag.tag_name) 
+        for tag in RecruitmentTag.query.all()
+    ]
+
+# お気に入り一覧取得
+def get_like_list(user_id):
+    query = (
+        db.session.query(Recruitment)
+        .join(Like, Recruitment.id == Like.recruitment_id)  # Likeテーブルと結合
+        .filter(Like.user_id == user_id)  # ログイン中のユーザーIDで絞り込み
+        .order_by(desc(Recruitment.created_at))
+    )
+    recruitments = query.all()
+    return recruitments
+ 
+#閲覧履歴一覧取得
+def get_view_history_list(user_id):
+    query = (
+        db.session.query(Recruitment)
+        .join(ViewHistory, Recruitment.id == ViewHistory.recruitment_id)  
+        .filter(ViewHistory.user_id == user_id)  # ログイン中のユーザーIDで絞り込み
+        .order_by(desc(Recruitment.updated_at))
+    )
+    recruitments = query.all()
+    return recruitments
+
+#お気に入り登録
+def add_like(user_id,recruitment_id):
+    recruitment = get_recruitment(recruitment_id)
+ 
+    like = Like.query.filter_by(
+        user_id=user_id,
+        recruitment_id=recruitment_id
+    ).first()
+ 
+    if like is None:
+        like = Like(
+            user_id=user_id,
+            recruitment_id=recruitment_id
+        )
+        db.session.add(like)
+        db.session.commit()
+ 
+#お気に入り解除
+def delete_like(user_id,recruitment_id):
+
+    like = Like.query.filter_by(
+        user_id=user_id,
+        recruitment_id=recruitment_id
+    ).first()
+
+    #データが存在していれば削除してコミット
+    if like is not None:
+        db.session.delete(like)
+        db.session.commit()
  
  
 # =====================================

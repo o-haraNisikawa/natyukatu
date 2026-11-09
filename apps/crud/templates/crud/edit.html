@@ -27,6 +27,27 @@
   {% for error in form.password.errors %}
   <span style="color: red;">{{ error }}</span>
   {% endfor %}
+  <p>
+  {{ form.age.label }} {{ form.age(placeholder="年齢",
+  value=user.age) }}
+  </p>
+  {% for error in form.age.errors %}
+  <span style="color: red;">{{ error }}</span>
+  {% endfor %}
+  <p>
+  {{ form.phone_number.label }} {{ form.phone_number(placeholder="電話番号",
+  value=user.phone_number) }}
+  </p>
+  {% for error in form.phone_number.errors %}
+  <span style="color: red;">{{ error }}</span>
+  {% endfor %}
+  <p>
+  {{ form.nickname.label }} {{ form.nickname(placeholder="ニックネーム",
+  value=user.nickname) }}
+  </p>
+  {% for error in form.nickname.errors %}
+  <span style="color: red;">{{ error }}</span>
+  {% endfor %}
   <p><input type="submit" value="更新" /></p>
 </form>
 

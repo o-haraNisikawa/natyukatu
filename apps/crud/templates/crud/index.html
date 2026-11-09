@@ -10,6 +10,9 @@
     <th>ユーザーID</th>
     <th>ユーザー名</th>
     <th>メールアドレス</th>
+    <th>年齢</th>
+    <th>電話番号</th>
+    <th>ニックネーム</th>
   </tr>
   {% for user in users %}
   <tr>
@@ -20,6 +23,9 @@
     </td>
     <td>{{ user.username }}</td>
     <td>{{ user.email }}</td>
+    <td>{{ user.age }}</td>
+    <td>{{ user.phone_number }}</td>
+    <td>{{ user.nickname }}</td>
   </tr>
   {% endfor %}
 </table>
