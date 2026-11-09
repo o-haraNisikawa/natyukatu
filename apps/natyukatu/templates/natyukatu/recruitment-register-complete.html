@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>新規募集登録 | 画面タイトル</title>
-  <link rel="stylesheet" href="recruitment-register.css">
+  <title>新規募集登録完了 | 画面タイトル</title>
+  
 </head>
 <body>
   <header class="topbar">
@@ -32,53 +32,14 @@
       <a class="nav-link" href="logout-confirm.html"><svg viewBox="0 0 24 24"><path d="M10 17l5-5-5-5M15 12H3"/><path d="M12 3h7a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-7"/></svg><span>ログアウト</span></a>
     </aside>
     <main>
-      <section class="form-card" aria-labelledby="pageTitle">
-        <h1 class="page-title" id="pageTitle">新規募集登録</h1>
-        <form id="recruitmentForm">
-          <div class="form-grid">
-            <div class="form-column">
-              <div class="field"><label class="field-label" for="recruitmentName">募集名 <span class="required">必須</span></label><input class="control" id="recruitmentName" name="recruitmentName" required placeholder="募集名を入力してください"></div>
-              <div class="field"><label class="field-label" for="description">内容（手順説明など） <span class="required">必須</span></label><textarea class="control textarea" id="description" name="description" required placeholder="内容（手順説明など）を入力してください"></textarea></div>
-              <div class="field">
-                <label class="field-label" for="media">画像or動画 <span class="required">必須</span></label>
-                <label class="upload-box" id="uploadBox" for="media"><svg class="upload-icon" viewBox="0 0 64 64" aria-hidden="true"><path d="M18 45H14a11 11 0 0 1 0-22 17 17 0 0 1 33-3 13 13 0 0 1 3 25h-4M32 54V31m-9 9 9-9 9 9"/></svg><span class="upload-main">ここにファイルをドラッグ＆ドロップ</span><span class="upload-sub">または <strong>クリックしてファイルを選択</strong></span><span class="file-name" id="fileName">画像または動画を選択してください</span></label>
-                <input class="file-input" id="media" name="media" type="file" accept="image/*,video/*" required>
-              </div>
-            </div>
-            <div class="form-column">
-              <div class="field"><label class="field-label" for="eventDate">日時 <span class="required">必須</span></label><input class="control" id="eventDate" name="eventDate" type="datetime-local" required aria-label="日時を選択してください"></div>
-              <div class="field"><label class="field-label" for="location">場所 <span class="required">必須</span></label><input class="control" id="location" name="location" required placeholder="場所を入力してください"></div>
-              <div class="field"><label class="field-label" for="capacity">定員 <span class="required">必須</span></label><input class="control" id="capacity" name="capacity" type="number" min="1" required placeholder="定員を入力してください"></div>
-              <div class="field"><label class="field-label" for="targetAudience">対象者 <span class="required">必須</span></label><input class="control" id="targetAudience" name="targetAudience" required placeholder="対象者を入力してください"></div>
-              <div class="field"><label class="field-label" for="items">持ち物 <span class="required">必須</span></label><input class="control" id="items" name="items" required placeholder="持ち物を入力してください"></div>
-              <div class="field"><label class="field-label" for="contact">連絡事項 <span class="required">必須</span></label><textarea class="control contact" id="contact" name="contact" required placeholder="連絡事項を入力してください"></textarea></div>
-            </div>
-          </div>
-          <button class="register-button" type="submit">登録する</button>
-          <p class="message" id="formMessage" role="status" aria-live="polite"></p>
-        </form>
+      <section class="complete-card" aria-labelledby="completeTitle">
+        <div class="success-wrap" aria-hidden="true"><div class="success-mark"><svg viewBox="0 0 64 64"><path d="m10 34 15 15L55 17"/></svg></div><svg class="rays" viewBox="0 0 200 180"><path d="m19 48 20 12M8 90h25M19 132l20-12M181 48l-20 12M192 90h-25M181 132l-20-12"/></svg></div>
+        <h1 class="complete-title" id="completeTitle">新規募集登録完了</h1>
+        <p class="message">募集の登録が完了しました。</p>
+        <p class="message">登録した募集を公開しました。</p>
+        <a class="top-link" href="top.html">トップ画面へ</a>
       </section>
     </main>
   </div>
-  <script>
-    const mediaInput = document.getElementById('media');
-    const uploadBox = document.getElementById('uploadBox');
-    mediaInput.addEventListener('change', () => {
-      document.getElementById('fileName').textContent = mediaInput.files.length ? Array.from(mediaInput.files).map(file => file.name).join('、') : '画像または動画を選択してください';
-    });
-    ['dragenter','dragover'].forEach(type => uploadBox.addEventListener(type, event => { event.preventDefault(); uploadBox.classList.add('dragover'); }));
-    ['dragleave','drop'].forEach(type => uploadBox.addEventListener(type, event => { event.preventDefault(); uploadBox.classList.remove('dragover'); }));
-    uploadBox.addEventListener('drop', event => {
-      const files = event.dataTransfer.files;
-      if (files.length) {
-        mediaInput.files = files;
-        mediaInput.dispatchEvent(new Event('change'));
-      }
-    });
-    document.getElementById('recruitmentForm').addEventListener('submit', event => {
-      event.preventDefault();
-      document.getElementById('formMessage').textContent = '登録内容を受け付けました（画面見本）';
-    });
-  </script>
 </body>
 </html>
