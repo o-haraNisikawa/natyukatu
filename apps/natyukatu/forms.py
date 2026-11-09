@@ -1,6 +1,6 @@
 from flask_wtf.form import FlaskForm
-
-from wtforms.fields.simple import (
+from flask_wtf.file import FileRequired, FileAllowed
+from wtforms.fields import (
     StringField,
     PasswordField,
     TextAreaField,
@@ -20,7 +20,30 @@ from wtforms.validators import (
     Optional,
     EqualTo,
 )
-from flask_wtf.file import FileAllowed, FileRequired
+ 
+ 
+class SearchForm(FlaskForm):
+    # キーワード検索欄
+    keyword = StringField(
+        validators=[
+            Optional(),
+            Length(max=50)
+        ]
+    )
+    # タグ選択欄
+    tag_id = SelectField(
+        choices=[],
+        coerce=int
+    )
+    submit = SubmitField("検索する")
+ 
+ 
+#お気に入り
+class LikeForm(FlaskForm):
+    recruitment_id = HiddenField(validators=[DataRequired()])
+    submit = SubmitField("お気に入り登録/解除")
+ 
+ 
 
 
 # =====================================
