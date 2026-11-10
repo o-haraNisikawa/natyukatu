@@ -18,7 +18,7 @@ def index():
 
 @crud.route("/sql")
 @login_required
-def aql():
+def sql():
     db.session.query(User).all()
     return "コンソールログを確認してください"
 

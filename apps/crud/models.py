@@ -10,14 +10,13 @@ class User(db.Model, UserMixin):
     __tablename__ = "users"
  
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(20), nullable=False)
+    username = db.Column(db.String(20), nullable=False)
     nickname = db.Column(db.String(20), nullable=False)
     age = db.Column(db.Integer, nullable=False)
     email = db.Column(db.String(30), nullable=False)
     password = db.Column(db.String(20), nullable=False)
     phone_number = db.Column(db.String(11), nullable=False)
     role = db.Column(db.Integer, nullable=False)
-    status = db.Column(db.Integer, nullable=False)
     create_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
     update_at = db.Column(db.DateTime, nullable=False, default=datetime.now, onupdate=datetime.now)
     title_id = db.Column(db.Integer,db.ForeignKey("titles.id"))  # FK
@@ -27,7 +26,6 @@ class User(db.Model, UserMixin):
     representative_name = db.Column(db.String(10), nullable=False)
     contact_email = db.Column(db.String(11), nullable=False)
     group_type = db.Column(db.String(20), nullable=False)
-
     users_title = db.relationship("Title", backref=db.backref("users",lazy=True))
     recruitments = db.relationship("Recruitment", back_populates="user")
     likes = db.relationship("Like", back_populates="user")

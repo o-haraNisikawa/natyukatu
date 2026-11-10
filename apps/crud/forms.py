@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import PasswordField, StringField, SubmitField
+from wtforms import PasswordField, StringField,IntegerField, SubmitField
 from wtforms.validators import DataRequired, Email, Length
 
 # ユーザー新規作成とユーザー編集フォームクラス
@@ -26,17 +26,17 @@ class UserForm(FlaskForm):
         validators=[DataRequired(message="パスワードは必須です。 ")]
     )
        # ユーザーフォームpassword属性のラベルとバリデータを設定する
-    age = PasswordField(
+    age = IntegerField(
         "年齢",
         validators=[DataRequired(message="必須です。 ")]
     )
    # ユーザーフォームpassword属性のラベルとバリデータを設定する
-    phone_number = PasswordField(
+    phone_number = StringField(
         "電話番号",
         validators=[DataRequired(message="必須です。 ")]
     )   
    # ユーザーフォームpassword属性のラベルとバリデータを設定する
-    nickname = PasswordField(
+    nickname = StringField(
         "ニックネーム",
         validators=[DataRequired(message="必須です。 ")]
     )
