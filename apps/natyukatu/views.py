@@ -210,10 +210,48 @@ def delete_like(user_id,recruitment_id):
         db.session.delete(like)
         db.session.commit()
 
-@dt.route("/new_recruitment")
+#新規募集登録
+@dt.route("/recruitment_register", methods=["GET", "POST"])
 @login_required
-def newRecruitment():
-    return render_template("natyukatu/new_recruitment.html")
+def recruitment_register():
+    form = RecruitmentForm()
+ 
+    form.tag_id.choices = [
+        (tag.tag_id, tag.tag_name)
+        for tag in RecruitmentTag.query.all()
+    ]
+ 
+    if form.validate_on_submit():
+        recruitment = Recruitment(
+            user_id=get_user_id(),
+            title=form.title.data,
+            description=form.description.data,
+            photo=form.photo.data.read(),
+            tag_id=form.tag_id.data,
+            location_prefecture=form.location_prefecture.data,
+            location_city=form.location_city.data,
+            location_detail=form.location_detail.data,
+            start_at=form.start_at.data,
+            end_at=form.end_at.data,
+            application_start_at=form.application_start_at.data,
+            application_end_at=form.application_end_at.data,
+            capacity=form.capacity.data,
+            eligibility=form.eligibility.data,
+            required_items=form.required_items.data,
+            status="",
+        )
+ 
+        db.session.add(recruitment)
+        db.session.commit()
+ 
+        flash("募集を登録しました")
+ 
+        return redirect(url_for("natyukatu.recruitment_resister_complete"))
+ 
+    return render_template(
+        "natyukatu/recruitment_resister.html",
+        form=form
+    )
 
 
 @dt.route("/user/detail")
@@ -313,94 +351,6 @@ def activity_detail(active_id):
  
  
 # =====================================
-# ③ お気に入り登録
-# =====================================
- 
-@dt.route("/favorites/add/<active_id>", methods=["POST"])
-@login_required
-def add_favorite(active_id):
-    recruitment = get_recruitment(active_id)
- 
-    favorite = Like.query.filter_by(
-        user_id=get_user_id(),
-        active_id=active_id
-    ).first()
- 
-    if favorite is None:
-        favorite = Like(
-            favorite_id=make_id(),
-            user_id=get_user_id(),
-            active_id=recruitment.active_id
-        )
- 
-        db.session.add(favorite)
-        db.session.commit()
- 
-    flash("お気に入りに登録しました")
- 
-    return redirect(url_for(
-        "natyukatu.activity_detail",
-        active_id=active_id
-    ))
- 
- 
-# =====================================
-# ④ お気に入り解除
-# =====================================
- 
-@dt.route("/favorites/delete/<favorite_id>", methods=["POST"])
-@login_required
-def delete_favorite(favorite_id):
-    favorite = Like.query.filter_by(
-        favorite_id=favorite_id,
-        user_id=get_user_id()
-    ).first_or_404()
- 
-    db.session.delete(favorite)
-    db.session.commit()
- 
-    flash("お気に入りを解除しました")
- 
-    return redirect(url_for("natyukatu.favorites"))
- 
- 
-# =====================================
-# ⑤ お気に入り一覧取得
-# =====================================
- 
-@dt.route("/favorites")
-@login_required
-def favorites():
-    favorites = Like.query.filter_by(
-        user_id=get_user_id()
-    ).all()
- 
-    return render_template(
-        "natyukatu/favorites.html",
-        favorites=favorites
-    )
- 
- 
-# =====================================
-# ⑥ 閲覧履歴一覧取得
-# =====================================
- 
-@dt.route("/history/views")
-@login_required
-def view_histories():
-    histories = ViewHistory.query.filter_by(
-        user_id=get_user_id()
-    ).order_by(
-        ViewHistory.apdate_at.desc()
-    ).all()
- 
-    return render_template(
-        "natyukatu/view_histories.html",
-        histories=histories
-    )
- 
- 
-# =====================================
 # ⑦ 参加履歴・募集履歴取得
 # =====================================
  
@@ -428,56 +378,7 @@ def recruitments():
         "natyukatu/recruitments.html",
         histories=histories
     )
- 
- 
-# =====================================
-# ⑧ 新規募集登録
-# =====================================
- 
-@dt.route("/recruitments/new", methods=["GET", "POST"])
-@login_required
-def create_recruitment():
-    form = RecruitmentForm()
- 
-    form.tag_id.choices = [
-        (tag.tag_id, tag.tag_name)
-        for tag in RecuruitmentTag.query.all()
-    ]
- 
-    if form.validate_on_submit():
-        recruitment = Recuruitment(
-            active_id=make_id(),
-            user_id=get_user_id(),
-            title=form.title.data,
-            description=form.description.data,
-            photo=form.photo.data.read(),
-            tag_id=form.tag_id.data,
-            location_prefecture=form.location_prefecture.data,
-            location_city=form.location_city.data,
-            location_detail=form.location_detail.data,
-            start_at=form.start_at.data,
-            end_at=form.end_at.data,
-            application_start_at=form.application_start_at.data,
-            application_end_at=form.application_end_at.data,
-            capacity=form.capacity.data,
-            eligibility=form.eligibility.data,
-            required_items=form.required_items.data,
-            status="募集中",
-            review_status="未確認"
-        )
- 
-        db.session.add(recruitment)
-        db.session.commit()
- 
-        flash("募集を登録しました")
- 
-        return redirect(url_for("natyukatu.recruitments"))
- 
-    return render_template(
-        "natyukatu/create_recruitment.html",
-        form=form
-    )
- 
+
  
 # =====================================
 # ⑨ 募集情報更新

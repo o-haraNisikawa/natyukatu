@@ -43,43 +43,13 @@ class LikeForm(FlaskForm):
     recruitment_id = HiddenField(validators=[DataRequired()])
     submit = SubmitField("お気に入り登録/解除")
  
- 
-
-
-# =====================================
-# ① 参加申し込みフォーム
-# =====================================
-
-class ParticipationForm(FlaskForm):
-    participant_count = IntegerField(
-        "参加人数",
-        validators=[
-            DataRequired(),
-            NumberRange(min=1)
-        ]
-    )
-
-    message = TextAreaField(
-        "応募メッセージ",
-        validators=[
-            Optional(),
-            Length(max=500)
-        ]
-    )
-
-    submit = SubmitField("参加申し込み")
-
-
-# =====================================
-# ② 新規募集登録フォーム
-# =====================================
-
+#新規募集登録
 class RecruitmentForm(FlaskForm):
     title = StringField(
         "募集タイトル",
         validators=[
             DataRequired(),
-            Length(max=30)
+            Length(max=100)
         ]
     )
 
@@ -87,7 +57,7 @@ class RecruitmentForm(FlaskForm):
         "募集内容",
         validators=[
             DataRequired(),
-            Length(max=50)
+            Length(max=400)
         ]
     )
 
@@ -109,7 +79,7 @@ class RecruitmentForm(FlaskForm):
         "都道府県",
         validators=[
             DataRequired(),
-            Length(max=5)
+            Length(max=30)
         ]
     )
 
@@ -117,7 +87,7 @@ class RecruitmentForm(FlaskForm):
         "市区町村",
         validators=[
             DataRequired(),
-            Length(max=10)
+            Length(max=30)
         ]
     )
 
@@ -125,7 +95,7 @@ class RecruitmentForm(FlaskForm):
         "詳しい住所",
         validators=[
             DataRequired(),
-            Length(max=30)
+            Length(max=100)
         ]
     )
 
@@ -165,7 +135,7 @@ class RecruitmentForm(FlaskForm):
         "参加条件",
         validators=[
             DataRequired(),
-            Length(max=30)
+            Length(max=100)
         ]
     )
 
@@ -173,11 +143,38 @@ class RecruitmentForm(FlaskForm):
         "持ち物",
         validators=[
             DataRequired(),
-            Length(max=30)
+            Length(max=100)
         ]
     )
 
     submit = SubmitField("募集を登録")
+
+
+
+# =====================================
+# ① 参加申し込みフォーム
+# =====================================
+
+class ParticipationForm(FlaskForm):
+    participant_count = IntegerField(
+        "参加人数",
+        validators=[
+            DataRequired(),
+            NumberRange(min=1)
+        ]
+    )
+
+    message = TextAreaField(
+        "応募メッセージ",
+        validators=[
+            Optional(),
+            Length(max=500)
+        ]
+    )
+
+    submit = SubmitField("参加申し込み")
+
+
 
 
 # =====================================
