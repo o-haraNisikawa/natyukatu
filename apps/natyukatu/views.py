@@ -209,8 +209,17 @@ def delete_like(user_id,recruitment_id):
     if like is not None:
         db.session.delete(like)
         db.session.commit()
- 
- 
+
+@dt.route("/new_recruitment")
+@login_required
+def newRecruitment():
+    return render_template("natyukatu/new_recruitment.html")
+
+
+@dt.route("/user/detail")
+@login_required
+def userDetail():
+    return render_template("natyukatu/user_detail.html")
 # =====================================
 # ① 募集一覧取得・検索・絞り込み
 # =====================================
