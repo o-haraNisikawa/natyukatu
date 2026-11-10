@@ -26,13 +26,18 @@ def signup():
             age=form.age.data,
             phone_number=form.phone_number.data,
             nickname=form.nickname.data,
+            role=form.role.data,
+            tanks_point=0,
+            group_name="",          # 空文字を設定
+            representative_name="", # 空文字を設定
+            contact_email="",       # 空文字を設定
+            group_type="",          # 空文字を設定
         )
 
     # メールアドレス重複チェックをする
         if user.is_duplicate_email():
             flash("指定のメールアドレスは登録済みです")
             return redirect(url_for("auth.signup"))
-
         # ユーザー情報を登録する
         db.session.add(user)
         db.session.commit()
@@ -42,7 +47,7 @@ def signup():
         # リダイレクトする
         next_ = request.args.get("next")
         if next_ is None or not next_.startswith("/"):
-            next_ = url_for("reviewer.index")
+            next_ = url_for("natyukatu.top")
         return redirect(next_)
 
     return render_template("auth/signup.html", form=form)
@@ -57,7 +62,7 @@ def login():
         # ユーザーが存在しパスワードが一致する場合はログインを許可する
         if user is not None and user.verify_password(form.password.data):
             login_user(user)
-            return redirect(url_for("reviewer.index"))
+            return redirect(url_for("natyukatu.top"))
 
         # ログイン失敗メッセージを設定する
         flash("メールアドレスかパスワードが不正です")
