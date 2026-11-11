@@ -227,7 +227,7 @@ def recruitment_register():
             title=form.title.data,
             description=form.description.data,
             photo=form.photo.data.read(),
-            tag_id=form.tag_id.data,
+            tag_id="",
             location_prefecture=form.location_prefecture.data,
             location_city=form.location_city.data,
             location_detail=form.location_detail.data,
@@ -246,10 +246,10 @@ def recruitment_register():
  
         flash("募集を登録しました")
  
-        return redirect(url_for("natyukatu.recruitment_resister_complete"))
+        return redirect(url_for("natyukatu.recruitment_register_complete"))
  
     return render_template(
-        "natyukatu/recruitment_resister.html",
+        "natyukatu/recruitment_register.html",
         form=form
     )
 
