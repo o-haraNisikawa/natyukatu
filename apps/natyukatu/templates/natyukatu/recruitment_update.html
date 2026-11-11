@@ -1,0 +1,55 @@
+{% extends "natyukatu/base.html" %}
+
+{% block title %}募集情報変更 | なちゅ活{% endblock %}
+
+{% block content %}
+<section class="page-heading">
+  <h1>募集情報変更</h1>
+</section>
+
+<form class="form-panel" action="" method="post" enctype="multipart/form-data">
+  {{ form.hidden_tag() }}
+
+  {% for field in [
+    form.title,
+    form.description,
+    form.photo,
+    form.tag_id,
+    form.location_prefecture,
+    form.location_city,
+    form.location_detail,
+    form.start_at,
+    form.end_at,
+    form.application_start_at,
+    form.application_end_at,
+    form.capacity,
+    form.eligibility,
+    form.required_items
+  ] %}
+    <div class="form-row">
+      {{ field.label(class_="form-label") }}
+
+      {% if field.type == "FileField" %}
+        {{ field(class_="form-input-file", accept=".jpg,.jpeg,.png") }}
+        <small>画像を変更する場合だけ選択してください。選択しなければ現在の画像を使います。</small>
+      {% elif field.type == "TextAreaField" %}
+        {{ field(class_="form-input") }}
+      {% else %}
+        {{ field(class_="form-input") }}
+      {% endif %}
+
+      {% if field.errors %}
+        <div class="error-list">
+          {% for error in field.errors %}
+            <span class="error">{{ error }}</span>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+  {% endfor %}
+
+  <div class="form-actions">
+    {{ form.submit(class_="button primary-button") }}
+  </div>
+</form>
+{% endblock %}
