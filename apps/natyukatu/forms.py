@@ -69,11 +69,11 @@ class RecruitmentForm(FlaskForm):
         ]
     )
 
-    tag_id = SelectField(
-        "活動タグ",
-        choices=[],
-        validators=[DataRequired()]
-    )
+    # tag_id = SelectField(
+    #    "活動タグ",
+    #    choices=[],
+    #    validators=[DataRequired()]
+    #)
 
     location_prefecture = StringField(
         "都道府県",
