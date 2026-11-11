@@ -82,7 +82,35 @@
  <ul>
   {% for item in like_list %}
   <li>
-   {{ item.title }}
+     <article class="activity-card">
+   <h3>
+    {{ item.title }}
+   </h3>
+   <p>
+    {{ item.description }}
+   </p>
+   <p>
+    開催日時：{{ item.start_at }}
+   </p>
+   <p>
+    場所：{{ item.location_prefecture }}{{ item.location_city }}{{ item.location_detail }}
+   </p>
+   <p>
+    募集人数：{{ item.capacity }}人
+   </p>
+   <a class="button button-secondary" href="{{ url_for('natyukatu.activity_detail', active_id=item.id) }}">
+    詳細を見る
+   </a>
+   {% if current_user.is_authenticated %}
+   <form action="{{ url_for('natyukatu.top') }}" class="inline-form" method="post">
+    {{ like_form.csrf_token }}
+              {{ like_form.recruitment_id(value=item.id) }}
+    <button class="button" name="like-submit" type="submit" value="1">
+     お気に入り登録・解除
+    </button>
+   </form>
+   {% endif %}
+  </article>
   </li>
   {% endfor %}
  </ul>

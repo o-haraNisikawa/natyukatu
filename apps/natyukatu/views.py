@@ -114,7 +114,7 @@ def top():
             else:
                 add_like(user_id, recruitment_id)
                 
-            return redirect(url_for("dt.top"))
+            return redirect(url_for("natyukatu.top"))
 
     #入力されたタグIDを取得
     selected_tag_id = search_form.tag_id.data
@@ -216,10 +216,10 @@ def delete_like(user_id,recruitment_id):
 def recruitment_register():
     form = RecruitmentForm()
  
-    form.tag_id.choices = [
-        (tag.tag_id, tag.tag_name)
-        for tag in RecruitmentTag.query.all()
-    ]
+   #form.tag_id.choices = [
+    #    (tag.tag_id, tag.tag_name)
+    #    for tag in RecruitmentTag.query.all()
+    #]
  
     if form.validate_on_submit():
         recruitment = Recruitment(
@@ -252,7 +252,12 @@ def recruitment_register():
         "natyukatu/recruitment_register.html",
         form=form
     )
-
+#新規募集登録完了画面
+@dt.route('/recruitment_register_complete')
+@login_required
+def recruitment_register_complete():
+    # 完了画面のテンプレートを表示するなどの処理
+    return render_template('natyukatu/recruitment_register_complete.html')
 
 @dt.route("/user/detail")
 @login_required

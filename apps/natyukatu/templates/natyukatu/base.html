@@ -38,10 +38,6 @@
                <a href="{{ url_for('natyukatu.recruitment_register') }}" class="nav-link">新規募集登録</a>
            </li>
         {% endif %}   
-        <!--称号-->
-          <li class="nav-item">
-            <span class="nav-link">{{ current_user.usertitle }}</span>
-          </li>
         <!--お問い合わせ-->
            <li class="nav-item">
             <a href="{{ url_for('natyukatu.contact') }}" class="nav-link">お問い合わせ</a>
@@ -53,6 +49,10 @@
         <!--ユーザー管理画面-->
           <li class="nav-item">
             <a href="{{ url_for('natyukatu.userDetail') }}" class="nav-link">ユーザー管理画面</a>
+          </li>
+        <!--称号-->
+          <li class="nav-item">
+            <span class="nav-link">{{ current_user.usertitle }}</span>
           </li>
         {% else %}
     <!--ログアウト中-->

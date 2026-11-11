@@ -26,6 +26,7 @@ class User(db.Model, UserMixin):
     representative_name = db.Column(db.String, nullable=False)
     contact_email = db.Column(db.String, nullable=False)
     group_type = db.Column(db.String, nullable=False)
+    
     users_title = db.relationship("Title", backref=db.backref("users",lazy=True))
     recruitments = db.relationship("Recruitment", back_populates="user")
     likes = db.relationship("Like", back_populates="user")

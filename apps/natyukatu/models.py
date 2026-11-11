@@ -97,7 +97,7 @@ class Participants(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     participant_count = db.Column(db.Integer)
     varchar = db.Column(db.Text, nullable=False)
-    status = db.Column(db.String(10), nullable=False)
+    status = db.Column(db.String, nullable=False)
     applicant_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
     update_at = db.Column(db.DateTime, nullable=False, default=datetime.now, onupdate=datetime.now)
     cancel_at = db.Column(db.DateTime, nullable=False)
@@ -124,7 +124,7 @@ class RecruitmentTag(db.Model):
     __tablename__ = "recruitment_tags"
  
     id = db.Column(db.Integer, primary_key=True)
-    tag_name = db.Column(db.String(20), nullable=False)
+    tag_name = db.Column(db.String, nullable=False)
  
     recruitments = db.relationship("Recruitment", back_populates="tag")
     search_tags = db.relationship("SearchTag", back_populates="tag")
@@ -147,7 +147,7 @@ class Title(db.Model):
     __tablename__ = "titles"
  
     id = db.Column(db.Integer, primary_key=True)
-    title_name = db.Column(db.String(20), nullable=False)
+    title_name = db.Column(db.String, nullable=False)
     title_explanation = db.Column(db.String, nullable=False)
  
  
@@ -159,7 +159,7 @@ class Entry(db.Model):
     recruitment_id = db.Column(db.Integer, db.ForeignKey("recruitments.id"), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     message = db.Column(db.Text)
-    status = db.Column(db.String(10), nullable=False)
+    status = db.Column(db.String, nullable=False)
     applicant_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
     update_at = db.Column(db.DateTime, nullable=False, default=datetime.now, onupdate=datetime.now)
     cansel_at = db.Column(db.DateTime, nullable=False)
@@ -173,7 +173,7 @@ class ActiveMessage(db.Model):
     __tablename__ = "active_messages"
  
     id = db.Column(db.Integer, primary_key=True)
-    message = db.Column(db.String(50))
+    message = db.Column(db.String)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
     post_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
  
@@ -199,9 +199,9 @@ class ContactHistory(db.Model):
     __tablename__ = "contact_histories"
  
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(20), nullable=False)
-    email = db.Column(db.String(30), nullable=False)
-    subject = db.Column(db.String(30), nullable=False)
+    name = db.Column(db.String, nullable=False)
+    email = db.Column(db.String, nullable=False)
+    subject = db.Column(db.String, nullable=False)
     body = db.Column(db.Text, nullable=False)
  
    
