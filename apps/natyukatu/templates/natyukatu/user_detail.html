@@ -1,0 +1,71 @@
+{% extends "natyukatu/base.html" %}
+
+{% block content %}
+<section class="page-heading">
+  <h1>ユーザー情報</h1>
+</section>
+
+<section class="profile-card" aria-label="ユーザー情報">
+  <div class="profile-row">
+    <span class="label">ユーザーID</span>
+    <span>{{ current_user.id }}</span>
+  </div>
+
+  <div class="profile-row">
+    <span class="label">ユーザー名</span>
+    <span>{{ current_user.username }}</span>
+  </div>
+
+  <div class="profile-row">
+    <span class="label">ニックネーム</span>
+    <span>{{ current_user.nickname }}</span>
+  </div>
+
+  <div class="profile-row">
+    <span class="label">メールアドレス</span>
+    <span>{{ current_user.email }}</span>
+  </div>
+
+  <div class="profile-row">
+    <span class="label">年齢</span>
+    <span>{{ current_user.age }}歳</span>
+  </div>
+
+  <div class="profile-row">
+    <span class="label">電話番号</span>
+    <span>{{ current_user.phone_number }}</span>
+  </div>
+
+  <div class="profile-row">
+    <a href="{{ url_for('natyukatu.participations') }}">
+      参加履歴を見る
+    </a>
+  </div>
+</section>
+
+<section class="summary" aria-label="ポイントと称号">
+  <div class="summary-card">
+    <span class="summary-label">保有ポイント</span>
+    <span>{{ current_user.tanks_point }}</span>
+  </div>
+
+  <div class="summary-card">
+    <span class="summary-label">称号</span>
+    <span>
+      {{ current_user.users_title.title_name
+         if current_user.users_title
+         else "未設定" }}
+    </span>
+  </div>
+</section>
+
+<div class="actions">
+  <a href="{{ url_for('natyukatu.edit_profile') }}">
+    ユーザー情報変更
+  </a>
+
+  <a href="{{ url_for('natyukatu.withdrawal') }}">
+    退会
+  </a>
+</div>
+{% endblock %}
