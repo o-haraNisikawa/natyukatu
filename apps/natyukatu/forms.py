@@ -11,6 +11,7 @@ from wtforms.fields import (
     HiddenField,
     BooleanField,
     SubmitField,
+    SelectMultipleField,
 )
 from wtforms.validators import (
     DataRequired,
@@ -69,11 +70,12 @@ class RecruitmentForm(FlaskForm):
         ]
     )
 
-    # tag_id = SelectField(
-    #    "活動タグ",
-    #    choices=[],
-    #    validators=[DataRequired()]
-    #)
+    #タグ
+    tag = StringField(
+        "タグ（#をつけてスペース区切りで入力）",
+        validators=[
+            DataRequired()
+        ])
 
     location_prefecture = StringField(
         "都道府県",
@@ -399,50 +401,6 @@ class HistoryUpdateForm(FlaskForm):
     )
 
     submit = SubmitField("履歴を更新")
-
-
-# =====================================
-# ⑨ 検索・絞り込みフォーム
-# =====================================
-
-class SearchForm(FlaskForm):
-    keyword = StringField(
-        "キーワード",
-        validators=[
-            Optional(),
-            Length(max=30)
-        ]
-    )
-
-    location_prefecture = StringField(
-        "都道府県",
-        validators=[
-            Optional(),
-            Length(max=5)
-        ]
-    )
-
-    location_city = StringField(
-        "市区町村",
-        validators=[
-            Optional(),
-            Length(max=10)
-        ]
-    )
-
-    tag_id = SelectField(
-        "活動タグ",
-        choices=[],
-        validators=[Optional()]
-    )
-
-    start_at = DateTimeLocalField(
-        "活動開始日時",
-        format="%Y-%m-%dT%H:%M",
-        validators=[Optional()]
-    )
-
-    submit = SubmitField("検索する")
 
 
 # =====================================
