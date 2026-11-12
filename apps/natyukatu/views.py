@@ -28,6 +28,7 @@ from apps.natyukatu.models import (
     Participants,
     ViewHistory,
     RecruitmentTag,
+    SearchTag,
     Entry,
     ActiveMessage,
     ThanksPoint,
@@ -154,7 +155,7 @@ def get_recruitment_list(keyword=None, tag_id=None):
 #タグ取得
 def set_tag_choices(form):
     form.tag_id.choices = [(0, "すべて")] + [
-        (tag.tag_id, tag.tag_name) 
+        (tag.id, tag.tag_name) 
         for tag in RecruitmentTag.query.all()
     ]
 
@@ -227,7 +228,6 @@ def recruitment_register():
             title=form.title.data,
             description=form.description.data,
             photo=form.photo.data.read(),
-            tag_id="",
             location_prefecture=form.location_prefecture.data,
             location_city=form.location_city.data,
             location_detail=form.location_detail.data,
@@ -243,7 +243,30 @@ def recruitment_register():
  
         db.session.add(recruitment)
         db.session.commit()
- 
+
+        if form.tag.data:
+            # スペース区切りで分割
+            tags = form.tag.data.strip().split()
+            for tag in tags:
+                #既存のタグがデータベースにあるかチェック
+                tag_obj = RecruitmentTag.query.filter_by(tag_name=tag).first()
+
+                if not tag_obj:
+                    # なければ新規作成
+                    tag_obj = RecruitmentTag(tag_name=tag)
+                    db.session.add(tag_obj)
+                    db.session.flush() 
+
+                # 中間テーブル (SearchTag) に登録して紐付け
+                search_tag = SearchTag(
+                    tag_id=tag_obj.id,
+                    recruitment_id=recruitment.id
+                )
+                db.session.add(search_tag)
+
+        #すべてまとめてコミット
+        db.session.commit()
+
         flash("募集を登録しました")
  
         return redirect(url_for("natyukatu.recruitment_register_complete"))
@@ -252,27 +275,20 @@ def recruitment_register():
         "natyukatu/recruitment_register.html",
         form=form
     )
+
 #新規募集登録完了画面
 @dt.route('/recruitment_register_complete')
 @login_required
 def recruitment_register_complete():
-    # 完了画面のテンプレートを表示するなどの処理
     return render_template('natyukatu/recruitment_register_complete.html')
 
+#ユーザー詳細画面
 @dt.route("/user/detail")
 @login_required
 def userDetail():
     return render_template("natyukatu/user_detail.html")
-# =====================================
-# ① 募集一覧取得・検索・絞り込み
-# =====================================
- 
-@dt.route("/")
-def index():
-    return render_template("natyukatu/top.html")
- 
- 
-@dt.route("/activities", methods=["GET", "POST"])
+
+
 def activities():
     form = SearchForm()
  
@@ -280,10 +296,10 @@ def activities():
         ("", "すべて")
     ] + [
         (tag.tag_id, tag.tag_name)
-        for tag in RecuruitmentTag.query.all()
+        for tag in RecruitmentTag.query.all()
     ]
  
-    query = Recuruitment.query.filter_by(
+    query = Recruitment.query.filter_by(
         status="募集中",
         review_status="確認済み"
     )
@@ -294,8 +310,8 @@ def activities():
         if keyword:
             query = query.filter(
                 db.or_(
-                    Recuruitment.title.contains(keyword),
-                    Recuruitment.description.contains(keyword)
+                    Recruitment.title.contains(keyword),
+                    Recruitment.description.contains(keyword)
                 )
             )
  
@@ -316,11 +332,11 @@ def activities():
  
         if form.start_at.data:
             query = query.filter(
-                Recuruitment.start_at >= form.start_at.data
+                Recruitment.start_at >= form.start_at.data
             )
  
     recruitments = query.order_by(
-        Recuruitment.created_at.desc()
+        Recruitment.created_at.desc()
     ).all()
  
     return render_template(

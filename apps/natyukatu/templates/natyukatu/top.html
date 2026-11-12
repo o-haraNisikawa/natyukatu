@@ -21,12 +21,22 @@
    </label>
    {{ form.keyword(id="keyword", placeholder="活動名を入力") }}
   </div>
-  <div class="form-row">
-   <label for="tag_id">
-    活動タグ
-   </label>
-   {{ form.tag_id(id="tag_id") }}
-  </div>
+<div class="tag-checkbox-list">
+    {% for value, label in form.tag_id.choices %}
+        <label class="tag-checkbox">
+            <input
+                type="checkbox"
+                name="{{ form.tag_id.name }}"
+                value="{{ value }}"
+                {% if value|string in form.tag_id.data|map('string')|list %}
+                    checked
+                {% endif %}
+            >
+            {{ label }}
+        </label>
+    {% endfor %}
+</div>
+コンテキスト メニューあり
   {{ form.submit(class_="button") }}
  </form>
 </section>

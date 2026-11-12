@@ -12,7 +12,6 @@ class Recruitment(db.Model):
     title = db.Column(db.String, nullable=False)
     description = db.Column(db.String, nullable=False)
     photo = db.Column(db.LargeBinary, nullable=False)
-    tag_id = db.Column(db.Integer, db.ForeignKey("recruitment_tags.id"), nullable=False)
     location_prefecture = db.Column(db.String, nullable=False)
     location_city = db.Column(db.String, nullable=False)
     location_detail = db.Column(db.String, nullable=False)
@@ -31,7 +30,6 @@ class Recruitment(db.Model):
     likes = db.relationship("Like", back_populates="recruitment")
     participants = db.relationship("Participants", back_populates="recruitment")
     view_histories = db.relationship("ViewHistory", back_populates="recruitment")
-    tag = db.relationship("RecruitmentTag", back_populates="recruitments")
     search_tags = db.relationship("SearchTag", back_populates="recruitment")
     entries = db.relationship("Entry", back_populates="recruitment")
     search_histories = db.relationship("SearchHistory", back_populates="recruitment")
@@ -126,7 +124,6 @@ class RecruitmentTag(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     tag_name = db.Column(db.String, nullable=False)
  
-    recruitments = db.relationship("Recruitment", back_populates="tag")
     search_tags = db.relationship("SearchTag", back_populates="tag")
  
  
