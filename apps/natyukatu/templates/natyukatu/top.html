@@ -1,151 +1,109 @@
 {% extends "natyukatu/base.html" %}
 {% block title %}トップページ | なちゅ活{% endblock %}
+
 {% block content %}
-<section class="page-heading">
- <h1>
-  ボランティア・体験活動を探そう
- </h1>
- <p>
-  地域の活動に参加して、新しい体験を見つけましょう。
- </p>
-</section>
-<section class="search-section">
- <h2>
-  活動を検索
- </h2>
- <form action="{{ url_for('natyukatu.top') }}" method="post">
-  {{ form.hidden_tag() }}
-  <div class="form-row">
-   <label for="keyword">
-    キーワード
-   </label>
-   {{ form.keyword(id="keyword", placeholder="活動名を入力") }}
-  </div>
-<div class="tag-checkbox-list">
-    {% for value, label in form.tag_id.choices %}
-        <label class="tag-checkbox">
-            <input
-                type="checkbox"
-                name="{{ form.tag_id.name }}"
-                value="{{ value }}"
-                {% if value|string in form.tag_id.data|map('string')|list %}
-                    checked
-                {% endif %}
-            >
-            {{ label }}
-        </label>
+<h1>ボランティア・体験活動を探そう</h1>
+<p>地域の活動に参加して、新しい体験を見つけましょう。</p>
+
+<h2>活動を検索</h2>
+
+<form action="{{ url_for('natyukatu.top') }}" method="post">
+    {{ form.hidden_tag() }}
+
+    <p>
+        <label for="keyword">キーワード</label>
+        {{ form.keyword(id="keyword", placeholder="活動名・内容を入力") }}
+    </p>
+
+    <details>
+        <summary>活動タグを選択する</summary>
+
+        <p>タグを選択してください（複数選択可）</p>
+
+        {% for group in tag_groups %}
+            <fieldset>
+                <legend>{{ group.name }}</legend>
+
+                {% for tag in group.tags %}
+                    <label>
+                        <input
+                            type="checkbox"
+                            name="{{ form.tag_id.name }}"
+                            value="{{ tag.id }}"
+                            {% if tag.id in (form.tag_id.data or []) %}checked{% endif %}
+                        >
+                        {{ tag.tag_name }}
+                    </label>
+                {% else %}
+                    <p>選択できるタグはありません。</p>
+                {% endfor %}
+            </fieldset>
+        {% endfor %}
+    </details>
+
+    <button type="submit" name="search-submit" value="1">検索する</button>
+</form>
+
+<h2>募集一覧</h2>
+{% if recruitments %}
+    {% for item in recruitments %}
+        <article>
+            <h3>{{ item.title }}</h3>
+            <p>{{ item.description }}</p>
+            <p>開催日時：{{ item.start_at }}</p>
+            <p>場所：{{ item.location_prefecture }}{{ item.location_city }}{{ item.location_detail }}</p>
+            <p>募集人数：{{ item.capacity }}人</p>
+            <a href="{{ url_for('natyukatu.activity_detail', active_id=item.id) }}">詳細を見る</a>
+
+            {% if current_user.is_authenticated %}
+                <form action="{{ url_for('natyukatu.top') }}" method="post">
+                    {{ like_form.csrf_token }}
+                    {{ like_form.recruitment_id(value=item.id) }}
+                    <button name="like-submit" type="submit" value="1">お気に入り登録・解除</button>
+                </form>
+            {% endif %}
+        </article>
     {% endfor %}
-</div>
-コンテキスト メニューあり
-  {{ form.submit(class_="button") }}
- </form>
-</section>
-<section class="content-section">
- <h2>
-  募集一覧
- </h2>
- {% if recruitments %}
- <div class="card-list">
-  {% for item in recruitments %}
-  <article class="activity-card">
-   <h3>
-    {{ item.title }}
-   </h3>
-   <p>
-    {{ item.description }}
-   </p>
-   <p>
-    開催日時：{{ item.start_at }}
-   </p>
-   <p>
-    場所：{{ item.location_prefecture }}{{ item.location_city }}{{ item.location_detail }}
-   </p>
-   <p>
-    募集人数：{{ item.capacity }}人
-   </p>
-   <a class="button button-secondary" href="{{ url_for('natyukatu.activity_detail', active_id=item.id) }}">
-    詳細を見る
-   </a>
-   {% if current_user.is_authenticated %}
-   <form action="{{ url_for('natyukatu.top') }}" class="inline-form" method="post">
-    {{ like_form.csrf_token }}
-              {{ like_form.recruitment_id(value=item.id) }}
-    <button class="button" name="like-submit" type="submit" value="1">
-     お気に入り登録・解除
-    </button>
-   </form>
-   {% endif %}
-  </article>
-  {% endfor %}
- </div>
- {% else %}
- <p>
-  現在掲載されている募集はありません。
- </p>
- {% endif %}
-</section>
-<section class="content-section">
- <h2>
-  お気に入り一覧
- </h2>
- {% if like_list %}
- <ul>
-  {% for item in like_list %}
-  <li>
-     <article class="activity-card">
-   <h3>
-    {{ item.title }}
-   </h3>
-   <p>
-    {{ item.description }}
-   </p>
-   <p>
-    開催日時：{{ item.start_at }}
-   </p>
-   <p>
-    場所：{{ item.location_prefecture }}{{ item.location_city }}{{ item.location_detail }}
-   </p>
-   <p>
-    募集人数：{{ item.capacity }}人
-   </p>
-   <a class="button button-secondary" href="{{ url_for('natyukatu.activity_detail', active_id=item.id) }}">
-    詳細を見る
-   </a>
-   {% if current_user.is_authenticated %}
-   <form action="{{ url_for('natyukatu.top') }}" class="inline-form" method="post">
-    {{ like_form.csrf_token }}
-              {{ like_form.recruitment_id(value=item.id) }}
-    <button class="button" name="like-submit" type="submit" value="1">
-     お気に入り登録・解除
-    </button>
-   </form>
-   {% endif %}
-  </article>
-  </li>
-  {% endfor %}
- </ul>
- {% else %}
- <p>
-  お気に入りはありません。
- </p>
- {% endif %}
-</section>
-<section class="content-section">
- <h2>
-  閲覧履歴
- </h2>
- {% if view_history_list %}
- <ul>
-  {% for item in view_history_list %}
-  <li>
-   {{ item.title }}
-  </li>
-  {% endfor %}
- </ul>
- {% else %}
- <p>
-  閲覧履歴はありません。
- </p>
- {% endif %}
-</section>
+{% else %}
+    <p>現在掲載されている募集はありません。</p>
+{% endif %}
+
+<h2>お気に入り一覧</h2>
+{% if like_list %}
+    <ul>
+        {% for item in like_list %}
+            <li>
+                <article>
+                    <h3>{{ item.title }}</h3>
+                    <p>{{ item.description }}</p>
+                    <p>開催日時：{{ item.start_at }}</p>
+                    <p>場所：{{ item.location_prefecture }}{{ item.location_city }}{{ item.location_detail }}</p>
+                    <p>募集人数：{{ item.capacity }}人</p>
+                    <a href="{{ url_for('natyukatu.activity_detail', active_id=item.id) }}">詳細を見る</a>
+
+                    {% if current_user.is_authenticated %}
+                        <form action="{{ url_for('natyukatu.top') }}" method="post">
+                            {{ like_form.csrf_token }}
+                            {{ like_form.recruitment_id(value=item.id) }}
+                            <button name="like-submit" type="submit" value="1">お気に入り登録・解除</button>
+                        </form>
+                    {% endif %}
+                </article>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>お気に入りはありません。</p>
+{% endif %}
+
+<h2>閲覧履歴</h2>
+{% if view_history_list %}
+    <ul>
+        {% for item in view_history_list %}
+            <li>{{ item.title }}</li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>閲覧履歴はありません。</p>
+{% endif %}
 {% endblock %}
