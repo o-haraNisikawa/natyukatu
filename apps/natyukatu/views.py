@@ -527,17 +527,14 @@ def recruitment_detail(recruitment_id):
         recruitment=recruitment
     )
  
-# =====================================
-# ⑪ 参加申し込み
-# =====================================
- 
+#参加申し込み
 @dt.route(
-    "/activities/<active_id>/apply",
+    "/participation_application/<recruitment_id>/apply",
     methods=["GET", "POST"]
 )
 @login_required
-def apply_activity(active_id):
-    recruitment = get_recruitment(active_id)
+def participation_application(recruitment_id):
+    recruitment = get_recruitment(recruitment_id)
     form = ParticipationForm()
  
     if form.validate_on_submit():
@@ -545,18 +542,16 @@ def apply_activity(active_id):
         if recruitment.application_end_at < datetime.now():
             flash("募集期間が終了しています")
             return redirect(url_for(
-                "natyukatu.activity_detail",
-                active_id=active_id
+                "natyukatu.recruitment_detail",
+                recruitment_id=recruitment_id
             ))
  
         entry = Entry(
-            applicant_id=make_id(),
-            activity_id=active_id,
+            recruitment_id=recruitment_id,
             user_id=get_user_id(),
-            particpant_count=form.participant_count.data,
             message=form.message.data,
             status="申込中",
-            cansel_at=datetime.now()
+            applocant_at=datetime.now()
         )
  
         db.session.add(entry)
@@ -564,20 +559,16 @@ def apply_activity(active_id):
  
         flash("参加申し込みが完了しました")
  
-        return redirect(url_for("natyukatu.apply_complete"))
+        return redirect(url_for("natyukatu.participation_application_complete"))
  
     return render_template(
-        "natyukatu/apply.html",
+        "natyukatu/participation_application.html",
         form=form,
         recruitment=recruitment
     )
  
- 
-# =====================================
-# ⑫ 申込完了画面
-# =====================================
- 
-@dt.route("/apply/complete")
+#申込完了画面
+@dt.route("/participation_application_complete")
 @login_required
 def apply_complete():
     return render_template("natyukatu/apply_complete.html")
