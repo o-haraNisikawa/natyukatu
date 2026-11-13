@@ -50,7 +50,7 @@ class RecruitmentForm(FlaskForm):
 
     kind = RadioField(
         "募集種類",
-        choices=[("農業", "農業"), ("漁業", "漁業"),("林業","林業")],
+        choices=[("#農業", "農業"), ("#漁業", "漁業"),("#林業","林業")],
         validators=[DataRequired()]
     )
 
@@ -84,11 +84,10 @@ class RecruitmentForm(FlaskForm):
             DataRequired()
         ])
 
-    location_prefecture = StringField(
+    location_prefecture = SelectField(
         "都道府県",
         validators=[
             DataRequired(),
-            Length(max=30)
         ]
     )
 

@@ -91,6 +91,7 @@ def top():
     user_id = get_user_id()
 
     #データベース初期登録
+    #delete()
     #init_data()
 
     #検索フォーム(prefixを使っているので複数のformsを区別してる)
@@ -226,7 +227,14 @@ def delete_like(user_id,recruitment_id):
 @login_required
 def recruitment_register():
     form = RecruitmentForm()
- 
+
+    # データベースからタグを取得し、# を削除して choices にセットする
+    prefecture_tags = RecruitmentTag.query.filter_by(tag_kinds=3).all()
+    form.location_prefecture.choices = [("", "選択してください")] + [
+        (tag.tag_name.replace("#", ""), tag.tag_name.replace("#", "")) 
+        for tag in prefecture_tags
+]
+    
     if form.validate_on_submit():
         recruitment = Recruitment(
             user_id=get_user_id(),
@@ -496,6 +504,61 @@ def recruitment_detail(recruitment_id):
         recruitment=recruitment
     )
  
+# =====================================
+# ⑪ 参加申し込み
+# =====================================
+ 
+@dt.route(
+    "/activities/<active_id>/apply",
+    methods=["GET", "POST"]
+)
+@login_required
+def apply_activity(active_id):
+    recruitment = get_recruitment(active_id)
+    form = ParticipationForm()
+ 
+    if form.validate_on_submit():
+ 
+        if recruitment.application_end_at < datetime.now():
+            flash("募集期間が終了しています")
+            return redirect(url_for(
+                "natyukatu.activity_detail",
+                active_id=active_id
+            ))
+ 
+        entry = Entry(
+            applicant_id=make_id(),
+            activity_id=active_id,
+            user_id=get_user_id(),
+            particpant_count=form.participant_count.data,
+            message=form.message.data,
+            status="申込中",
+            cansel_at=datetime.now()
+        )
+ 
+        db.session.add(entry)
+        db.session.commit()
+ 
+        flash("参加申し込みが完了しました")
+ 
+        return redirect(url_for("natyukatu.apply_complete"))
+ 
+    return render_template(
+        "natyukatu/apply.html",
+        form=form,
+        recruitment=recruitment
+    )
+ 
+ 
+# =====================================
+# ⑫ 申込完了画面
+# =====================================
+ 
+@dt.route("/apply/complete")
+@login_required
+def apply_complete():
+    return render_template("natyukatu/apply_complete.html")
+
  
 # =====================================
 # ⑦ 参加履歴・募集履歴取得
@@ -619,60 +682,7 @@ def delete_recruitment(active_id):
     return redirect(url_for("natyukatu.recruitments"))
  
  
-# =====================================
-# ⑪ 参加申し込み
-# =====================================
- 
-@dt.route(
-    "/activities/<active_id>/apply",
-    methods=["GET", "POST"]
-)
-@login_required
-def apply_activity(active_id):
-    recruitment = get_recruitment(active_id)
-    form = ParticipationForm()
- 
-    if form.validate_on_submit():
- 
-        if recruitment.application_end_at < datetime.now():
-            flash("募集期間が終了しています")
-            return redirect(url_for(
-                "natyukatu.activity_detail",
-                active_id=active_id
-            ))
- 
-        entry = Entry(
-            applicant_id=make_id(),
-            activity_id=active_id,
-            user_id=get_user_id(),
-            particpant_count=form.participant_count.data,
-            message=form.message.data,
-            status="申込中",
-            cansel_at=datetime.now()
-        )
- 
-        db.session.add(entry)
-        db.session.commit()
- 
-        flash("参加申し込みが完了しました")
- 
-        return redirect(url_for("natyukatu.apply_complete"))
- 
-    return render_template(
-        "natyukatu/apply.html",
-        form=form,
-        recruitment=recruitment
-    )
- 
- 
-# =====================================
-# ⑫ 申込完了画面
-# =====================================
- 
-@dt.route("/apply/complete")
-@login_required
-def apply_complete():
-    return render_template("natyukatu/apply_complete.html")
+
  
  
 # =====================================
@@ -954,3 +964,15 @@ def init_data():
     
     db.session.add_all(tags)
     db.session.commit()  # 最後にまとめてコミット
+
+def delete():
+    """RecruitmentTagテーブルの全レコードを削除する"""
+    try:
+        # テーブルの全件削除
+        num_deleted = RecruitmentTag.query.delete()
+        db.session.commit()
+        print(f"RecruitmentTag から {num_deleted} 件のレコードを削除しました。")
+    except Exception as e:
+        db.session.rollback()
+        print(f"削除中にエラーが発生しました: {e}")
+        raise e
