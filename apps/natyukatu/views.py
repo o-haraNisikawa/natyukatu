@@ -90,32 +90,13 @@ def top():
     #ユーザーID取得
     user_id = get_user_id()
 
+    #データベース初期登録
+    #init_data()
+
     #検索フォーム(prefixを使っているので複数のformsを区別してる)
     search_form = SearchForm(prefix="search")
     #タグ検索用
     set_tag_choices(search_form)
-
-    #いったん初期登録
-    #tag_kind_reg = RecruitmentTag(
-    #    tag_name="農業",
-    #    tag_kinds=1,
-    #)
-    #db.session.add(tag_kind_reg)
-    #db.session.commit()
-
-    #tag_kind_reg2 = RecruitmentTag(
-    #    tag_name="漁業",
-    #    tag_kinds=1,
-    #)
-    #db.session.add(tag_kind_reg2)
-    #db.session.commit()
-
-    #tag_kind_reg3 = RecruitmentTag(
-    #    tag_name="林業",
-    #    tag_kinds=1,
-    #)
-    #db.session.add(tag_kind_reg3)
-    #db.session.commit()
 
     #お気に入りフォーム
     like_form = LikeForm(prefix="like")
@@ -316,12 +297,128 @@ def recruitment_register_complete():
     return render_template('natyukatu/recruitment_register_complete.html')
 
 #ユーザー詳細画面
-@dt.route("/user/detail")
+@dt.route("/user_detail")
 @login_required
 def userDetail():
     return render_template("natyukatu/user_detail.html")
 
+#ユーザー情報変更 
+@dt.route(
+    "/mypage/edit",
+    methods=["GET", "POST"]
+)
+@login_required
+def edit_profile():
+    form = UserUpdateForm()
+ 
+    user = User.query.filter_by(
+        id=get_user_id()
+    ).first_or_404()
+ 
+    if form.validate_on_submit():
+        user.username = form.username.data
+        user.nickname = form.nickname.data
+        user.age = form.age.data
+        user.email = form.email.data
+        user.phone_number = form.phone_number.data
+ 
+        db.session.commit()
+ 
+        flash("ユーザー情報を変更しました")
+ 
+        return redirect(url_for("natyukatu.user_detail_update_complete"))
+ 
+    elif request.method == "GET":
+        form.username.data = user.username
+        form.nickname.data = user.nickname
+        form.age.data = user.age
+        form.email.data = user.email
+        form.phone_number.data = user.phone_number
+ 
+    return render_template(
+        "natyukatu/user_detail_update.html",
+        form=form
+    )
 
+#ユーザー情報変更完了画面
+@dt.route('/user_detail_update_complete')
+@login_required
+def user_detail_update_complete():
+    return render_template('natyukatu/user_detail_update_complete.html')
+
+#退会
+@dt.route("/mypage/withdrawal", methods=["GET", "POST"])
+@login_required
+def withdrawal():
+    form = WithdrawalForm()
+ 
+    if form.validate_on_submit():
+        user = User.query.filter_by(
+            id=get_user_id()
+        ).first_or_404()
+ 
+        # パスワードがハッシュ化されている場合のチェック
+        if not user.verify_password(form.password.data):
+            flash("パスワードが違います")
+            return render_template(
+                "natyukatu/withdrawal.html",
+                form=form
+            )
+ 
+        # ユーザーデータを削除してログアウト
+        db.session.delete(user)
+        db.session.commit()
+ 
+        from flask_login import logout_user
+        logout_user()
+ 
+        flash("退会しました")
+ 
+        # 退会完了画面へリダイレクト（※ルート名が withdrawal_complete の場合）
+        return redirect(url_for("natyukatu.withdrawal_complete"))
+ 
+    return render_template(
+        "natyukatu/withdrawal.html",
+        form=form
+    )
+
+#退会完了
+@dt.route("/mypage/withdrawal-complete")
+@login_required
+def withdrawal_complete():
+    return render_template("natyukatu/withdrawal_complete.html")
+
+#お問い合わせ 
+@dt.route(
+    "/contact",
+    methods=["GET", "POST"]
+)
+@login_required
+def contact():
+    form = ContactForm()
+ 
+    if form.validate_on_submit():
+        contact_history = ContactHistory(
+            id=get_user_id(),
+            name=form.name.data,
+            email=form.email.data,
+            subject=form.subject.data,
+            body=form.body.data
+        )
+ 
+        db.session.add(contact_history)
+        db.session.commit()
+ 
+        flash("お問い合わせを送信しました")
+ 
+        return redirect(url_for("natyukatu.top"))
+ 
+    return render_template(
+        "natyukatu/contact.html",
+        form=form
+    )
+
+#?
 def activities():
     form = SearchForm()
  
@@ -378,28 +475,24 @@ def activities():
         recruitments=recruitments
     )
  
- 
-# =====================================
-# ② 募集詳細・閲覧履歴
-# =====================================
- 
-@dt.route("/activities/<active_id>")
-def activity_detail(active_id):
-    recruitment = get_recruitment(active_id)
+
+#募集詳細
+@dt.route("/recruitment_detail/<recruitment_id>")
+def recruitment_detail(recruitment_id):
+    recruitment = get_recruitment(recruitment_id)
  
     if current_user.is_authenticated:
         history = ViewHistory(
-            id=None,
-            active_id=active_id,
+            recruitment_id=recruitment_id,
             user_id=get_user_id(),
-            apdate_at=datetime.now()
+            added_at=datetime.now()
         )
  
         db.session.add(history)
         db.session.commit()
  
     return render_template(
-        "natyukatu/activity_detail.html",
+        "natyukatu/recruitment_detail.html",
         recruitment=recruitment
     )
  
@@ -710,41 +803,8 @@ def messages(active_id):
         form=form,
         recruitment=recruitment
     )
- 
- 
-# =====================================
-# ⑰ お問い合わせ
-# =====================================
- 
-@dt.route(
-    "/contact",
-    methods=["GET", "POST"]
-)
-@login_required
-def contact():
-    form = ContactForm()
- 
-    if form.validate_on_submit():
-        contact_history = ContactHistory(
-            contact_id=make_id(),
-            user_id=get_user_id(),
-            name=form.name.data,
-            email=form.email.data,
-            subject=form.subject.data,
-            body=form.body.data
-        )
- 
-        db.session.add(contact_history)
-        db.session.commit()
- 
-        flash("お問い合わせを送信しました")
- 
-        return redirect(url_for("natyukatu.index"))
- 
-    return render_template(
-        "natyukatu/contact.html",
-        form=form
-    )
+
+
  
  
 # =====================================
@@ -800,89 +860,7 @@ def ranking():
         rankings=results
     )
  
- 
-# =====================================
-# ⑳ ユーザー情報変更
-# =====================================
- 
-@dt.route(
-    "/mypage/edit",
-    methods=["GET", "POST"]
-)
-@login_required
-def edit_profile():
-    form = UserUpdateForm()
- 
-    user = User.query.filter_by(
-        user_id=get_user_id()
-    ).first_or_404()
- 
-    if form.validate_on_submit():
-        user.username = form.username.data
-        user.nickname = form.nickname.data
-        user.age = form.age.data
-        user.email = form.email.data
-        user.emergency_contact = form.emergency_contact.data
- 
-        db.session.commit()
- 
-        flash("ユーザー情報を変更しました")
- 
-        return redirect(url_for("natyukatu.mypage"))
- 
-    elif request.method == "GET":
-        form.username.data = user.username
-        form.nickname.data = user.nickname
-        form.age.data = user.age
-        form.email.data = user.email
-        form.emergency_contact.data = user.emergency_contact
- 
-    return render_template(
-        "natyukatu/edit_profile.html",
-        form=form
-    )
- 
- 
-# =====================================
-# ㉑ ユーザー退会
-# =====================================
- 
-@dt.route(
-    "/mypage/withdrawal",
-    methods=["GET", "POST"]
-)
-@login_required
-def withdrawal():
-    form = WithdrawalForm()
- 
- 
-    if form.validate_on_submit():
-        user = User.query.filter_by(
-            user_id=get_user_id()
-        ).first_or_404()
- 
-        if not user.check_password(form.password.data):
-            flash("パスワードが違います")
-            return render_template(
-                "natyukatu/withdrawal.html",
-                form=form
-            )
- 
-        db.session.delete(user)
-        db.session.commit()
- 
-        from flask_login import logout_user
-        logout_user()
- 
-        flash("退会しました")
- 
-        return redirect(url_for("natyukatu.index"))
- 
-    return render_template(
-        "natyukatu/withdrawal.html",
-        form=form
-    )
- 
+
  
 # =====================================
 # ㉒ 管理者用削除
@@ -919,4 +897,61 @@ def admin():
         users=users
     )
  
- 
+
+def init_data():
+        #いったん初期登録
+    tags = [
+        RecruitmentTag(tag_name="農業", tag_kinds=1),
+        RecruitmentTag(tag_name="漁業", tag_kinds=1),
+        RecruitmentTag(tag_name="林業", tag_kinds=1),
+        RecruitmentTag(tag_name="北海道", tag_kinds=3),
+        RecruitmentTag(tag_name="青森県", tag_kinds=3),
+        RecruitmentTag(tag_name="岩手県", tag_kinds=3),
+        RecruitmentTag(tag_name="宮城県", tag_kinds=3),
+        RecruitmentTag(tag_name="秋田県", tag_kinds=3),
+        RecruitmentTag(tag_name="山形県", tag_kinds=3),
+        RecruitmentTag(tag_name="福島県", tag_kinds=3),
+        RecruitmentTag(tag_name="茨城県", tag_kinds=3),
+        RecruitmentTag(tag_name="栃木県", tag_kinds=3),
+        RecruitmentTag(tag_name="群馬県", tag_kinds=3),
+        RecruitmentTag(tag_name="埼玉県", tag_kinds=3),
+        RecruitmentTag(tag_name="千葉県", tag_kinds=3),
+        RecruitmentTag(tag_name="東京都", tag_kinds=3),
+        RecruitmentTag(tag_name="神奈川県", tag_kinds=3),
+        RecruitmentTag(tag_name="新潟県", tag_kinds=3),
+        RecruitmentTag(tag_name="富山県", tag_kinds=3),
+        RecruitmentTag(tag_name="石川県", tag_kinds=3),
+        RecruitmentTag(tag_name="福井県", tag_kinds=3),
+        RecruitmentTag(tag_name="山梨県", tag_kinds=3),
+        RecruitmentTag(tag_name="長野県", tag_kinds=3),
+        RecruitmentTag(tag_name="岐阜県", tag_kinds=3),
+        RecruitmentTag(tag_name="静岡県", tag_kinds=3),
+        RecruitmentTag(tag_name="愛知県", tag_kinds=3),
+        RecruitmentTag(tag_name="三重県", tag_kinds=3),
+        RecruitmentTag(tag_name="滋賀県", tag_kinds=3),
+        RecruitmentTag(tag_name="京都府", tag_kinds=3),
+        RecruitmentTag(tag_name="大阪府", tag_kinds=3),
+        RecruitmentTag(tag_name="兵庫県", tag_kinds=3),
+        RecruitmentTag(tag_name="奈良県", tag_kinds=3),
+        RecruitmentTag(tag_name="和歌山県", tag_kinds=3),
+        RecruitmentTag(tag_name="鳥取県", tag_kinds=3),
+        RecruitmentTag(tag_name="島根県", tag_kinds=3),
+        RecruitmentTag(tag_name="岡山県", tag_kinds=3),
+        RecruitmentTag(tag_name="広島県", tag_kinds=3),
+        RecruitmentTag(tag_name="山口県", tag_kinds=3),
+        RecruitmentTag(tag_name="徳島県", tag_kinds=3),
+        RecruitmentTag(tag_name="香川県", tag_kinds=3),
+        RecruitmentTag(tag_name="愛媛県", tag_kinds=3),
+        RecruitmentTag(tag_name="高知県", tag_kinds=3),
+        RecruitmentTag(tag_name="福岡県", tag_kinds=3),
+        RecruitmentTag(tag_name="佐賀県", tag_kinds=3),
+        RecruitmentTag(tag_name="長崎県", tag_kinds=3),
+        RecruitmentTag(tag_name="熊本県", tag_kinds=3),
+        RecruitmentTag(tag_name="大分県", tag_kinds=3),
+        RecruitmentTag(tag_name="宮崎県", tag_kinds=3),
+        RecruitmentTag(tag_name="鹿児島県", tag_kinds=3),
+        RecruitmentTag(tag_name="沖縄県", tag_kinds=3),
+    ]
+    
+    db.session.add_all(tags)
+    db.session.commit()  # 最後にまとめてコミット

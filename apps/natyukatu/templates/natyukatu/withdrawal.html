@@ -1,10 +1,10 @@
 {% extends "natyukatu/base.html" %}
-
+ 
 {% block content %}
 <section class="page-heading">
   <h1>退会</h1>
 </section>
-
+ 
 <section class="withdrawal-card" aria-label="退会確認">
   <div class="warning">
     <h2 class="warning-heading">注意事項</h2>
@@ -13,40 +13,44 @@
       退会してよろしいですか？
     </p>
   </div>
-
+ 
   <form
     class="actions"
     action="{{ url_for('natyukatu.withdrawal') }}"
     method="post"
   >
     {{ form.hidden_tag() }}
-
+ 
+    <!-- パスワード入力欄 -->
     <div class="form-row">
       {{ form.password.label }}
       {{ form.password(class_="input") }}
-
+ 
       {% for error in form.password.errors %}
         <p class="error">{{ error }}</p>
       {% endfor %}
     </div>
-
+ 
+    <!-- 同意チェックボックス -->
     <div class="form-row">
       {{ form.confirm() }}
       {{ form.confirm.label }}
-
+ 
       {% for error in form.confirm.errors %}
         <p class="error">{{ error }}</p>
       {% endfor %}
     </div>
-
+ 
+    <!-- キャンセル（トップへ戻る）ボタン -->
     <a
       class="button cancel"
-      href="{{ url_for('natyukatu.index') }}"
+      href="{{ url_for('natyukatu.top') }}"
     >
       キャンセル
     </a>
-
-    {{ form.submit(class_="button withdraw-button") }}
+ 
+    <!-- 送信ボタン -->
+    {{ form.submit(class_="button withdraw_button") }}
   </form>
 </section>
 {% endblock %}

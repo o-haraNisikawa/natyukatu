@@ -158,38 +158,21 @@ class RecruitmentForm(FlaskForm):
 
     submit = SubmitField("募集を登録")
 
-
-
-# =====================================
-# ① 参加申し込みフォーム
-# =====================================
-
-class ParticipationForm(FlaskForm):
-    participant_count = IntegerField(
-        "参加人数",
-        validators=[
-            DataRequired(),
-            NumberRange(min=1)
-        ]
+#ユーザー退会
+class WithdrawalForm(FlaskForm):
+    password = PasswordField(
+        "パスワード",
+        validators=[DataRequired()]
     )
 
-    message = TextAreaField(
-        "応募メッセージ",
-        validators=[
-            Optional(),
-            Length(max=500)
-        ]
+    confirm = BooleanField(
+        "退会することに同意します",
+        validators=[DataRequired(message="同意にチェックが必要です。")]
     )
-
-    submit = SubmitField("参加申し込み")
-
+    submit = SubmitField("退会する")
 
 
-
-# =====================================
-# ③ お問い合わせフォーム
-# =====================================
-
+#お問い合わせ
 class ContactForm(FlaskForm):
     name = StringField(
         "名前",
@@ -225,16 +208,27 @@ class ContactForm(FlaskForm):
 
 
 # =====================================
-# ④ お気に入りフォーム
+# ① 参加申し込みフォーム
 # =====================================
 
-class FavoriteForm(FlaskForm):
-    active_id = HiddenField(
-        "募集ID",
-        validators=[DataRequired()]
+class ParticipationForm(FlaskForm):
+    participant_count = IntegerField(
+        "参加人数",
+        validators=[
+            DataRequired(),
+            NumberRange(min=1)
+        ]
     )
 
-    submit = SubmitField("❤")
+    message = TextAreaField(
+        "応募メッセージ",
+        validators=[
+            Optional(),
+            Length(max=500)
+        ]
+    )
+
+    submit = SubmitField("参加申し込み")
 
 
 # =====================================
@@ -432,22 +426,8 @@ class ApplicantDecisionForm(FlaskForm):
     submit = SubmitField("決定する")
 
 
-# =====================================
-# ⑪ ユーザー退会フォーム
-# =====================================
 
-class WithdrawalForm(FlaskForm):
-    password = PasswordField(
-        "パスワード",
-        validators=[DataRequired()]
-    )
 
-    confirm = BooleanField(
-        "退会することに同意します",
-        validators=[DataRequired()]
-    )
-
-    submit = SubmitField("退会する")
 
 
 # =====================================

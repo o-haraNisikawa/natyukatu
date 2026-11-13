@@ -1,5 +1,5 @@
 {% extends "natyukatu/base.html" %}
-
+ 
 {% block content %}
 <section class="complete-card" aria-labelledby="completeTitle">
   <div class="success-mark" aria-hidden="true">
@@ -7,18 +7,18 @@
       <path d="m10 34 15 15L55 17"></path>
     </svg>
   </div>
-
+ 
   <h1 class="complete-title" id="completeTitle">
     退会完了
   </h1>
-
+ 
   <p class="message">
     退会処理が完了しました。
   </p>
-
+ 
   <a
     class="top-link"
-    href="{{ url_for('natyukatu.index') }}"
+    href="{{ url_for('natyukatu.top') }}"
   >
     トップ画面へ
   </a>
