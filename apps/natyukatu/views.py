@@ -25,7 +25,7 @@ from flask import(
 from apps.natyukatu.models import (
     Recruitment,
     Like,
-    Participants,
+    Participant,
     ViewHistory,
     RecruitmentTag,
     SearchTag,
@@ -95,6 +95,28 @@ def top():
     #タグ検索用
     set_tag_choices(search_form)
 
+    #いったん初期登録
+    #tag_kind_reg = RecruitmentTag(
+    #    tag_name="農業",
+    #    tag_kinds=1,
+    #)
+    #db.session.add(tag_kind_reg)
+    #db.session.commit()
+
+    #tag_kind_reg2 = RecruitmentTag(
+    #    tag_name="漁業",
+    #    tag_kinds=1,
+    #)
+    #db.session.add(tag_kind_reg2)
+    #db.session.commit()
+
+    #tag_kind_reg3 = RecruitmentTag(
+    #    tag_name="林業",
+    #    tag_kinds=1,
+    #)
+    #db.session.add(tag_kind_reg3)
+    #db.session.commit()
+
     #お気に入りフォーム
     like_form = LikeForm(prefix="like")
 
@@ -118,11 +140,11 @@ def top():
             return redirect(url_for("natyukatu.top"))
 
     #入力されたタグIDを取得
-    selected_tag_id = search_form.tag_id.data
+    selected_tag_ids = search_form.tag_id.data or []
     #入力された検索ワード取得
     keyword = search_form.keyword.data if hasattr(search_form, 'keyword') else None
     # 絞り込み条件を反映した募集一覧を取得
-    recruitments = get_recruitment_list(keyword=keyword,tag_id=selected_tag_id)
+    recruitments = get_recruitment_list(keyword=keyword,tag_ids=selected_tag_ids)
     #お気に入り一覧取得
     like_list = get_like_list(user_id)
     #閲覧履歴取得
@@ -138,19 +160,26 @@ def top():
         )
  
 # 募集一覧取得（タグとワードで絞り込み有）
-def get_recruitment_list(keyword=None, tag_id=None):
-    query = db.session.query(Recruitment)
+def get_recruitment_list(keyword=None, tag_ids=None):
+    query = db.session.query(Recruitment).outerjoin(
+        SearchTag,
+        Recruitment.id == SearchTag.recruitment_id
+    )
     
     # キーワード検索がある場合
     if keyword:
         query = query.filter(Recruitment.title.like(f"%{keyword}%"))
         
-    # タグIDが指定されており、「すべて」（0やNoneなど）ではない場合
-    if tag_id and tag_id != 0:
-        query = query.filter(Recruitment.tag_id == tag_id)
-        
-    recruitments = query.order_by(desc(Recruitment.created_at)).all()
-    return recruitments
+    # タグIDをリスト形式に統一
+    if tag_ids is None:
+        tag_ids = []
+    elif isinstance(tag_ids, (int, str)):
+        tag_ids = [int(tag_ids)] if str(tag_ids).isdigit() else []
+    else:
+        tag_ids = [int(tag_id) for tag_id in tag_ids if str(tag_id).isdigit()]
+           
+        recruitments = query.distinct().order_by(desc(Recruitment.created_at)).all()
+        return recruitments
 
 #タグ取得
 def set_tag_choices(form):
@@ -217,11 +246,6 @@ def delete_like(user_id,recruitment_id):
 def recruitment_register():
     form = RecruitmentForm()
  
-   #form.tag_id.choices = [
-    #    (tag.tag_id, tag.tag_name)
-    #    for tag in RecruitmentTag.query.all()
-    #]
- 
     if form.validate_on_submit():
         recruitment = Recruitment(
             user_id=get_user_id(),
@@ -242,27 +266,36 @@ def recruitment_register():
         )
  
         db.session.add(recruitment)
-        db.session.commit()
+        db.session.flush()
 
-        if form.tag.data:
-            # スペース区切りで分割
-            tags = form.tag.data.strip().split()
-            for tag in tags:
-                #既存のタグがデータベースにあるかチェック
-                tag_obj = RecruitmentTag.query.filter_by(tag_name=tag).first()
+        #タグ
+        #種類(農業、漁業、林業)
+        selected_kind = form.kind.data
+        selected_kind_id = RecruitmentTag.query.filter_by(tag_name=selected_kind).first()
+        search_tag = SearchTag(
+                    tag_id=selected_kind_id.id,
+                    recruitment_id=recruitment.id
+                    )
+        db.session.add(search_tag)
 
-                if not tag_obj:
-                    # なければ新規作成
-                    tag_obj = RecruitmentTag(tag_name=tag)
+        # スペース区切りで分割
+        tags = form.tag.data.strip().split()
+        for tag in tags:
+            #既存のタグがデータベースにあるかチェック
+            tag_obj = RecruitmentTag.query.filter_by(tag_name=tag).first()
+
+            if not tag_obj:
+                # なければ新規作成
+                    tag_obj = RecruitmentTag(tag_name=tag,tag_kinds=6)
                     db.session.add(tag_obj)
                     db.session.flush() 
-
-                # 中間テーブル (SearchTag) に登録して紐付け
-                search_tag = SearchTag(
-                    tag_id=tag_obj.id,
-                    recruitment_id=recruitment.id
-                )
-                db.session.add(search_tag)
+                    
+            # 中間テーブル (SearchTag) に登録して紐付け
+            search_tag = SearchTag(
+                tag_id=tag_obj.id,
+                recruitment_id=recruitment.id
+            )
+            db.session.add(search_tag)
 
         #すべてまとめてコミット
         db.session.commit()
@@ -391,7 +424,7 @@ def participations():
 @dt.route("/recruitments")
 @login_required
 def recruitments():
-    histories = RecuruitmentHistory.query.filter_by(
+    histories = RecruitmentHistory.query.filter_by(
         user_id=get_user_id()
     ).all()
  
@@ -420,7 +453,7 @@ def edit_recruitment(active_id):
  
     form.tag_id.choices = [
         (tag.tag_id, tag.tag_name)
-        for tag in RecuruitmentTag.query.all()
+        for tag in RecruitmentTag.query.all()
     ]
  
     if form.validate_on_submit():
@@ -875,7 +908,7 @@ def admin_delete_recruitment(active_id):
 @dt.route("/admin")
 @login_required
 def admin():
-    recruitments = Recuruitment.query.all()
+    recruitments = Recruitment.query.all()
     entries = Entry.query.all()
     users = User.query.all()
  

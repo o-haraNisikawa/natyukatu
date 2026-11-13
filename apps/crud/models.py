@@ -33,10 +33,10 @@ class User(db.Model, UserMixin):
     search_histories = db.relationship("SearchHistory", back_populates="user")
     participation_histories = db.relationship("ParticipationHistory", back_populates="user")
     recruitment_histories = db.relationship("RecruitmentHistory", back_populates="user")
-    participations = db.relationship("Participants", back_populates="user")
     view_histories = db.relationship("ViewHistory", back_populates="user")
     entries = db.relationship("Entry", back_populates="user")
     thanks_points = db.relationship("ThanksPoint", back_populates="user")
+    participants = db.relationship("Participant", back_populates="user")
 
     @property
     def password(self):

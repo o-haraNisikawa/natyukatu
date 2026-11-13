@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: ba882d3f162f
+Revision ID: e8dd5e46e5c3
 Revises: 
-Create Date: 2026-11-12 10:43:25.843554
+Create Date: 2026-11-13 10:32:26.485430
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'ba882d3f162f'
+revision = 'e8dd5e46e5c3'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -36,6 +36,7 @@ def upgrade():
     op.create_table('recruitment_tags',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('tag_name', sa.String(), nullable=False),
+    sa.Column('tag_kinds', sa.Integer(), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('titles',
@@ -103,7 +104,6 @@ def upgrade():
     sa.Column('status', sa.String(), nullable=False),
     sa.Column('applicant_at', sa.DateTime(), nullable=False),
     sa.Column('update_at', sa.DateTime(), nullable=False),
-    sa.Column('cansel_at', sa.DateTime(), nullable=False),
     sa.ForeignKeyConstraint(['recruitment_id'], ['recruitments.id'], ),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
@@ -126,7 +126,6 @@ def upgrade():
     sa.Column('status', sa.String(), nullable=False),
     sa.Column('applicant_at', sa.DateTime(), nullable=False),
     sa.Column('update_at', sa.DateTime(), nullable=False),
-    sa.Column('cancel_at', sa.DateTime(), nullable=False),
     sa.ForeignKeyConstraint(['recruitment_id'], ['recruitments.id'], ),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')

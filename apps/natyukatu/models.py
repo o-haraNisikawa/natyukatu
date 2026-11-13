@@ -28,7 +28,7 @@ class Recruitment(db.Model):
  
     user = db.relationship("User", back_populates="recruitments")
     likes = db.relationship("Like", back_populates="recruitment")
-    participants = db.relationship("Participants", back_populates="recruitment")
+    participants = db.relationship("Participant", back_populates="recruitment")
     view_histories = db.relationship("ViewHistory", back_populates="recruitment")
     search_tags = db.relationship("SearchTag", back_populates="recruitment")
     entries = db.relationship("Entry", back_populates="recruitment")
@@ -86,7 +86,7 @@ class RecruitmentHistory(db.Model):
     user = db.relationship("User", back_populates="recruitment_histories")
     recruitment = db.relationship("Recruitment", back_populates="recruitment_histories")
  
-class Participants(db.Model):
+class Participant(db.Model):
     """参加者テーブル"""
     __tablename__ = "participants"
  
@@ -98,9 +98,8 @@ class Participants(db.Model):
     status = db.Column(db.String, nullable=False)
     applicant_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
     update_at = db.Column(db.DateTime, nullable=False, default=datetime.now, onupdate=datetime.now)
-    cancel_at = db.Column(db.DateTime, nullable=False)
  
-    user = db.relationship("User", back_populates="participations")
+    user = db.relationship("User", back_populates="participants")
     recruitment = db.relationship("Recruitment", back_populates="participants")
  
  
@@ -123,7 +122,8 @@ class RecruitmentTag(db.Model):
  
     id = db.Column(db.Integer, primary_key=True)
     tag_name = db.Column(db.String, nullable=False)
- 
+    tag_kinds = db.Column(db.Integer, nullable=False)
+    # 1:活動種類　2:活動内容　3県　4市町村　5参加条件 6その他 
     search_tags = db.relationship("SearchTag", back_populates="tag")
  
  
@@ -159,7 +159,6 @@ class Entry(db.Model):
     status = db.Column(db.String, nullable=False)
     applicant_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
     update_at = db.Column(db.DateTime, nullable=False, default=datetime.now, onupdate=datetime.now)
-    cansel_at = db.Column(db.DateTime, nullable=False)
  
     user = db.relationship("User", back_populates="entries")
     recruitment = db.relationship("Recruitment", back_populates="entries")

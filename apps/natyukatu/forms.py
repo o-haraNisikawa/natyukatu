@@ -12,6 +12,7 @@ from wtforms.fields import (
     BooleanField,
     SubmitField,
     SelectMultipleField,
+    RadioField,
 )
 from wtforms.validators import (
     DataRequired,
@@ -32,7 +33,7 @@ class SearchForm(FlaskForm):
         ]
     )
     # タグ選択欄
-    tag_id = SelectField(
+    tag_id = SelectMultipleField(
         choices=[],
         coerce=int
     )
@@ -46,6 +47,13 @@ class LikeForm(FlaskForm):
  
 #新規募集登録
 class RecruitmentForm(FlaskForm):
+
+    kind = RadioField(
+        "募集種類",
+        choices=[("農業", "農業"), ("漁業", "漁業"),("林業","林業")],
+        validators=[DataRequired()]
+    )
+
     title = StringField(
         "募集タイトル",
         validators=[
@@ -70,7 +78,6 @@ class RecruitmentForm(FlaskForm):
         ]
     )
 
-    #タグ
     tag = StringField(
         "タグ（#をつけてスペース区切りで入力）",
         validators=[
