@@ -81,57 +81,79 @@ def get_recruitment(recruitment_id):
         abort(404)
  
     return recruitment
- 
-#トップ画面表示
+
+#トップ画面
 @dt.route("/", methods=["GET", "POST"])
 def top():
-
-#各メソッドを持ってくる
-    #ユーザーID取得
+ 
+    # 各メソッドを持ってくる
+    # ユーザーID取得
     user_id = get_user_id()
-
-    #データベース初期登録
-    #delete()
-    #init_data()
-
-    #検索フォーム(prefixを使っているので複数のformsを区別してる)
+ 
+    # データベース初期登録
+    # init_data()
+ 
+    # 検索フォーム
     search_form = SearchForm(prefix="search")
-    #タグ検索用
+ 
+    # タグ検索用
     set_tag_choices(search_form)
-
-    #お気に入りフォーム
+ 
+    # タグを分類ごとに取得
+    tag_groups = {
+        # 1：産業種別
+        1: RecruitmentTag.query.filter_by(tag_kinds=1).all(),
+ 
+        # 2：作業内容・参加条件・その他
+        2: RecruitmentTag.query.filter_by(tag_kinds=2).all(),
+ 
+        # 3：都道府県
+        3: RecruitmentTag.query.filter_by(tag_kinds=3).all(),
+ 
+        # 4：市区町村
+        4: RecruitmentTag.query.filter_by(tag_kinds=4).all(),
+    }
+ 
+    # お気に入りフォーム
     like_form = LikeForm(prefix="like")
-
+ 
     # POSTリクエスト時の処理
     if request.method == "POST":
-
-        #お気に入りボタンが押された場合
+ 
+        # お気に入りボタンが押された場合
         if "like-submit" in request.form and like_form.validate_on_submit():
             recruitment_id = int(like_form.recruitment_id.data)
-            
+ 
             existing_like = Like.query.filter_by(
-                user_id=user_id, 
+                user_id=user_id,
                 recruitment_id=recruitment_id
             ).first()
-            
+ 
             if existing_like:
                 delete_like(user_id, recruitment_id)
             else:
                 add_like(user_id, recruitment_id)
-                
+ 
             return redirect(url_for("natyukatu.top"))
-
-    #入力されたタグIDを取得
+ 
+    # 入力されたタグIDを取得
     selected_tag_ids = search_form.tag_id.data or []
-    #入力された検索ワード取得
+ 
+    # 入力された検索ワード取得
     keyword = search_form.keyword.data if hasattr(search_form, 'keyword') else None
+ 
     # 絞り込み条件を反映した募集一覧を取得
-    recruitments = get_recruitment_list(keyword=keyword,tag_ids=selected_tag_ids)
-    #お気に入り一覧取得
+    recruitments = get_recruitment_list(
+        keyword=keyword,
+        tag_ids=selected_tag_ids
+    )
+ 
+    # お気に入り一覧取得
     like_list = get_like_list(user_id)
-    #閲覧履歴取得
+ 
+    # 閲覧履歴取得
     view_history_list = get_view_history_list(user_id)
-
+ 
     return render_template(
         "natyukatu/top.html",
         form=search_form,
@@ -139,7 +161,8 @@ def top():
         recruitments=recruitments,
         like_list=like_list,
         view_history_list=view_history_list,
-        )
+        tag_groups=tag_groups,
+    )
  
 # 募集一覧取得（タグとワードで絞り込み有）
 def get_recruitment_list(keyword=None, tag_ids=None):
