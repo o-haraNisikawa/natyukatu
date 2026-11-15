@@ -536,9 +536,21 @@ def recruitment_detail(recruitment_id):
 def participation_application(recruitment_id):
     recruitment = get_recruitment(recruitment_id)
     form = ParticipationForm()
- 
+    user_id = get_user_id()
+
+    #すでに同じユーザーがこの募集に申し込んでいるかチェック
+    existing_entry = Entry.query.filter_by(
+        recruitment_id=recruitment_id,
+        user_id=user_id
+    ).first()
+
+    if existing_entry:
+        return redirect(url_for(
+            "natyukatu.participation_application_already",
+            recruitment_id=recruitment_id
+        ))
+    
     if form.validate_on_submit():
- 
         if recruitment.application_end_at < datetime.now():
             flash("募集期間が終了しています")
             return redirect(url_for(
@@ -551,7 +563,6 @@ def participation_application(recruitment_id):
             user_id=get_user_id(),
             message=form.message.data,
             status="申込中",
-            applocant_at=datetime.now()
         )
  
         db.session.add(entry)
@@ -570,36 +581,42 @@ def participation_application(recruitment_id):
 #申込完了画面
 @dt.route("/participation_application_complete")
 @login_required
-def apply_complete():
-    return render_template("natyukatu/apply_complete.html")
+def participation_application_complete():
+    return render_template("natyukatu/participation_application_complete.html")
 
- 
-# =====================================
-# ⑦ 参加履歴・募集履歴取得
-# =====================================
- 
-@dt.route("/participations")
+#申込済み画面
+@dt.route("/natyukatu.participation_application_already/<recruitment_id>",methods=["GET"])
 @login_required
-def participations():
+def participation_application_already(recruitment_id):
+    recruitment = get_recruitment(recruitment_id)
+    return render_template(
+        "natyukatu/participation_application_already.html",
+        recruitment=recruitment
+        )
+ 
+#参加履歴 
+@dt.route("/participation_history" ,methods=["GET", "POST"])
+@login_required
+def participation_history():
     histories = ParticipationHistory.query.filter_by(
         user_id=get_user_id()
     ).all()
  
     return render_template(
-        "natyukatu/participations.html",
+        "natyukatu/participation_history.html",
         histories=histories
     )
  
- 
-@dt.route("/recruitments")
+#募集履歴
+@dt.route("/recruitment_history")
 @login_required
-def recruitments():
+def recruitments_history():
     histories = RecruitmentHistory.query.filter_by(
         user_id=get_user_id()
     ).all()
  
     return render_template(
-        "natyukatu/recruitments.html",
+        "natyukatu/recruitment_history.html",
         histories=histories
     )
 
@@ -607,7 +624,6 @@ def recruitments():
 # =====================================
 # ⑨ 募集情報更新
 # =====================================
- 
 @dt.route(
     "/recruitments/<active_id>/edit",
     methods=["GET", "POST"]

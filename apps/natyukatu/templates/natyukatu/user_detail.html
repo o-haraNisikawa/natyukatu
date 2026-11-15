@@ -36,11 +36,23 @@
     <span>{{ current_user.phone_number }}</span>
   </div>
 
-  <div class="profile-row">
-    <a href="{{ url_for('natyukatu.participations') }}">
-      参加履歴を見る
-    </a>
-  </div>
+<!--参加者の場合-->  
+  {% if current_user.role == 3 %}
+    <div class="profile-row">
+      <a href="{{ url_for('natyukatu.participation_history') }}">
+        参加履歴を見る
+      </a>
+    </div>  
+  {% endif %}
+<!--募集者の場合-->  
+  {% if current_user.role == 2 %}
+    <div class="profile-row">
+      <a href="{{ url_for('natyukatu.recruitment_history') }}">
+        参加履歴を見る
+      </a>
+    </div>
+  {% endif %}
+  
 </section>
 
 <section class="summary" aria-label="ポイントと称号">

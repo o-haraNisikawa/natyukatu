@@ -98,7 +98,7 @@ class Participant(db.Model):
     status = db.Column(db.String, nullable=False)
     applicant_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
     update_at = db.Column(db.DateTime, nullable=False, default=datetime.now, onupdate=datetime.now)
- 
+
     user = db.relationship("User", back_populates="participants")
     recruitment = db.relationship("Recruitment", back_populates="participants")
  

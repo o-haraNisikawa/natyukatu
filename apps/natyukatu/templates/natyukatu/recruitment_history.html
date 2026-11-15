@@ -31,8 +31,8 @@
             <a
               class="detail-link"
               href="{{ url_for(
-                'natyukatu.activity_detail',
-                active_id=history.recruitment_id
+                'natyukatu.recruitment_detail',
+                recruitment_id=history.recruitment_id
               ) }}"
             >
               詳細を見る
@@ -45,7 +45,7 @@
               <a
                 class="action-link"
                 href="{{ url_for(
-                  'natyukatu.edit_recruitment',
+                  'natyukatu.recruitment_update',
                   active_id=history.recruitment_id
                 ) }}"
               >
@@ -56,7 +56,7 @@
                 class="action-link"
                 href="{{ url_for(
                   'natyukatu.applicants',
-                  active_id=history.recruitment_id
+                  recruitment_id=history.recruitment_id
                 ) }}"
               >
                 申込受付管理

@@ -157,6 +157,51 @@ class RecruitmentForm(FlaskForm):
 
     submit = SubmitField("募集を登録")
 
+#ユーザー情報更新フォーム
+class UserUpdateForm(FlaskForm):
+    username = StringField(
+        "名前",
+        validators=[
+            DataRequired(),
+            Length(max=30)
+        ]
+    )
+
+    nickname = StringField(
+        "ニックネーム",
+        validators=[
+            DataRequired(),
+            Length(max=30)
+        ]
+    )
+
+    age = IntegerField(
+        "年齢",
+        validators=[
+            DataRequired(),
+            NumberRange(min=1, max=120)
+        ]
+    )
+
+    email = StringField(
+        "メールアドレス",
+        validators=[
+            DataRequired(),
+            Email()
+        ]
+    )
+
+    phone_number = StringField(
+        "電話番号",
+        validators=[
+            Optional(),
+            Length(max=30)
+        ]
+    )
+
+    submit = SubmitField("変更を保存")
+
+
 #ユーザー退会
 class WithdrawalForm(FlaskForm):
     password = PasswordField(
@@ -206,10 +251,7 @@ class ContactForm(FlaskForm):
     submit = SubmitField("送信する")
 
 
-# =====================================
-# ① 参加申し込みフォーム
-# =====================================
-
+#参加申し込みフォーム
 class ParticipationForm(FlaskForm):
     participant_count = IntegerField(
         "参加人数",
@@ -425,53 +467,3 @@ class ApplicantDecisionForm(FlaskForm):
     submit = SubmitField("決定する")
 
 
-
-
-
-
-# =====================================
-# ⑫ ユーザー情報更新フォーム
-# =====================================
-
-class UserUpdateForm(FlaskForm):
-    username = StringField(
-        "名前",
-        validators=[
-            DataRequired(),
-            Length(max=30)
-        ]
-    )
-
-    nickname = StringField(
-        "ニックネーム",
-        validators=[
-            DataRequired(),
-            Length(max=30)
-        ]
-    )
-
-    age = IntegerField(
-        "年齢",
-        validators=[
-            DataRequired(),
-            NumberRange(min=1, max=120)
-        ]
-    )
-
-    email = StringField(
-        "メールアドレス",
-        validators=[
-            DataRequired(),
-            Email()
-        ]
-    )
-
-    phone_number = StringField(
-        "電話番号",
-        validators=[
-            Optional(),
-            Length(max=30)
-        ]
-    )
-
-    submit = SubmitField("変更を保存")

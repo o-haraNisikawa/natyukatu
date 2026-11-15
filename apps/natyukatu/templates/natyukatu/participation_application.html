@@ -10,7 +10,7 @@
   <h2>{{ recruitment.title }}</h2>
 
   <form
-    action="{{ url_for('natyukatu.apply_activity', active_id=recruitment.id) }}"
+    action="{{ url_for('natyukatu.participation_application', recruitment_id=recruitment.id) }}"
     method="post"
   >
     {{ form.hidden_tag() }}
