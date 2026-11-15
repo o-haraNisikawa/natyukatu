@@ -298,7 +298,7 @@ def recruitment_register():
 
             if not tag_obj:
                 # なければ新規作成
-                    tag_obj = RecruitmentTag(tag_name=tag,tag_kinds=6)
+                    tag_obj = RecruitmentTag(tag_name=tag,tag_kinds=2)
                     db.session.add(tag_obj)
                     db.session.flush() 
                     
