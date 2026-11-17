@@ -90,7 +90,7 @@ def top():
     user_id = get_user_id()
  
     # データベース初期登録
-    delete()
+    #delete()
     #init_data()
     
     # 検索フォーム
