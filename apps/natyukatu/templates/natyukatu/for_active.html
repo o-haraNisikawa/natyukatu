@@ -1,0 +1,30 @@
+{% extends "natyukatu/base.html" %}
+
+{% block content %}
+<section class="page-heading">
+  <h1>活動用画面</h1>
+  <p>{{ recruitment.title }}</p>
+</section>
+
+<section class="content-section" aria-label="メッセージ投稿">
+  <h2>メッセージ</h2>
+
+  <form
+    action="{{ url_for('natyukatu.messages', active_id=recruitment.id) }}"
+    method="post"
+  >
+    {{ form.hidden_tag() }}
+
+    <div class="form-row">
+      {{ form.message.label(class_="form-label") }}
+      {{ form.message(class_="form-input", placeholder="メッセージを入力") }}
+
+      {% for error in form.message.errors %}
+        <p class="error">{{ error }}</p>
+      {% endfor %}
+    </div>
+
+    {{ form.submit(class_="button primary-button") }}
+  </form>
+</section>
+{% endblock %}

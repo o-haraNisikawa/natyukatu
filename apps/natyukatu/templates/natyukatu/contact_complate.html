@@ -1,0 +1,29 @@
+{% extends "natyukatu/base.html" %}
+
+{% block title %}お問い合わせ完了 | なちゅ活{% endblock %}
+
+{% block page_styles %}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/contact_complete.css') }}"
+>
+{% endblock %}
+
+{% block content %}
+<main class="contact-complete-page">
+  <section class="contact-complete-card" aria-labelledby="completeTitle">
+    <div class="success-mark" aria-hidden="true">
+      <svg viewBox="0 0 64 64">
+        <path d="m9 34 15 15L56 16"></path>
+      </svg>
+    </div>
+
+    <h1 id="completeTitle">お問い合わせ完了</h1>
+    <p>お問い合わせを送信しました。</p>
+
+    <a class="return-link" href="{{ url_for('natyukatu.top') }}">
+      トップ画面へ
+    </a>
+  </section>
+</main>
+{% endblock %}
