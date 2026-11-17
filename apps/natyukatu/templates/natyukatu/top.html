@@ -170,11 +170,7 @@
                     {{ like_form.csrf_token }}
                     {{ like_form.recruitment_id(value=item.id) }}
                     <button name="like-submit" type="submit" value="1">
-                        {% if item.id in liked_ids %}
-                            お気に入り解除
-                        {% else %}
-                            お気に入り登録
-                        {% endif %}
+                       お気に入り登録・解除
                     </button>
                 </form>
             {% endif %}

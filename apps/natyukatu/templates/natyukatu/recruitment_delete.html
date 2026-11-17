@@ -7,7 +7,7 @@
   </h1>
 
   <p class="question">
-    この募集を削除します。よろしいですか？
+        「{{ recruitment.title }}」を削除します。よろしいですか？
   </p>
 
   <p class="caution">
@@ -17,28 +17,26 @@
   <form
     class="actions"
     action="{{ url_for(
-      'natyukatu.delete_recruitment',
-      active_id=active_id
+      'natyukatu.recruitment_delete',
+      recruitment_id=recruitment.id
     ) }}"
     method="post"
   >
-    {{ form.hidden_tag() }}
-    {{ form.active_id(value=active_id) }}
+    <!-- CSRFトークン -->
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-    <div class="form-row">
-      {{ form.confirm() }}
-      {{ form.confirm.label }}
-
-      {% for error in form.confirm.errors %}
-        <p class="error">{{ error }}</p>
-      {% endfor %}
+    <div class="form-row" style="margin: 1.5rem 0;">
+      <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+        <input type="checkbox" name="confirm_check" required>
+        上記の内容を確認し、削除に同意します
+      </label>
     </div>
 
-    {{ form.submit(class_="button delete") }}
+    <button type="submit" class="button delete">削除する</button>
 
     <a
       class="button"
-      href="{{ url_for('natyukatu.recruitments') }}"
+      href="{{ url_for('natyukatu.recruitment_history') }}"
     >
       キャンセル
     </a>

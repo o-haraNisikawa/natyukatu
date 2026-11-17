@@ -6,7 +6,7 @@
 </section>
 
 <section class="history-card" aria-label="参加履歴一覧">
-  {% if histories %}
+  {% if participation_histories %}
   <div class="table-wrap">
     <table>
       <thead>
@@ -14,11 +14,13 @@
           <th scope="col">開催日時</th>
           <th scope="col">募集名</th>
           <th scope="col">詳細</th>
+          <th scope="col">状態</th>
+          
         </tr>
       </thead>
 
       <tbody>
-        {% for history in histories %}
+        {% for history in participation_histories %}
         <tr>
           <td>
             {{ history.recruitment.start_at.strftime("%Y/%m/%d %H:%M") }}
@@ -35,8 +37,12 @@
               詳細を見る
             </a>
           </td>
+          <td>
+            {{ history.status.status_name }}
+          </td>
         </tr>
         {% endfor %}
+
       </tbody>
     </table>
   </div>

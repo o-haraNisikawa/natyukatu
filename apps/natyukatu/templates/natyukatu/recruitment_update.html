@@ -11,10 +11,11 @@
   {{ form.hidden_tag() }}
 
   {% for field in [
+    form.kind,
     form.title,
     form.description,
     form.photo,
-    form.tag_id,
+    form.tag,
     form.location_prefecture,
     form.location_city,
     form.location_detail,
@@ -34,6 +35,10 @@
         <small>画像を変更する場合だけ選択してください。選択しなければ現在の画像を使います。</small>
       {% elif field.type == "TextAreaField" %}
         {{ field(class_="form-input") }}
+      {% elif field.type == "RadioField" %}
+        <div class="radio-group">
+          {{ field(class_="form-radio") }}
+        </div>
       {% else %}
         {{ field(class_="form-input") }}
       {% endif %}

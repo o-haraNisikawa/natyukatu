@@ -26,17 +26,15 @@ class User(db.Model, UserMixin):
     representative_name = db.Column(db.String, nullable=False)
     contact_email = db.Column(db.String, nullable=False)
     group_type = db.Column(db.String, nullable=False)
+
+    recruitments = db.relationship("Recruitment", back_populates="user", cascade="all, delete-orphan")
+    likes = db.relationship("Like", back_populates="user", cascade="all, delete-orphan")
+    search_histories = db.relationship("SearchHistory", back_populates="user", cascade="all, delete-orphan")
+    participation_histories = db.relationship("ParticipationHistory", back_populates="user", cascade="all, delete-orphan")
+    recruitment_histories = db.relationship("RecruitmentHistory", back_populates="user", cascade="all, delete-orphan")
+    view_histories = db.relationship("ViewHistory", back_populates="user", cascade="all, delete-orphan")
+    thanks_points = db.relationship("ThanksPoint", back_populates="user", cascade="all, delete-orphan")
     
-    users_title = db.relationship("Title", backref=db.backref("users",lazy=True))
-    recruitments = db.relationship("Recruitment", back_populates="user")
-    likes = db.relationship("Like", back_populates="user")
-    search_histories = db.relationship("SearchHistory", back_populates="user")
-    participation_histories = db.relationship("ParticipationHistory", back_populates="user")
-    recruitment_histories = db.relationship("RecruitmentHistory", back_populates="user")
-    view_histories = db.relationship("ViewHistory", back_populates="user")
-    entries = db.relationship("Entry", back_populates="user")
-    thanks_points = db.relationship("ThanksPoint", back_populates="user")
-    participants = db.relationship("Participant", back_populates="user")
 
     @property
     def password(self):

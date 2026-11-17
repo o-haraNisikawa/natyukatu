@@ -271,29 +271,10 @@ class ParticipationForm(FlaskForm):
 
     submit = SubmitField("参加申し込み")
 
-
-# =====================================
-# ⑤ メッセージフォーム
-# =====================================
-
-class MessageForm(FlaskForm):
-    message = StringField(
-        "メッセージ",
-        validators=[
-            DataRequired(),
-            Length(max=200)
-        ]
-    )
-
-    submit = SubmitField("投稿する")
-
-
-# =====================================
-# ⑥ 募集削除フォーム
-# =====================================
+#募集削除フォーム
 
 class RecruitmentDeleteForm(FlaskForm):
-    active_id = HiddenField(
+    recruitment_id = HiddenField(
         "募集ID",
         validators=[DataRequired()]
     )
@@ -305,17 +286,19 @@ class RecruitmentDeleteForm(FlaskForm):
 
     submit = SubmitField("募集を削除")
 
-
-# =====================================
-# ⑦ 募集更新フォーム
-# =====================================
-
+#募集更新フォーム
 class RecruitmentUpdateForm(FlaskForm):
+    kind = RadioField(
+            "募集種類",
+            choices=[("#農業", "農業"), ("#漁業", "漁業"),("#林業","林業")],
+            validators=[DataRequired()]
+        )
+    
     title = StringField(
         "募集タイトル",
         validators=[
             DataRequired(),
-            Length(max=30)
+            Length(max=100)
         ]
     )
 
@@ -323,29 +306,28 @@ class RecruitmentUpdateForm(FlaskForm):
         "募集内容",
         validators=[
             DataRequired(),
-            Length(max=50)
+            Length(max=400)
         ]
     )
 
     photo = FileField(
         "募集画像",
         validators=[
-            Optional(),
-            FileAllowed(["jpg", "jpeg", "png"])
+            FileRequired(),
+            FileAllowed(["jpg", "jpeg", "png"], "画像を選択してください")
         ]
     )
 
-    tag_id = SelectField(
-        "活動タグ",
-        choices=[],
-        validators=[DataRequired()]
-    )
+    tag = StringField(
+        "タグ（#をつけてスペース区切りで入力）",
+        validators=[
+            DataRequired()
+        ])
 
-    location_prefecture = StringField(
+    location_prefecture = SelectField(
         "都道府県",
         validators=[
             DataRequired(),
-            Length(max=5)
         ]
     )
 
@@ -353,7 +335,7 @@ class RecruitmentUpdateForm(FlaskForm):
         "市区町村",
         validators=[
             DataRequired(),
-            Length(max=10)
+            Length(max=30)
         ]
     )
 
@@ -361,7 +343,7 @@ class RecruitmentUpdateForm(FlaskForm):
         "詳しい住所",
         validators=[
             DataRequired(),
-            Length(max=30)
+            Length(max=100)
         ]
     )
 
@@ -401,7 +383,7 @@ class RecruitmentUpdateForm(FlaskForm):
         "参加条件",
         validators=[
             DataRequired(),
-            Length(max=30)
+            Length(max=100)
         ]
     )
 
@@ -409,7 +391,7 @@ class RecruitmentUpdateForm(FlaskForm):
         "持ち物",
         validators=[
             DataRequired(),
-            Length(max=30)
+            Length(max=100)
         ]
     )
 
@@ -444,6 +426,20 @@ class HistoryUpdateForm(FlaskForm):
 
     submit = SubmitField("履歴を更新")
 
+# =====================================
+# ⑤ メッセージフォーム
+# =====================================
+
+class MessageForm(FlaskForm):
+    message = StringField(
+        "メッセージ",
+        validators=[
+            DataRequired(),
+            Length(max=200)
+        ]
+    )
+
+    submit = SubmitField("投稿する")
 
 # =====================================
 # ⑩ 申込者一覧・可否ボタンフォーム

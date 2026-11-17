@@ -27,14 +27,12 @@ class Recruitment(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
  
     user = db.relationship("User", back_populates="recruitments")
-    likes = db.relationship("Like", back_populates="recruitment")
-    participants = db.relationship("Participant", back_populates="recruitment")
-    view_histories = db.relationship("ViewHistory", back_populates="recruitment")
-    search_tags = db.relationship("SearchTag", back_populates="recruitment")
-    entries = db.relationship("Entry", back_populates="recruitment")
-    search_histories = db.relationship("SearchHistory", back_populates="recruitment")
-    participation_histories = db.relationship("ParticipationHistory", back_populates="recruitment")
-    recruitment_histories = db.relationship("RecruitmentHistory", back_populates="recruitment")
+    likes = db.relationship("Like", back_populates="recruitment", cascade="all, delete-orphan")
+    view_histories = db.relationship("ViewHistory", back_populates="recruitment", cascade="all, delete-orphan")
+    tags = db.relationship("Tag", back_populates="recruitment", cascade="all, delete-orphan")
+    search_histories = db.relationship("SearchHistory", back_populates="recruitment", cascade="all, delete-orphan")
+    participation_histories = db.relationship("ParticipationHistory", back_populates="recruitment", cascade="all, delete-orphan")
+    recruitment_histories = db.relationship("RecruitmentHistory", back_populates="recruitment", cascade="all, delete-orphan")
  
 class Like(db.Model):
     """お気に入りテーブル"""
@@ -68,10 +66,13 @@ class ParticipationHistory(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     recruitment_id = db.Column(db.Integer, db.ForeignKey("recruitments.id"), nullable=False)
+    status_id = db.Column(db.Integer, db.ForeignKey("status.id"), nullable=False)
+    message = db.Column(db.Text)
     added_at = db.Column(db.DateTime, nullable=False, default=datetime.now, onupdate=datetime.now)
    
     user = db.relationship("User", back_populates="participation_histories")
     recruitment = db.relationship("Recruitment", back_populates="participation_histories")
+    status = db.relationship("Status", back_populates="participation_histories")
      
  
 class RecruitmentHistory(db.Model):
@@ -81,27 +82,22 @@ class RecruitmentHistory(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     recruitment_id = db.Column(db.Integer, db.ForeignKey("recruitments.id"), nullable=False)
+    status_id = db.Column(db.Integer, db.ForeignKey("status.id"), nullable=False)
     added_at = db.Column(db.DateTime, nullable=False, default=datetime.now, onupdate=datetime.now)
    
     user = db.relationship("User", back_populates="recruitment_histories")
     recruitment = db.relationship("Recruitment", back_populates="recruitment_histories")
- 
-class Participant(db.Model):
-    """参加者テーブル"""
-    __tablename__ = "participants"
+    status = db.relationship("Status", back_populates="recruitment_histories")
+
+class Status(db.Model):
+    """募集・参加用ステータス"""
+    __tablename__ = "status"
  
     id = db.Column(db.Integer, primary_key=True)
-    recruitment_id = db.Column(db.Integer, db.ForeignKey("recruitments.id"), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    participant_count = db.Column(db.Integer)
-    varchar = db.Column(db.Text, nullable=False)
-    status = db.Column(db.String, nullable=False)
-    applicant_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
-    update_at = db.Column(db.DateTime, nullable=False, default=datetime.now, onupdate=datetime.now)
+    status_name = db.Column(db.String, nullable=False)
 
-    user = db.relationship("User", back_populates="participants")
-    recruitment = db.relationship("Recruitment", back_populates="participants")
- 
+    participation_histories = db.relationship("ParticipationHistory",back_populates="status")
+    recruitment_histories = db.relationship("RecruitmentHistory", back_populates="status")
  
 class ViewHistory(db.Model):
     """閲覧履歴テーブル"""
@@ -124,19 +120,19 @@ class RecruitmentTag(db.Model):
     tag_name = db.Column(db.String, nullable=False)
     tag_kinds = db.Column(db.Integer, nullable=False)
     # 1:活動種類　2:活動内容　3県　4市町村　5参加条件 6その他 
-    search_tags = db.relationship("SearchTag", back_populates="tag")
+    tags = db.relationship("Tag", back_populates="recruitment_tags")
  
  
-class SearchTag(db.Model):
+class Tag(db.Model):
     """タグ検索用テーブル"""
-    __tablename__ = "search_tags"
+    __tablename__ = "tags"
  
     id = db.Column(db.Integer, primary_key=True)
     tag_id = db.Column(db.Integer, db.ForeignKey("recruitment_tags.id"), nullable=False)
     recruitment_id = db.Column(db.Integer, db.ForeignKey("recruitments.id"), nullable=False)
  
-    tag = db.relationship("RecruitmentTag", back_populates="search_tags")
-    recruitment = db.relationship("Recruitment", back_populates="search_tags")
+    recruitment_tags = db.relationship("RecruitmentTag", back_populates="tags")
+    recruitment = db.relationship("Recruitment", back_populates="tags")
  
  
 class Title(db.Model):
@@ -146,24 +142,7 @@ class Title(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title_name = db.Column(db.String, nullable=False)
     title_explanation = db.Column(db.String, nullable=False)
- 
- 
-class Entry(db.Model):
-    """申込者テーブル"""
-    __tablename__ = "entries"
- 
-    id = db.Column(db.Integer, primary_key=True)
-    recruitment_id = db.Column(db.Integer, db.ForeignKey("recruitments.id"), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    message = db.Column(db.Text)
-    status = db.Column(db.String, nullable=False)
-    applicant_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
-    update_at = db.Column(db.DateTime, nullable=False, default=datetime.now, onupdate=datetime.now)
- 
-    user = db.relationship("User", back_populates="entries")
-    recruitment = db.relationship("Recruitment", back_populates="entries")
- 
- 
+  
 class ActiveMessage(db.Model):
     """活動用メッセージテーブル"""
     __tablename__ = "active_messages"

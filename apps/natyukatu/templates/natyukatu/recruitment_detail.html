@@ -12,9 +12,9 @@
 
       <h2 class="tags-title">関連タグ</h2>
       <div class="tag-list">
-        {% for search_tag in recruitment.search_tags %}
-          {% if search_tag.tag %}
-            <span class="tag">{{ search_tag.tag.tag_name }}</span>
+        {% for tag in recruitment.tags %}
+          {% if tag.recruitment_tags %}
+            <span class="tag">{{ tag.recruitment_tags.tag_name }}</span>
           {% endif %}
         {% else %}
           <span>タグはありません。</span>

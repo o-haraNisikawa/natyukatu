@@ -14,9 +14,9 @@
           <th scope="col">開催日時</th>
           <th scope="col">募集名</th>
           <th scope="col">詳細</th>
-          <th scope="col">状態</th>
-          <th scope="col">状態変更</th>
-          <th scope="col">操作</th>
+          <th scope="col"></th>
+          <th scope="col"></th>
+          <th scope="col"></th>
         </tr>
       </thead>
 
@@ -39,28 +39,38 @@
             </a>
           </td>
           <td>{{ history.recruitment.status }}</td>
-          <td>—</td>
           <td>
             <div class="row-actions">
               <a
                 class="action-link"
                 href="{{ url_for(
                   'natyukatu.recruitment_update',
-                  active_id=history.recruitment_id
-                ) }}"
-              >
-                募集情報変更
-              </a>
-
-              <a
-                class="action-link"
-                href="{{ url_for(
-                  'natyukatu.applicants',
                   recruitment_id=history.recruitment_id
                 ) }}"
               >
-                申込受付管理
+                募集情報更新
               </a>
+            </div>
+          </td>
+          <td>
+              <a
+                class="action-link"
+                href="{{ url_for(
+                  'natyukatu.for_active',
+                  recruitment_id=history.recruitment_id
+                ) }}"
+              >
+                活動用画面へ
+              </a>
+          </td> 
+          <td>   
+            <div>
+              <form action="{{ url_for('natyukatu.recruitment_delete', recruitment_id=history.recruitment_id) }}" method="post" style="display: inline;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="action-link" style="background: none; border: none; cursor: pointer; padding: 0;">
+                  募集を削除
+                </button>
+              </form>
             </div>
           </td>
         </tr>
