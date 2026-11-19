@@ -1,5 +1,9 @@
 {% extends "natyukatu/base.html" %}
 
+
+{% block page_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/application_management.css') }}" />
+{% endblock %}
 {% block content %}
 <section class="page-heading">
   <h1>申し込み管理</h1>

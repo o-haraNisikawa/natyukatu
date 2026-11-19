@@ -1,5 +1,9 @@
 {% extends "natyukatu/base.html" %}
 
+
+{% block page_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user_detail.css') }}" />
+{% endblock %}
 {% block content %}
 <div class="title-row">
   <h1 class="page-title">ユーザー情報表示</h1>
@@ -34,8 +38,8 @@
     <span class="label">称号</span>
     <span>
       {{ user.users_title.title_name
-         if user.users_title
-         else "未設定" }}
+        if user.users_title
+        else "未設定" }}
     </span>
   </div>
 </section>

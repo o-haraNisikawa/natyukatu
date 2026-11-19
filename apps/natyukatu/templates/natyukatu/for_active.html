@@ -1,5 +1,9 @@
 {% extends "natyukatu/base.html" %}
 
+
+{% block page_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/for_active.css') }}" />
+{% endblock %}
 {% block content %}
 <section class="page-heading">
   <h1>活動用画面</h1>

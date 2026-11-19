@@ -1,5 +1,9 @@
 {% extends "natyukatu/base.html" %}
 
+
+{% block page_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/recruitment_detail.css') }}" />
+{% endblock %}
 {% block content %}
 <section class="detail-card" aria-labelledby="page-title">
   <h1 id="page-title">募集詳細</h1>

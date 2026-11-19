@@ -2,6 +2,9 @@
 
 {% block title %}お問い合わせ | なちゅ活{% endblock %}
 
+{% block page_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/contact.css') }}" />
+{% endblock %}
 {% block content %}
 <section class="page-heading">
   <h1>お問い合わせ</h1>

@@ -1,6 +1,10 @@
 {% extends "natyukatu/base.html" %}
 {% block title %}トップページ | なちゅ活{% endblock %}
  
+
+{% block page_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/top.css') }}" />
+{% endblock %}
 {% block content %}
 <h1>ボランティア・体験活動を探そう</h1>
 <p>地域の活動に参加して、新しい体験を見つけましょう。</p>

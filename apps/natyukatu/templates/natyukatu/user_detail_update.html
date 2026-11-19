@@ -1,5 +1,9 @@
 {% extends "natyukatu/base.html" %}
 
+
+{% block page_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user_detail_update.css') }}" />
+{% endblock %}
 {% block content %}
 <section class="page-heading">
   <h1>ユーザー情報変更</h1>

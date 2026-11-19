@@ -2,13 +2,9 @@
 
 {% block title %}お問い合わせ完了 | なちゅ活{% endblock %}
 
-{% block page_styles %}
-<link
-  rel="stylesheet"
-  href="{{ url_for('static', filename='css/contact_complete.css') }}"
->
+{% block page_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/contact_complate.css') }}" />
 {% endblock %}
-
 {% block content %}
 <main class="contact-complete-page">
   <section class="contact-complete-card" aria-labelledby="completeTitle">

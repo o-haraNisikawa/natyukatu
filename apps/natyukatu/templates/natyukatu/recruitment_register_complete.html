@@ -1,5 +1,9 @@
 {% extends "natyukatu/base.html" %}
 {% block title %}登録完了 | なちゅ活{% endblock %}
+
+{% block page_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/recruitment_register_complete.css') }}" />
+{% endblock %}
 {% block content %}
 <section class="complete-panel">
  <h1>

@@ -1,5 +1,9 @@
 {% extends "natyukatu/base.html" %}
 
+
+{% block page_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/recruitment_delete_complete.css') }}" />
+{% endblock %}
 {% block content %}
 <section class="complete-card" aria-labelledby="completeTitle">
   <div class="success-wrap" aria-hidden="true">

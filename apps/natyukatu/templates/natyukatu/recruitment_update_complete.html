@@ -1,6 +1,10 @@
 {% extends "natyukatu/base.html" %}
 {% block title %}募集情報変更完了 | なちゅ活{% endblock %}
 
+
+{% block page_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/recruitment_update_complete.css') }}" />
+{% endblock %}
 {% block content %}
 <section class="complete-card" aria-labelledby="completeTitle">
   <div class="success-wrap" aria-hidden="true">
