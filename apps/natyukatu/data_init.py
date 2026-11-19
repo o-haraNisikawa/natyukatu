@@ -5,7 +5,6 @@ from apps.natyukatu.models import (
     RecruitmentTag,
     Tag,
     ActiveMessage,
-    ThanksPoint,
     ContactHistory,
     ParticipationHistory,
     RecruitmentHistory,

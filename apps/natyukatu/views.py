@@ -30,7 +30,6 @@ from apps.natyukatu.models import (
     RecruitmentTag,
     Tag,
     ActiveMessage,
-    ThanksPoint,
     ContactHistory,
     ParticipationHistory,
     RecruitmentHistory,
@@ -91,7 +90,7 @@ def top():
  
     # データベース初期登録
     #delete()
-    #init_data()
+    init_data()
     
     # 検索フォーム
     search_form = SearchForm(prefix="search")
@@ -782,81 +781,28 @@ def for_active(recruitment_id):
         recruitment=recruitment,
         form=form
     )
-# =====================================
-# ⑬ 申込者一覧取得
-# =====================================
- 
-@dt.route(
-    "/recruitments/<active_id>/applicants"
-)
-@login_required
-def applicants(active_id):
-    recruitment = get_recruitment(active_id)
+
+#参加者一覧取得
+def participation(recruitment_id):
+    recruitment = get_recruitment(recruitment_id)
  
     if recruitment.user_id != get_user_id():
         abort(403)
  
-    entries = Entry.query.filter_by(
-        activity_id=active_id
+    entries = ParticipationHistory.query.filter_by(
+        recruitment_id=recruitment_id
     ).all()
+
+    return entries
  
-    return render_template(
-        "natyukatu/applicants.html",
-        entries=entries,
-        recruitment=recruitment
-    )
- 
- 
-# =====================================
-# ⑭ 申込状態変更（可・否）
-# =====================================
- 
-@dt.route(
-    "/applicants/<applicant_id>/decision",
-    methods=["POST"]
-)
-@login_required
-def applicant_decision(applicant_id):
-    entry = Entry.query.filter_by(
-        applicant_id=applicant_id
+
+#参加者を一覧から削除
+def delete_participation(participation_id):
+    entry = participation_history.query.filter_by(
+        id=participation_id
     ).first_or_404()
  
-    recruitment = get_recruitment(entry.activity_id)
- 
-    if recruitment.user_id != get_user_id():
-        abort(403)
- 
-    form = ApplicantDecisionForm()
- 
-    if form.validate_on_submit():
-        entry.status = form.status.data
-        entry.update_at = datetime.now()
- 
-        db.session.commit()
- 
-        flash("申込状態を変更しました")
- 
-    return redirect(url_for(
-        "natyukatu.applicants",
-        active_id=entry.activity_id
-    ))
- 
- 
-# =====================================
-# ⑮ 申込者を一覧から削除
-# =====================================
- 
-@dt.route(
-    "/applicants/<applicant_id>/delete",
-    methods=["POST"]
-)
-@login_required
-def delete_applicant(applicant_id):
-    entry = Entry.query.filter_by(
-        applicant_id=applicant_id
-    ).first_or_404()
- 
-    recruitment = get_recruitment(entry.activity_id)
+    recruitment = get_recruitment(entry.recruitment_id)
  
     if recruitment.user_id != get_user_id():
         abort(403)
@@ -866,23 +812,9 @@ def delete_applicant(applicant_id):
  
     flash("申込者を削除しました")
  
-    return redirect(url_for(
-        "natyukatu.applicants",
-        active_id=recruitment.active_id
-    ))
- 
- 
-# =====================================
-# ⑯ 活動用メッセージ投稿
-# =====================================
- 
-@dt.route(
-    "/messages/<active_id>",
-    methods=["GET", "POST"]
-)
-@login_required
-def messages(active_id):
-    recruitment = get_recruitment(active_id)
+#活動用メッセージ投稿
+def messages(recruitment_id):
+    recruitment = get_recruitment(recruitment_id)
     form = MessageForm()
  
     if form.validate_on_submit():
@@ -890,27 +822,15 @@ def messages(active_id):
             user_id=get_user_id(),
             message=form.message.data,
             nickname=current_user.nickname,
-            created_at=datetime.now(),
             post_at=datetime.now(),
-            update_at=datetime.now()
         )
  
         db.session.add(message)
         db.session.commit()
  
         flash("メッセージを投稿しました")
- 
-        return redirect(url_for(
-            "natyukatu.messages",
-            active_id=active_id
-        ))
- 
-    return render_template(
-        "natyukatu/messages.html",
-        form=form,
-        recruitment=recruitment
-    )
 
+ 
 # =====================================
 # ⑱ サンクスボタン
 # =====================================

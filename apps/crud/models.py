@@ -33,7 +33,7 @@ class User(db.Model, UserMixin):
     participation_histories = db.relationship("ParticipationHistory", back_populates="user", cascade="all, delete-orphan")
     recruitment_histories = db.relationship("RecruitmentHistory", back_populates="user", cascade="all, delete-orphan")
     view_histories = db.relationship("ViewHistory", back_populates="user", cascade="all, delete-orphan")
-    thanks_points = db.relationship("ThanksPoint", back_populates="user", cascade="all, delete-orphan")
+    active_messages = db.relationship("ActiveMessage", back_populates="user", cascade="all, delete-orphan")
     
 
     @property

@@ -148,22 +148,13 @@ class ActiveMessage(db.Model):
     __tablename__ = "active_messages"
  
     id = db.Column(db.Integer, primary_key=True)
-    message = db.Column(db.String)
-    created_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
-    post_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
- 
- 
-class ThanksPoint(db.Model):
-    """サンクスポイントテーブル"""
-    __tablename__ = "thanks_points"
- 
-    id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    point_count = db.Column(db.Integer, nullable=False)
-    created_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
+    message = db.Column(db.String)
+    post_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
+
+    user = db.relationship("User", back_populates="active_messages")
  
-    user = db.relationship("User", back_populates="thanks_points")
-    
+
 #class Ranking(db.Model):
 #    __tablename__ = "rankings"
  

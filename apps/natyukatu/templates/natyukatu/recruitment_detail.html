@@ -93,8 +93,10 @@
       <span>{{ recruitment.likes|length }}</span>
     </div>
 
-    <a href="{{ url_for('natyukatu.participation_application', recruitment_id=recruitment.id) }}">参加申し込み</a>
-    </div>
+    {% if current_user.role == 3 %}
+      <a href="{{ url_for('natyukatu.participation_application', recruitment_id=recruitment.id) }}">参加申し込み</a>
+      </div>
+    {% endif %}
 
   </div>
 </section>
