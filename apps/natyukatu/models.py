@@ -119,12 +119,13 @@ class RecruitmentTag(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     tag_name = db.Column(db.String, nullable=False)
     tag_kinds = db.Column(db.Integer, nullable=False)
+    #parent_id = db.Column(db.Integer, db.ForeignKey("recruitment_tags.id"), nullable=True)
+
     # 1:活動種類　2:活動内容　3県　4市町村　5参加条件 6その他 
     tags = db.relationship("Tag", back_populates="recruitment_tags")
  
- 
 class Tag(db.Model):
-    """タグ検索用テーブル"""
+    """タグリレーションテーブル"""
     __tablename__ = "tags"
  
     id = db.Column(db.Integer, primary_key=True)
