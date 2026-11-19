@@ -9,6 +9,7 @@ import pandas as pd
 import joblib
 from sqlalchemy import desc
 from sklearn.feature_extraction.text import CountVectorizer
+from apps.natyukatu.data_init import init_data,delete
  
 from flask import(
     Blueprint,
@@ -43,14 +44,13 @@ from apps.natyukatu.forms import (
     LikeForm,
     MessageForm,
     RecruitmentDeleteForm,
-    RecruitmentUpdateForm,
     HistoryUpdateForm,
     SearchForm,
     ApplicantDecisionForm,
     WithdrawalForm,
-    UserUpdateForm,
- 
 )
+
+from apps.crud.forms import UserForm
  
 from flask_login import current_user,login_required
 from PIL import Image
@@ -245,27 +245,41 @@ def delete_like(user_id,recruitment_id):
         db.session.delete(like)
         db.session.commit()
 
-#新規募集登録
+# 新規募集登録
 @dt.route("/recruitment_register", methods=["GET", "POST"])
 @login_required
 def recruitment_register():
     form = RecruitmentForm()
 
-    # データベースからタグを取得し、# を削除して choices にセットする
+    # 都道府県(tag_kinds=3)の choices をセット
     prefecture_tags = RecruitmentTag.query.filter_by(tag_kinds=3).all()
     form.location_prefecture.choices = [("", "選択してください")] + [
-        (tag.tag_name.replace("#", ""), tag.tag_name.replace("#", "")) 
+        (tag.tag_name, tag.tag_name)
         for tag in prefecture_tags
-]
-    
+    ]
+
+    # 市町村(tag_kinds=4)の choices をセット（必須）
+    city_tags = RecruitmentTag.query.filter_by(tag_kinds=4).all()
+    form.location_city.choices = [("", "選択してください")] + [
+        (tag.tag_name, tag.tag_name)
+        for tag in city_tags
+    ]
+
+    # GET時の初期値を岩手県にする場合
+    if request.method == "GET" and not form.location_prefecture.data:
+        form.location_prefecture.data = "岩手県"
+
     if form.validate_on_submit():
+        selected_pref = form.location_prefecture.data or "岩手県"
+        selected_city = form.location_city.data
+
         recruitment = Recruitment(
             user_id=get_user_id(),
             title=form.title.data,
             description=form.description.data,
             photo=form.photo.data.read(),
-            location_prefecture=form.location_prefecture.data,
-            location_city=form.location_city.data,
+            location_prefecture=selected_pref,  # ← ここ
+            location_city=selected_city,
             location_detail=form.location_detail.data,
             start_at=form.start_at.data,
             end_at=form.end_at.data,
@@ -276,33 +290,39 @@ def recruitment_register():
             required_items=form.required_items.data,
             status="",
         )
- 
+
         db.session.add(recruitment)
         db.session.flush()
 
-        #タグ
-        #種類(農業、漁業、林業)
+        # 種類（農業、漁業、林業）
         selected_kind = form.kind.data
-        selected_kind_id = RecruitmentTag.query.filter_by(tag_name=selected_kind).first()
-        search_tag = Tag(
-                    tag_id=selected_kind_id.id,
-                    recruitment_id=recruitment.id
-                    )
-        db.session.add(search_tag)
+        selected_kind_id = RecruitmentTag.query.filter_by(tag_name=selected_kind, tag_kinds=1).first()
+        if selected_kind_id:
+            search_tag = Tag(
+                tag_id=selected_kind_id.id,
+                recruitment_id=recruitment.id
+            )
+            db.session.add(search_tag)
+
+        # 県（岩手県固定で紐付け）
+        pref_tag = RecruitmentTag.query.filter_by(tag_name="岩手県", tag_kinds=3).first()
+        if pref_tag:
+            db.session.add(Tag(tag_id=pref_tag.id, recruitment_id=recruitment.id))
+
+        # 市
+        city_tag = RecruitmentTag.query.filter_by(tag_name=selected_city, tag_kinds=4).first()
+        if city_tag:
+            db.session.add(Tag(tag_id=city_tag.id, recruitment_id=recruitment.id))
 
         # スペース区切りで分割
         tags = form.tag.data.strip().split()
         for tag in tags:
-            #既存のタグがデータベースにあるかチェック
             tag_obj = RecruitmentTag.query.filter_by(tag_name=tag).first()
-
             if not tag_obj:
-                # なければ新規作成
-                    tag_obj = RecruitmentTag(tag_name=tag,tag_kinds=2)
-                    db.session.add(tag_obj)
-                    db.session.flush() 
-                    
-            # 中間テーブル () に登録して紐付け
+                tag_obj = RecruitmentTag(tag_name=tag, tag_kinds=2)
+                db.session.add(tag_obj)
+                db.session.flush()
+
             search_tag = Tag(
                 tag_id=tag_obj.id,
                 recruitment_id=recruitment.id
@@ -314,17 +334,12 @@ def recruitment_register():
             user_id=get_user_id(),
             status_id=3,
         )
- 
         db.session.add(recruitment_history)
-        db.session.flush()
-
-        #すべてまとめてコミット
         db.session.commit()
 
         flash("募集を登録しました")
- 
         return redirect(url_for("natyukatu.recruitment_register_complete"))
- 
+
     return render_template(
         "natyukatu/recruitment_register.html",
         form=form
@@ -349,7 +364,7 @@ def userDetail():
 )
 @login_required
 def edit_profile():
-    form = UserUpdateForm()
+    form = UserForm()
  
     user = User.query.filter_by(
         id=get_user_id()
@@ -456,63 +471,6 @@ def contact():
     return render_template(
         "natyukatu/contact.html",
         form=form
-    )
-
-#?
-def activities():
-    form = SearchForm()
- 
-    form.tag_id.choices = [
-        ("", "すべて")
-    ] + [
-        (tag.tag_id, tag.tag_name)
-        for tag in RecruitmentTag.query.all()
-    ]
- 
-    query = Recruitment.query.filter_by(
-        status="募集中",
-        review_status="確認済み"
-    )
- 
-    if form.validate_on_submit():
-        keyword = form.keyword.data
- 
-        if keyword:
-            query = query.filter(
-                db.or_(
-                    Recruitment.title.contains(keyword),
-                    Recruitment.description.contains(keyword)
-                )
-            )
- 
-        if form.location_prefecture.data:
-            query = query.filter_by(
-                location_prefecture=form.location_prefecture.data
-            )
- 
-        if form.location_city.data:
-            query = query.filter_by(
-                location_city=form.location_city.data
-            )
- 
-        if form.tag_id.data:
-            query = query.filter_by(
-                tag_id=form.tag_id.data
-            )
- 
-        if form.start_at.data:
-            query = query.filter(
-                Recruitment.start_at >= form.start_at.data
-            )
- 
-    recruitments = query.order_by(
-        Recruitment.created_at.desc()
-    ).all()
- 
-    return render_template(
-        "natyukatu/activities.html",
-        form=form,
-        recruitments=recruitments
     )
  
 
@@ -642,23 +600,34 @@ def recruitment_update(recruitment_id):
     if recruitment.user_id != get_user_id():
         abort(403)
 
-    form = RecruitmentUpdateForm()
+    form = RecruitmentForm()
 
+    # 都道府県(tag_kinds=3)の choices をセット
     prefecture_tags = RecruitmentTag.query.filter_by(tag_kinds=3).all()
     form.location_prefecture.choices = [("", "選択してください")] + [
-        (tag.tag_name.replace("#", ""), tag.tag_name.replace("#", "")) 
+        (tag.tag_name, tag.tag_name)
         for tag in prefecture_tags
     ]
 
+    # 市町村(tag_kinds=4)の choices をセット
+    city_tags = RecruitmentTag.query.filter_by(tag_kinds=4).all()
+    form.location_city.choices = [("", "選択してください")] + [
+        (tag.tag_name, tag.tag_name)
+        for tag in city_tags
+    ]
+
     if form.validate_on_submit():
+        selected_pref = form.location_prefecture.data or "岩手県"
+        selected_city = form.location_city.data
+
         recruitment.title = form.title.data
         recruitment.description = form.description.data
 
         if form.photo.data:
             recruitment.photo = form.photo.data.read()
 
-        recruitment.location_prefecture = form.location_prefecture.data
-        recruitment.location_city = form.location_city.data
+        recruitment.location_prefecture = selected_pref
+        recruitment.location_city = selected_city
         recruitment.location_detail = form.location_detail.data
         recruitment.start_at = form.start_at.data
         recruitment.end_at = form.end_at.data
@@ -668,49 +637,71 @@ def recruitment_update(recruitment_id):
         recruitment.eligibility = form.eligibility.data
         recruitment.required_items = form.required_items.data
 
- 
+        # 一旦、この募集に紐づく Tag レコードを削除して再登録
         Tag.query.filter_by(recruitment_id=recruitment.id).delete()
 
-        #選択された種類（農業、漁業、林業など）のタグを登録
-        selected_kind = form.kind.data
+        # 1. 種類（農業、漁業、林業）のタグを登録
+        selected_kind = form.kind.data.lstrip("#") if form.kind.data else ""
         if selected_kind:
-            selected_kind_obj = RecruitmentTag.query.filter_by(tag_name=selected_kind).first()
+            selected_kind_obj = RecruitmentTag.query.filter_by(
+                tag_name=selected_kind,
+                tag_kinds=1
+            ).first()
             if selected_kind_obj:
-                kind_tag = Tag(
+                db.session.add(Tag(
                     tag_id=selected_kind_obj.id,
                     recruitment_id=recruitment.id
-                )
-                db.session.add(kind_tag)
+                ))
 
-        #自由入力タグをスペース区切りで分割して登録
-        tags = form.tag.data.strip().split() if form.tag.data else []
-        for tag_name in tags:
-            tag_name = tag_name.strip()
+        # 2. 県（tag_kinds=3）のタグを登録
+        pref_tag = RecruitmentTag.query.filter_by(
+            tag_name=selected_pref,
+            tag_kinds=3
+        ).first()
+        if pref_tag:
+            db.session.add(Tag(
+                tag_id=pref_tag.id,
+                recruitment_id=recruitment.id
+            ))
+
+        # 3. 市町村（tag_kinds=4）のタグを登録
+        city_tag = RecruitmentTag.query.filter_by(
+            tag_name=selected_city,
+            tag_kinds=4
+        ).first()
+        if city_tag:
+            db.session.add(Tag(
+                tag_id=city_tag.id,
+                recruitment_id=recruitment.id
+            ))
+
+        # 4. 自由入力タグ（tag_kinds=2）をスペース区切りで分割して登録
+        raw_tags = set(form.tag.data.replace(" ", " ").strip().split()) if form.tag.data else set()
+        for raw_tag in raw_tags:
+            tag_name = raw_tag.lstrip("#").strip()
             if not tag_name:
                 continue
-            
+
             tag_obj = RecruitmentTag.query.filter_by(tag_name=tag_name).first()
             if not tag_obj:
                 tag_obj = RecruitmentTag(tag_name=tag_name, tag_kinds=2)
                 db.session.add(tag_obj)
                 db.session.flush()
-            
-            search_tag = Tag(
+
+            db.session.add(Tag(
                 tag_id=tag_obj.id,
                 recruitment_id=recruitment.id
-            )
-            db.session.add(search_tag)
+            ))
 
         db.session.commit()
 
         flash("募集情報を更新しました")
-
         return redirect(url_for("natyukatu.recruitment_history"))
 
     elif request.method == "GET":
         form.title.data = recruitment.title
         form.description.data = recruitment.description
-        form.location_prefecture.data = recruitment.location_prefecture
+        form.location_prefecture.data = recruitment.location_prefecture or "岩手県"
         form.location_city.data = recruitment.location_city
         form.location_detail.data = recruitment.location_detail
         form.start_at.data = recruitment.start_at
@@ -721,13 +712,19 @@ def recruitment_update(recruitment_id):
         form.eligibility.data = recruitment.eligibility
         form.required_items.data = recruitment.required_items
 
-        associated_tags = RecruitmentTag.query.join(Tag).filter(Tag.recruitment_id == recruitment.id).all()
-        
-        kind_tag = next((t for t in associated_tags if t.tag_kinds == 1), None) # 実際の tag_kinds の番号に合わせて調整してください
-        if kind_tag:
-            form.kind.data = kind_tag.tag_name
+        associated_tags = (
+            RecruitmentTag.query
+            .join(Tag)
+            .filter(Tag.recruitment_id == recruitment.id)
+            .all()
+        )
 
-        free_tags = [t.tag_name for t in associated_tags if t.tag_kinds != 1]
+        kind_tag = next((t for t in associated_tags if t.tag_kinds == 1), None)
+        if kind_tag:
+            # RecruitmentForm の kind の choices が "#農業" 形式なら "#" を付ける
+            form.kind.data = f"#{kind_tag.tag_name}"
+
+        free_tags = [t.tag_name for t in associated_tags if t.tag_kinds == 2]
         form.tag.data = " ".join(free_tags)
 
     return render_template(
@@ -1004,76 +1001,3 @@ def admin():
         users=users
     )
  
-
-def init_data():
-        #いったん初期登録
-    init = [
-        RecruitmentTag(tag_name="#農業", tag_kinds=1),
-        RecruitmentTag(tag_name="#漁業", tag_kinds=1),
-        RecruitmentTag(tag_name="#林業", tag_kinds=1),
-        RecruitmentTag(tag_name="#北海道", tag_kinds=3),
-        RecruitmentTag(tag_name="#青森県", tag_kinds=3),
-        RecruitmentTag(tag_name="#宮城県", tag_kinds=3),
-        RecruitmentTag(tag_name="#秋田県", tag_kinds=3),
-        RecruitmentTag(tag_name="#山形県", tag_kinds=3),
-        RecruitmentTag(tag_name="#福島県", tag_kinds=3),
-        RecruitmentTag(tag_name="#茨城県", tag_kinds=3),
-        RecruitmentTag(tag_name="#栃木県", tag_kinds=3),
-        RecruitmentTag(tag_name="#群馬県", tag_kinds=3),
-        RecruitmentTag(tag_name="#埼玉県", tag_kinds=3),
-        RecruitmentTag(tag_name="#千葉県", tag_kinds=3),
-        RecruitmentTag(tag_name="#東京都", tag_kinds=3),
-        RecruitmentTag(tag_name="#神奈川県", tag_kinds=3),
-        RecruitmentTag(tag_name="#新潟県", tag_kinds=3),
-        RecruitmentTag(tag_name="#富山県", tag_kinds=3),
-        RecruitmentTag(tag_name="#石川県", tag_kinds=3),
-        RecruitmentTag(tag_name="#福井県", tag_kinds=3),
-        RecruitmentTag(tag_name="#山梨県", tag_kinds=3),
-        RecruitmentTag(tag_name="#長野県", tag_kinds=3),
-        RecruitmentTag(tag_name="#岐阜県", tag_kinds=3),
-        RecruitmentTag(tag_name="#静岡県", tag_kinds=3),
-        RecruitmentTag(tag_name="#愛知県", tag_kinds=3),
-        RecruitmentTag(tag_name="#三重県", tag_kinds=3),
-        RecruitmentTag(tag_name="#滋賀県", tag_kinds=3),
-        RecruitmentTag(tag_name="#京都府", tag_kinds=3),
-        RecruitmentTag(tag_name="#大阪府", tag_kinds=3),
-        RecruitmentTag(tag_name="#兵庫県", tag_kinds=3),
-        RecruitmentTag(tag_name="#奈良県", tag_kinds=3),
-        RecruitmentTag(tag_name="#和歌山県", tag_kinds=3),
-        RecruitmentTag(tag_name="#鳥取県", tag_kinds=3),
-        RecruitmentTag(tag_name="#島根県", tag_kinds=3),
-        RecruitmentTag(tag_name="#岡山県", tag_kinds=3),
-        RecruitmentTag(tag_name="#広島県", tag_kinds=3),
-        RecruitmentTag(tag_name="#山口県", tag_kinds=3),
-        RecruitmentTag(tag_name="#徳島県", tag_kinds=3),
-        RecruitmentTag(tag_name="#香川県", tag_kinds=3),
-        RecruitmentTag(tag_name="#愛媛県", tag_kinds=3),
-        RecruitmentTag(tag_name="#高知県", tag_kinds=3),
-        RecruitmentTag(tag_name="#福岡県", tag_kinds=3),
-        RecruitmentTag(tag_name="#佐賀県", tag_kinds=3),
-        RecruitmentTag(tag_name="#長崎県", tag_kinds=3),
-        RecruitmentTag(tag_name="#熊本県", tag_kinds=3),
-        RecruitmentTag(tag_name="#大分県", tag_kinds=3),
-        RecruitmentTag(tag_name="#宮崎県", tag_kinds=3),
-        RecruitmentTag(tag_name="#鹿児島県", tag_kinds=3),
-        RecruitmentTag(tag_name="#沖縄県", tag_kinds=3),
-        Status(status_name="募集中"),
-        Status(status_name="募集終了"),
-        Status(status_name="参加申込中"),
-        Status(status_name="参加中"),
-        Status(status_name="辞退"),
-        Status(status_name="参加済み")
-    ]
-    
-    db.session.add_all(init)
-    db.session.commit()  # 最後にまとめてコミット
-
-def delete():
-    try:
-        # テーブルの全件削除
-        Recruitment.query.delete()
-        db.session.commit()
-    except Exception as e:
-        db.session.rollback()
-        print(f"削除中にエラーが発生しました: {e}")
-        raise e

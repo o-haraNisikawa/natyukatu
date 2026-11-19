@@ -79,23 +79,23 @@ class RecruitmentForm(FlaskForm):
     )
 
     tag = StringField(
-        "タグ（#をつけてスペース区切りで入力）",
+        "タグ（スペース区切りで入力）",
         validators=[
-            DataRequired()
+            Optional()
         ])
 
     location_prefecture = SelectField(
-        "都道府県",
-        validators=[
-            DataRequired(),
-        ]
-    )
+            "都道府県",
+            default="岩手県",
+            validators=[
+                DataRequired(),
+            ]
+        )
 
-    location_city = StringField(
+    location_city = SelectField(
         "市区町村",
         validators=[
             DataRequired(),
-            Length(max=30)
         ]
     )
 
@@ -156,51 +156,6 @@ class RecruitmentForm(FlaskForm):
     )
 
     submit = SubmitField("募集を登録")
-
-#ユーザー情報更新フォーム
-class UserUpdateForm(FlaskForm):
-    username = StringField(
-        "名前",
-        validators=[
-            DataRequired(),
-            Length(max=30)
-        ]
-    )
-
-    nickname = StringField(
-        "ニックネーム",
-        validators=[
-            DataRequired(),
-            Length(max=30)
-        ]
-    )
-
-    age = IntegerField(
-        "年齢",
-        validators=[
-            DataRequired(),
-            NumberRange(min=1, max=120)
-        ]
-    )
-
-    email = StringField(
-        "メールアドレス",
-        validators=[
-            DataRequired(),
-            Email()
-        ]
-    )
-
-    phone_number = StringField(
-        "電話番号",
-        validators=[
-            Optional(),
-            Length(max=30)
-        ]
-    )
-
-    submit = SubmitField("変更を保存")
-
 
 #ユーザー退会
 class WithdrawalForm(FlaskForm):
@@ -285,118 +240,6 @@ class RecruitmentDeleteForm(FlaskForm):
     )
 
     submit = SubmitField("募集を削除")
-
-#募集更新フォーム
-class RecruitmentUpdateForm(FlaskForm):
-    kind = RadioField(
-            "募集種類",
-            choices=[("#農業", "農業"), ("#漁業", "漁業"),("#林業","林業")],
-            validators=[DataRequired()]
-        )
-    
-    title = StringField(
-        "募集タイトル",
-        validators=[
-            DataRequired(),
-            Length(max=100)
-        ]
-    )
-
-    description = TextAreaField(
-        "募集内容",
-        validators=[
-            DataRequired(),
-            Length(max=400)
-        ]
-    )
-
-    photo = FileField(
-        "募集画像",
-        validators=[
-            FileRequired(),
-            FileAllowed(["jpg", "jpeg", "png"], "画像を選択してください")
-        ]
-    )
-
-    tag = StringField(
-        "タグ（#をつけてスペース区切りで入力）",
-        validators=[
-            DataRequired()
-        ])
-
-    location_prefecture = SelectField(
-        "都道府県",
-        validators=[
-            DataRequired(),
-        ]
-    )
-
-    location_city = StringField(
-        "市区町村",
-        validators=[
-            DataRequired(),
-            Length(max=30)
-        ]
-    )
-
-    location_detail = StringField(
-        "詳しい住所",
-        validators=[
-            DataRequired(),
-            Length(max=100)
-        ]
-    )
-
-    start_at = DateTimeLocalField(
-        "活動開始日時",
-        format="%Y-%m-%dT%H:%M",
-        validators=[DataRequired()]
-    )
-
-    end_at = DateTimeLocalField(
-        "活動終了日時",
-        format="%Y-%m-%dT%H:%M",
-        validators=[DataRequired()]
-    )
-
-    application_start_at = DateTimeLocalField(
-        "募集開始日時",
-        format="%Y-%m-%dT%H:%M",
-        validators=[DataRequired()]
-    )
-
-    application_end_at = DateTimeLocalField(
-        "募集終了日時",
-        format="%Y-%m-%dT%H:%M",
-        validators=[DataRequired()]
-    )
-
-    capacity = IntegerField(
-        "募集人数",
-        validators=[
-            DataRequired(),
-            NumberRange(min=1)
-        ]
-    )
-
-    eligibility = StringField(
-        "参加条件",
-        validators=[
-            DataRequired(),
-            Length(max=100)
-        ]
-    )
-
-    required_items = StringField(
-        "持ち物",
-        validators=[
-            DataRequired(),
-            Length(max=100)
-        ]
-    )
-
-    submit = SubmitField("変更を保存")
-
 
 # =====================================
 # ⑧ 参加・募集履歴更新フォーム(分ける)
