@@ -772,9 +772,19 @@ def recruitment_delete_complete():
     "/for_active/<recruitment_id>",
     methods=["GET", "POST"])
 @login_required
-def for_active():
-    return render_template("natyukatu/for_active.html")
- 
+def for_active(recruitment_id):
+
+    #募集情報を取得
+    recruitment = get_recruitment(recruitment_id)
+
+    #メッセージ投稿フォーム
+    form = MessageForm()
+
+    return render_template(
+        "natyukatu/for_active.html",
+        recruitment=recruitment,
+        form=form
+    )
 # =====================================
 # ⑬ 申込者一覧取得
 # =====================================
@@ -879,7 +889,7 @@ def messages(active_id):
     form = MessageForm()
  
     if form.validate_on_submit():
-        message = ActiveMessagae(
+        message = ActiveMessage(
             user_id=get_user_id(),
             message=form.message.data,
             nickname=current_user.nickname,
