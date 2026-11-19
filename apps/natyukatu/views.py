@@ -10,6 +10,8 @@ import joblib
 from sqlalchemy import desc
 from sklearn.feature_extraction.text import CountVectorizer
 from apps.natyukatu.data_init import init_data,delete
+import io
+from flask import send_file
  
 from flask import(
     Blueprint,
@@ -33,7 +35,8 @@ from apps.natyukatu.models import (
     ContactHistory,
     ParticipationHistory,
     RecruitmentHistory,
-    Status
+    Status,
+    RecruitmentImage,
 )
  
 from apps.natyukatu.forms import (
@@ -79,6 +82,49 @@ def get_recruitment(recruitment_id):
         abort(404)
  
     return recruitment
+
+# 募集画像を表示
+@dt.route("/recruitment/<int:recruitment_id>/photo")
+def recruitment_photo(recruitment_id):
+
+    recruitment = get_recruitment(recruitment_id)
+
+    if not recruitment.photo:
+        abort(404)
+
+    return send_file(
+        io.BytesIO(recruitment.photo),
+        mimetype=recruitment.photo_mimetype or "image/jpeg"
+    )
+
+
+# 2枚目以降の募集画像を表示
+@dt.route("/recruitment_image/<int:image_id>")
+def recruitment_extra_photo(image_id):
+    image = RecruitmentImage.query.get_or_404(image_id)
+
+    if not image.image_data:
+        abort(404)
+
+    return send_file(
+        io.BytesIO(image.image_data),
+        mimetype=image.mimetype or "image/jpeg"
+    )
+
+
+# 募集動画を表示
+@dt.route("/recruitment/<int:recruitment_id>/video")
+def recruitment_video(recruitment_id):
+
+    recruitment = get_recruitment(recruitment_id)
+
+    if not recruitment.video:
+        abort(404)
+
+    return send_file(
+        io.BytesIO(recruitment.video),
+        mimetype=recruitment.video_mimetype or "video/mp4"
+    )
 
 #トップ画面
 @dt.route("/", methods=["GET", "POST"])
@@ -272,12 +318,57 @@ def recruitment_register():
         selected_pref = form.location_prefecture.data or "岩手県"
         selected_city = form.location_city.data
 
+
+        # 選択された画像を取得
+        photos = [
+            photo for photo in form.photo.data
+            if photo and photo.filename
+        ]
+
+        # 画像形式を確認
+        allowed_extensions = {"jpg", "jpeg", "png"}
+
+        for photo in photos:
+            extension = photo.filename.rsplit(".", 1)[-1].lower()
+
+            if extension not in allowed_extensions:
+                flash("画像はjpg、jpeg、png形式で選択してください")
+                return render_template(
+                    "natyukatu/recruitment_register.html",
+                    form=form
+                )
+
+        # 最低1枚必要
+        if not photos:
+            flash("募集画像を1枚以上選択してください")
+            return render_template(
+                "natyukatu/recruitment_register.html",
+                form=form
+            )
         recruitment = Recruitment(
             user_id=get_user_id(),
             title=form.title.data,
             description=form.description.data,
-            photo=form.photo.data.read(),
-            location_prefecture=selected_pref,  # ← ここ
+
+            # 1枚目をメイン画像として保存
+            photo=photos[0].read(),
+            photo_mimetype=photos[0].mimetype,
+
+            # 動画保存
+            video=(
+                form.video.data.read()
+                if form.video.data and form.video.data.filename
+                else None
+            ),
+
+            video_mimetype=(
+                form.video.data.mimetype
+                if form.video.data and form.video.data.filename
+                else None
+            ),
+
+            # 以下は現在の設定をそのまま残す
+            location_prefecture=selected_pref,
             location_city=selected_city,
             location_detail=form.location_detail.data,
             start_at=form.start_at.data,
@@ -292,6 +383,17 @@ def recruitment_register():
 
         db.session.add(recruitment)
         db.session.flush()
+
+        # 2枚目以降を追加画像テーブルに保存
+        # form.photo.data は MultipleFileField のため、選択画像のリストを使う
+        for index, photo in enumerate(photos[1:], start=1):
+            image = RecruitmentImage(
+                recruitment_id=recruitment.id,
+                image_data=photo.read(),
+                mimetype=photo.mimetype or "image/jpeg",
+                display_order=index
+            )
+            db.session.add(image)
 
         # 種類（農業、漁業、林業）
         selected_kind = form.kind.data

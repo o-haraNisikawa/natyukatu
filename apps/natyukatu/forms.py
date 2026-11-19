@@ -1,5 +1,5 @@
 from flask_wtf.form import FlaskForm
-from flask_wtf.file import FileRequired, FileAllowed
+from flask_wtf.file import FileRequired, FileAllowed, MultipleFileField
 from wtforms.fields import (
     StringField,
     PasswordField,
@@ -70,11 +70,20 @@ class RecruitmentForm(FlaskForm):
         ]
     )
 
-    photo = FileField(
-        "募集画像",
+    photo = MultipleFileField(
+        "募集画像（複数選択可能）",
+        validators=[Optional()]
+    )
+
+    # 募集動画（任意）
+    video = FileField(
+        "募集動画（任意）",
         validators=[
-            FileRequired(),
-            FileAllowed(["jpg", "jpeg", "png"], "画像を選択してください")
+            Optional(),
+            FileAllowed(
+                ["mp4", "webm"],
+                "MP4またはWebM形式の動画を選択してください"
+            )
         ]
     )
 

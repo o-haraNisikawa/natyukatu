@@ -190,6 +190,17 @@
         {% for item in like_list %}
             <li>
                 <article>
+                    <!-- 募集画像 -->
+                    {% if item.photo %}
+                        <img
+                            src="{{ url_for(
+                                'natyukatu.recruitment_photo',
+                                recruitment_id=item.id
+                            ) }}"
+                            alt="{{ item.title }}"
+                            width="250"
+                        >
+                    {% endif %}
                     <h3>{{ item.title }}</h3>
                     <p>{{ item.description }}</p>
                     <p>開催日時：{{ item.start_at }}</p>

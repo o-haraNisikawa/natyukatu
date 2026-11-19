@@ -6,7 +6,7 @@ from apps.app import db
 class Recruitment(db.Model):
     """募集テーブル"""
     __tablename__ = "recruitments"
- 
+
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     title = db.Column(db.String, nullable=False)
@@ -25,7 +25,16 @@ class Recruitment(db.Model):
     status = db.Column(db.String, nullable=False)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
     updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
- 
+
+    # 募集画像
+    photo = db.Column(db.LargeBinary, nullable=False)
+    # 画像の形式
+    photo_mimetype = db.Column(db.String(50), nullable=True)
+    # 募集動画
+    video = db.Column(db.LargeBinary, nullable=True)
+    # 動画の形式
+    video_mimetype = db.Column(db.String(50), nullable=True)
+
     user = db.relationship("User", back_populates="recruitments")
     likes = db.relationship("Like", back_populates="recruitment", cascade="all, delete-orphan")
     view_histories = db.relationship("ViewHistory", back_populates="recruitment", cascade="all, delete-orphan")
@@ -33,7 +42,34 @@ class Recruitment(db.Model):
     search_histories = db.relationship("SearchHistory", back_populates="recruitment", cascade="all, delete-orphan")
     participation_histories = db.relationship("ParticipationHistory", back_populates="recruitment", cascade="all, delete-orphan")
     recruitment_histories = db.relationship("RecruitmentHistory", back_populates="recruitment", cascade="all, delete-orphan")
- 
+    images = db.relationship(
+        "RecruitmentImage",
+        back_populates="recruitment",
+        cascade="all, delete-orphan",
+        order_by="RecruitmentImage.display_order"
+    )
+
+class RecruitmentImage(db.Model):
+    """募集画像テーブル"""
+    __tablename__ = "recruitment_images"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    recruitment_id = db.Column(
+        db.Integer,
+        db.ForeignKey("recruitments.id"),
+        nullable=False
+    )
+
+    image_data = db.Column(db.LargeBinary, nullable=False)
+    mimetype = db.Column(db.String(50), nullable=False)
+    display_order = db.Column(db.Integer, nullable=False, default=0)
+
+    recruitment = db.relationship(
+        "Recruitment",
+        back_populates="images"
+    )
+
 class Like(db.Model):
     """お気に入りテーブル"""
     __tablename__ = "likes"
