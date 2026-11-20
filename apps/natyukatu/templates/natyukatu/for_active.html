@@ -1,20 +1,21 @@
 {% extends "natyukatu/base.html" %}
 
-
 {% block page_css %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/for_active.css') }}" />
 {% endblock %}
+
 {% block content %}
 <section class="page-heading">
   <h1>活動用画面</h1>
   <p>{{ recruitment.title }}</p>
 </section>
 
+<!-- ① メッセージ投稿セクション -->
 <section class="content-section" aria-label="メッセージ投稿">
   <h2>メッセージ</h2>
 
   <form
-    action="{{ url_for('natyukatu.messages', active_id=recruitment.id) }}"
+    action="{{ url_for('natyukatu.for_active', recruitment_id=recruitment.id) }}"
     method="post"
   >
     {{ form.hidden_tag() }}
@@ -28,7 +29,41 @@
       {% endfor %}
     </div>
 
+    {# Python側で判別するために name="submit_message" を指定 #}
     {{ form.submit(class_="button primary-button") }}
   </form>
+</section>
+
+<!-- ② 参加者一覧・削除セクション -->
+<section class="content-section" aria-label="参加者一覧">
+  <h2>参加者一覧</h2>
+
+  {% if entries %}
+    <ul>
+      {% for entry in entries %}
+        <li>
+          {# ユーザー名の表示方法はモデルの定義に合わせて調整してください #}
+          <span>{{ entry.user.username }}</span>
+
+          {# 募集作成者本人の場合のみ削除ボタンを表示 #}
+          {% if recruitment.user_id == current_user.id %}
+            <form
+              action="{{ url_for('natyukatu.for_active', recruitment_id=recruitment.id) }}"
+              method="post"
+              style="display: inline;"
+            >
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+              <input type="hidden" name="participation_id" value="{{ entry.id }}" />
+              <button type="submit" name="delete_participation" class="button danger-button">
+                削除
+              </button>
+            </form>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>現在、参加者はいません。</p>
+  {% endif %}
 </section>
 {% endblock %}
