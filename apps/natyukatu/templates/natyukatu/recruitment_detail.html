@@ -1,0 +1,80 @@
+{% extends "natyukatu/base.html" %}
+
+{% block content %}
+<section class="detail-card" aria-labelledby="page-title">
+  <h1 id="page-title">募集詳細</h1>
+  <div class="detail-grid">
+    <div class="visual-column">
+      <div class="image-slider">
+        <div class="image-slider-track" id="recruitmentImageTrack">
+          {% if recruitment.photo %}
+          <div class="image-slide">
+            <img src="{{ url_for('natyukatu.recruitment_photo', recruitment_id=recruitment.id) }}" alt="{{ recruitment.title }} 画像1">
+          </div>
+          {% endif %}
+          {% for image in recruitment.images %}
+          <div class="image-slide">
+            <img src="{{ url_for('natyukatu.recruitment_extra_photo', image_id=image.id) }}" alt="{{ recruitment.title }} 画像{{ loop.index + 1 }}">
+          </div>
+          {% endfor %}
+        </div>
+        {% if recruitment.images|length > 0 %}
+        <button type="button" class="slider-button slider-prev" onclick="slideRecruitmentImage(-1)" aria-label="前の画像">‹</button>
+        <button type="button" class="slider-button slider-next" onclick="slideRecruitmentImage(1)" aria-label="次の画像">›</button>
+        {% endif %}
+      </div>
+
+      {% if recruitment.video %}
+      <video class="recruitment-video" controls preload="metadata">
+        <source src="{{ url_for('natyukatu.recruitment_video', recruitment_id=recruitment.id) }}" type="{{ recruitment.video_mimetype or 'video/mp4' }}">
+        お使いのブラウザでは動画を再生できません。
+      </video>
+      {% endif %}
+
+      <h2 class="tags-title">関連タグ</h2>
+      <div class="tag-list">
+        {% for tag in recruitment.tags %}
+          {% if tag.recruitment_tags %}<span class="tag">{{ tag.recruitment_tags.tag_name }}</span>{% endif %}
+        {% else %}<span>タグはありません。</span>{% endfor %}
+      </div>
+    </div>
+
+    <div class="info-column">
+      <div class="title-row"><div class="field-title"><h2>募集名</h2><p>{{ recruitment.title }}</p></div></div>
+      <div class="info-row content-row"><h3>内容</h3><p>{{ recruitment.description }}</p></div>
+      <div class="info-row"><h3>日時</h3><p>{{ recruitment.start_at.strftime("%Y/%m/%d %H:%M") }} 〜 {{ recruitment.end_at.strftime("%Y/%m/%d %H:%M") }}</p></div>
+      <div class="info-row"><h3>場所</h3><p>{{ recruitment.location_prefecture }}{{ recruitment.location_city }}{{ recruitment.location_detail }}</p></div>
+      <div class="info-row"><h3>募集人数</h3><p>{{ recruitment.capacity }}人</p></div>
+      <div class="info-row"><h3>参加条件</h3><p>{{ recruitment.eligibility }}</p></div>
+      <div class="info-row bring-row"><h3>持ち物</h3><p>{{ recruitment.required_items }}</p></div>
+      <div class="info-row organizer-row"><h3>募集者情報</h3><p>{{ recruitment.user.nickname }}</p></div>
+    </div>
+  </div>
+  {% if current_user.is_authenticated and recruitment.user_id == current_user.id %}
+  <div class="d-flex flex-wrap gap-2 mt-3">
+    <a class="btn btn-outline-primary" href="{{ url_for('natyukatu.application_management', recruitment_id=recruitment.id) }}">申し込み管理</a>
+    <a class="btn btn-outline-secondary" href="{{ url_for('natyukatu.recruitment_update', recruitment_id=recruitment.id) }}">募集内容を編集</a>
+    <a class="btn btn-outline-danger" href="{{ url_for('natyukatu.recruitment_history') }}">募集履歴</a>
+  </div>
+  {% endif %}
+  <div class="stats-row">
+    <div class="stat"><strong>閲覧数</strong><span>{{ recruitment.view_histories|length }}</span></div>
+    <div class="stat"><strong>お気に入り数</strong><span>{{ recruitment.likes|length }}</span></div>
+    {% if current_user.is_authenticated and current_user.role == 3 %}
+    <a href="{{ url_for('natyukatu.participation_application', recruitment_id=recruitment.id) }}">参加申し込み</a>
+    {% endif %}
+  </div>
+</section>
+<script>
+function slideRecruitmentImage(direction) {
+  const track = document.getElementById("recruitmentImageTrack");
+  if (!track) return;
+  const slide = track.querySelector(".image-slide");
+  if (!slide) return;
+  track.scrollBy({
+    left: direction * slide.getBoundingClientRect().width,
+    behavior: "smooth"
+  });
+}
+</script>
+{% endblock %}

@@ -985,47 +985,69 @@ def applicant_decision(applicant_id):
 def for_active(recruitment_id):
     # 募集情報を取得
     recruitment = get_recruitment(recruitment_id)
+    user_id = get_user_id()
+
+    # 募集者本人、または参加承認済みのユーザーだけアクセス可能
+    is_owner = recruitment.user_id == user_id
+    approved_entry = ParticipationHistory.query.join(
+        Status,
+        ParticipationHistory.status_id == Status.id
+    ).filter(
+        ParticipationHistory.recruitment_id == recruitment.id,
+        ParticipationHistory.user_id == user_id,
+        Status.status_name == "可"
+    ).first()
+
+    if not is_owner and approved_entry is None:
+        abort(403)
 
     # メッセージ投稿フォーム
     form = MessageForm()
 
     # POSTリクエスト時の処理分岐
     if request.method == "POST":
-        #メッセージ投稿ボタンが押された場合
+        # メッセージ投稿ボタンが押された場合
         if form.submit.name in request.form:
             if form.validate_on_submit():
                 message = ActiveMessage(
-                    recruitment_id=recruitment_id, 
-                    user_id=get_user_id(),
+                    recruitment_id=recruitment.id,
+                    user_id=user_id,
                     message=form.message.data,
                 )
                 db.session.add(message)
                 db.session.commit()
                 flash("メッセージを投稿しました")
-                return redirect(url_for("natyukatu.for_active", recruitment_id=recruitment_id))
+                return redirect(url_for(
+                    "natyukatu.for_active",
+                    recruitment_id=recruitment.id
+                ))
 
-        #参加者削除ボタンが押された場合
+        # 参加者削除ボタンが押された場合
         elif "delete_participation" in request.form:
+            # 参加者の削除は募集者本人だけ可能
+            if not is_owner:
+                abort(403)
+
             participation_id = request.form.get("participation_id")
             entry = ParticipationHistory.query.filter_by(
-                id=participation_id
+                id=participation_id,
+                recruitment_id=recruitment.id
             ).first_or_404()
-
-            #募集者本人かチェック
-            if recruitment.user_id != get_user_id():
-                abort(403)
 
             db.session.delete(entry)
             db.session.commit()
             flash("申込者を削除しました")
-            return redirect(url_for("natyukatu.for_active", recruitment_id=recruitment_id))
+            return redirect(url_for(
+                "natyukatu.for_active",
+                recruitment_id=recruitment.id
+            ))
 
     # 参加者一覧を取得
     entries = ParticipationHistory.query.filter_by(
-        recruitment_id=recruitment_id
+        recruitment_id=recruitment.id
     ).all()
     messages = ActiveMessage.query.filter_by(
-        recruitment_id=recruitment_id
+        recruitment_id=recruitment.id
     ).order_by(ActiveMessage.post_at.asc()).all()
 
     return render_template(

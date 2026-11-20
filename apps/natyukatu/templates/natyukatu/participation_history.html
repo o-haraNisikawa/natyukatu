@@ -19,6 +19,7 @@
           <th scope="col">詳細</th>
           <th scope="col">状態</th>
           
+        <th scope="col">活動</th>
         </tr>
       </thead>
 
@@ -43,6 +44,21 @@
           </td>
           <td>
             {{ history.status.status_name if history.status else '未設定' }}
+          </td>
+          <td>
+            {% if history.status and history.status.status_name == "可" %}
+              <a
+                class="btn btn-primary"
+                href="{{ url_for(
+                  'natyukatu.for_active',
+                  recruitment_id=history.recruitment_id
+                ) }}"
+              >
+                活動用画面へ
+              </a>
+            {% else %}
+              -
+            {% endif %}
           </td>
         </tr>
         {% endfor %}
