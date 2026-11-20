@@ -76,7 +76,7 @@ def init_data():
 def delete():
     try:
         # テーブルの全件削除
-        RecruitmentTag.query.delete()
+        Status.query.delete()
         db.session.commit()
     except Exception as e:
         db.session.rollback()

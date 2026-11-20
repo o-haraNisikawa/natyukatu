@@ -135,8 +135,9 @@ def top():
     user_id = get_user_id()
  
     # データベース初期登録
+    
     #delete()
-    init_data()
+    #init_data()
     
     # 検索フォーム
     search_form = SearchForm(prefix="search")
@@ -864,39 +865,59 @@ def recruitment_delete(recruitment_id):
 def recruitment_delete_complete():
     return render_template("natyukatu/recruitment_delete_complete.html")
 
-
 #活動用画面
-@dt.route(
-    "/for_active/<recruitment_id>",
-    methods=["GET", "POST"])
+@dt.route("/for_active/<recruitment_id>", methods=["GET", "POST"])
 @login_required
 def for_active(recruitment_id):
-
-    #募集情報を取得
+    # 募集情報を取得
     recruitment = get_recruitment(recruitment_id)
 
-    #メッセージ投稿フォーム
+    # メッセージ投稿フォーム
     form = MessageForm()
 
-    return render_template(
-        "natyukatu/for_active.html",
-        recruitment=recruitment,
-        form=form
-    )
+    # POSTリクエスト時の処理分岐
+    if request.method == "POST":
+        #メッセージ投稿ボタンが押された場合
+        if form.submit.name in request.form:
+            if form.validate_on_submit():
+                message = ActiveMessage(
+                    recruitment_id=recruitment_id, 
+                    user_id=get_user_id(),
+                    message=form.message.data,
+                )
+                db.session.add(message)
+                db.session.commit()
+                flash("メッセージを投稿しました")
+                return redirect(url_for("dt.for_active", recruitment_id=recruitment_id))
 
-#参加者一覧取得
-def participation(recruitment_id):
-    recruitment = get_recruitment(recruitment_id)
- 
-    if recruitment.user_id != get_user_id():
-        abort(403)
- 
+        #参加者削除ボタンが押された場合
+        elif "delete_participation" in request.form:
+            participation_id = request.form.get("participation_id")
+            entry = ParticipationHistory.query.filter_by(
+                id=participation_id
+            ).first_or_404()
+
+            #募集者本人かチェック
+            if recruitment.user_id != get_user_id():
+                abort(403)
+
+            db.session.delete(entry)
+            db.session.commit()
+            flash("申込者を削除しました")
+            return redirect(url_for("dt.for_active", recruitment_id=recruitment_id))
+
+    # 参加者一覧を取得
     entries = ParticipationHistory.query.filter_by(
         recruitment_id=recruitment_id
     ).all()
 
-    return entries
- 
+    return render_template(
+        "natyukatu/for_active.html",
+        recruitment=recruitment,
+        entries=entries,
+        form=form,
+    )
+
 
 #参加者を一覧から削除
 def delete_participation(participation_id):
@@ -923,15 +944,12 @@ def messages(recruitment_id):
         message = ActiveMessage(
             user_id=get_user_id(),
             message=form.message.data,
-            nickname=current_user.nickname,
-            post_at=datetime.now(),
         )
  
         db.session.add(message)
         db.session.commit()
  
         flash("メッセージを投稿しました")
-
  
 # =====================================
 # ⑱ サンクスボタン
