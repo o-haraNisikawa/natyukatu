@@ -20,52 +20,52 @@
         {% if current_user.is_authenticated %}
         <!--ユーザー名-->
           <li class="nav-item">
-            <span class="nav-link">{{ current_user.username }}</span>
+            <span class="site-nav-link">{{ current_user.username }}</span>
           </li>
         <!--ログアウト-->
           <li class="nav-item">
-            <a href="{{ url_for('auth.logout') }}" class="nav-link">ログアウト</a>
+            <a href="{{ url_for('auth.logout') }}" class="site-nav-link">ログアウト</a>
           </li>
         <!--募集者のみ表示-->
         {% if current_user.role == 2 %}
           <!--新規募集登録-->
            <li class="nav-item">
-               <a href="{{ url_for('natyukatu.recruitment_register') }}" class="nav-link">新規募集登録</a>
+               <a href="{{ url_for('natyukatu.recruitment_register') }}" class="site-nav-link">新規募集登録</a>
            </li>
         {% endif %}   
         <!--お問い合わせ-->
            <li class="nav-item">
-            <a href="{{ url_for('natyukatu.contact') }}" class="nav-link">お問い合わせ</a>
+            <a href="{{ url_for('natyukatu.contact') }}" class="site-nav-link">お問い合わせ</a>
           </li>
         <!--ランキング-->
           <li class="nav-item">
-            <a href="{{ url_for('natyukatu.ranking') }}" class="nav-link">ランキング</a>
+            <a href="{{ url_for('natyukatu.ranking') }}" class="site-nav-link">ランキング</a>
           </li>
         <!--ユーザー管理画面-->
           <li class="nav-item">
-            <a href="{{ url_for('natyukatu.userDetail') }}" class="nav-link">ユーザー管理画面</a>
+            <a href="{{ url_for('natyukatu.userDetail') }}" class="site-nav-link">ユーザー管理画面</a>
           </li>
         <!--称号-->
           <li class="nav-item">
-            <span class="nav-link">{{ current_user.usertitle }}</span>
+            <span class="site-nav-link">{{ current_user.usertitle }}</span>
           </li>
         {% else %}
     <!--ログアウト中-->
         <!--新規登録-->
           <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('auth.signup') }}">新規登録</a>
+            <a class="site-nav-link" href="{{ url_for('auth.signup') }}">新規登録</a>
           </li>
         <!--ログイン-->
           <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('auth.login') }}">ログイン</a>
+            <a class="site-nav-link" href="{{ url_for('auth.login') }}">ログイン</a>
           </li>
         <!--お問い合わせ-->
            <li class="nav-item">
-            <a href="{{ url_for('natyukatu.contact') }}" class="nav-link">お問い合わせ</a>
+            <a href="{{ url_for('natyukatu.contact') }}" class="site-nav-link">お問い合わせ</a>
           </li>
         <!--ランキング-->
           <li class="nav-item">
-            <a href="{{ url_for('natyukatu.ranking') }}" class="nav-link">ランキング</a>
+            <a href="{{ url_for('natyukatu.ranking') }}" class="site-nav-link">ランキング</a>
           </li>
         {% endif %}
       </ul>
