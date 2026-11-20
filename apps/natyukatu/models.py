@@ -48,6 +48,7 @@ class Recruitment(db.Model):
         cascade="all, delete-orphan",
         order_by="RecruitmentImage.display_order"
     )
+    active_messages = db.relationship("ActiveMessage", back_populates="recruitment", cascade="all, delete-orphan")
 
 class RecruitmentImage(db.Model):
     """募集画像テーブル"""
@@ -184,11 +185,13 @@ class ActiveMessage(db.Model):
     __tablename__ = "active_messages"
  
     id = db.Column(db.Integer, primary_key=True)
+    recruitment_id = db.Column(db.Integer, db.ForeignKey("recruitments.id"), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     message = db.Column(db.String)
     post_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
 
     user = db.relationship("User", back_populates="active_messages")
+    recruitment = db.relationship("Recruitment", back_populates="active_messages")
  
 
 #class Ranking(db.Model):
