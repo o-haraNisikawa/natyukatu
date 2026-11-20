@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: e31b9a17e031
+Revision ID: ed377fa40b69
 Revises: 
-Create Date: 2026-11-19 13:00:52.874744
+Create Date: 2026-11-20 09:45:25.189389
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'e31b9a17e031'
+revision = 'ed377fa40b69'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -64,14 +64,6 @@ def upgrade():
     sa.ForeignKeyConstraint(['title_id'], ['titles.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_table('active_messages',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('user_id', sa.Integer(), nullable=False),
-    sa.Column('message', sa.String(), nullable=True),
-    sa.Column('post_at', sa.DateTime(), nullable=False),
-    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
-    sa.PrimaryKeyConstraint('id')
-    )
     op.create_table('recruitments',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=False),
@@ -91,6 +83,19 @@ def upgrade():
     sa.Column('status', sa.String(), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
+    sa.Column('photo_mimetype', sa.String(length=50), nullable=True),
+    sa.Column('video', sa.LargeBinary(), nullable=True),
+    sa.Column('video_mimetype', sa.String(length=50), nullable=True),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('active_messages',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('recruitment_id', sa.Integer(), nullable=False),
+    sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.Column('message', sa.String(), nullable=True),
+    sa.Column('post_at', sa.DateTime(), nullable=False),
+    sa.ForeignKeyConstraint(['recruitment_id'], ['recruitments.id'], ),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -124,6 +129,15 @@ def upgrade():
     sa.ForeignKeyConstraint(['recruitment_id'], ['recruitments.id'], ),
     sa.ForeignKeyConstraint(['status_id'], ['status.id'], ),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('recruitment_images',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('recruitment_id', sa.Integer(), nullable=False),
+    sa.Column('image_data', sa.LargeBinary(), nullable=False),
+    sa.Column('mimetype', sa.String(length=50), nullable=False),
+    sa.Column('display_order', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['recruitment_id'], ['recruitments.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('search_histories',
@@ -160,11 +174,12 @@ def downgrade():
     op.drop_table('view_histories')
     op.drop_table('tags')
     op.drop_table('search_histories')
+    op.drop_table('recruitment_images')
     op.drop_table('recruitment_histories')
     op.drop_table('participation_histories')
     op.drop_table('likes')
-    op.drop_table('recruitments')
     op.drop_table('active_messages')
+    op.drop_table('recruitments')
     op.drop_table('users')
     op.drop_table('titles')
     op.drop_table('status')

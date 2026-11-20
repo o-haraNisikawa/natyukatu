@@ -27,7 +27,7 @@ class Recruitment(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
 
     # 募集画像
-    photo = db.Column(db.LargeBinary, nullable=False)
+    photo = db.Column(db.LargeBinary, nullable=True)
     # 画像の形式
     photo_mimetype = db.Column(db.String(50), nullable=True)
     # 募集動画

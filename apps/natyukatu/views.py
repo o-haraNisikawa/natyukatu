@@ -322,8 +322,8 @@ def recruitment_register():
 
         # 選択された画像を取得
         photos = [
-            photo for photo in form.photo.data
-            if photo and photo.filename
+            photo for photo in (form.photo.data or [])
+            if photo and getattr(photo, "filename", "")
         ]
 
         # 画像形式を確認
@@ -888,7 +888,7 @@ def for_active(recruitment_id):
                 db.session.add(message)
                 db.session.commit()
                 flash("メッセージを投稿しました")
-                return redirect(url_for("dt.for_active", recruitment_id=recruitment_id))
+                return redirect(url_for("natyukatu.for_active", recruitment_id=recruitment_id))
 
         #参加者削除ボタンが押された場合
         elif "delete_participation" in request.form:
