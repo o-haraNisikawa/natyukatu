@@ -1,179 +1,104 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8" />
-    <title>{% block title %}なちゅ活{% endblock %}</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
- 
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
- 
-    <!-- 共通CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/natyukatu_base.css') }}">
- 
-    {% block page_css %}{% endblock %}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#155a9c">
+
+  <title>{% block title %}なちゅ活{% endblock %}</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/natyukatu_base.css') }}">
 </head>
- 
-<body class="d-flex flex-column min-vh-100 bg-light">
- 
-    <!-- ヘッダー -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow">
-        <div class="container-fluid px-4">
- 
-            <!-- ロゴ -->
-            <a class="navbar-brand fw-bold fs-4"
-               href="{{ url_for('natyukatu.top') }}">
-                なちゅ活
-            </a>
- 
-            <!-- スマホ用メニューボタン -->
-            <button class="navbar-toggler" type="button"
-                    data-bs-toggle="collapse"
-                    data-bs-target="#navbarMenu"
-                    aria-controls="navbarMenu"
-                    aria-expanded="false"
-                    aria-label="メニューを開く">
-                <span class="navbar-toggler-icon"></span>
-            </button>
- 
-            <!-- ナビゲーション -->
-            <div class="collapse navbar-collapse" id="navbarMenu">
-                <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
- 
-                    {% if current_user.is_authenticated %}
- 
-                    <!-- ユーザー名 -->
-                    <li class="nav-item">
-                        <span class="nav-link text-info fw-bold">
-                            {{ current_user.username }}
-                        </span>
-                    </li>
- 
-                    <!-- 募集者のみ -->
-                    {% if current_user.role == 2 %}
-                    <li class="nav-item">
-                        <a href="{{ url_for('natyukatu.recruitment_register') }}"
-                           class="nav-link">
-                            新規募集登録
-                        </a>
-                    </li>
-                    {% endif %}
- 
-                    <!-- お問い合わせ -->
-                    <li class="nav-item">
-                        <a href="{{ url_for('natyukatu.contact') }}"
-                           class="nav-link">
-                            お問い合わせ
-                        </a>
-                    </li>
- 
-                    <!-- ランキング -->
-                    <li class="nav-item">
-                        <a href="{{ url_for('natyukatu.ranking') }}"
-                           class="nav-link">
-                            ランキング
-                        </a>
-                    </li>
- 
-                    <!-- ユーザー管理 -->
-                    <li class="nav-item">
-                        <a href="{{ url_for('natyukatu.userDetail') }}"
-                           class="nav-link">
-                            ユーザー管理画面
-                        </a>
-                    </li>
- 
-                    <!-- 称号 -->
-                    <li class="nav-item">
-                        <span class="badge bg-warning text-dark">
-                            {{ current_user.usertitle }}
-                        </span>
-                    </li>
- 
-                    <!-- ログアウト -->
-                    <li class="nav-item">
-                        <a href="{{ url_for('auth.logout') }}"
-                           class="btn btn-outline-light btn-sm ms-lg-2">
-                            ログアウト
-                        </a>
-                    </li>
- 
-                    {% else %}
- 
-                    <!-- 新規登録 -->
-                    <li class="nav-item">
-                        <a href="{{ url_for('auth.signup') }}"
-                           class="nav-link">
-                            新規登録
-                        </a>
-                    </li>
- 
-                    <!-- ログイン -->
-                    <li class="nav-item">
-                        <a href="{{ url_for('auth.login') }}"
-                           class="btn btn-success btn-sm px-3">
-                            ログイン
-                        </a>
-                    </li>
- 
-                    <!-- お問い合わせ -->
-                    <li class="nav-item">
-                        <a href="{{ url_for('natyukatu.contact') }}"
-                           class="nav-link">
-                            お問い合わせ
-                        </a>
-                    </li>
- 
-                    <!-- ランキング -->
-                    <li class="nav-item">
-                        <a href="{{ url_for('natyukatu.ranking') }}"
-                           class="nav-link">
-                            ランキング
-                        </a>
-                    </li>
- 
-                    {% endif %}
- 
-                </ul>
-            </div>
-        </div>
-    </nav>
- 
-    <!-- メインコンテンツ -->
-    <main class="container-fluid flex-grow-1 py-4 px-3 px-md-4">
-        {% block content %}{% endblock %}
-    </main>
- 
-    <!-- フッター -->
-    <footer class="bg-dark text-light py-4 mt-auto">
-        <div class="container text-center">
- 
-            <div class="d-flex justify-content-center gap-3 mb-2">
-                <a href="{{ url_for('natyukatu.top') }}"
-                   class="text-light text-decoration-none">
-                    ホーム
-                </a>
- 
-                <a href="{{ url_for('natyukatu.contact') }}"
-                   class="text-light text-decoration-none">
-                    お問い合わせ
-                </a>
-            </div>
- 
-            <p class="mb-0 text-secondary">
-                &copy; 2026 なちゅ活
-            </p>
- 
-            <a href="#"
-               class="text-info text-decoration-none small">
-                ページ上部へ戻る ↑
-            </a>
- 
-        </div>
-    </footer>
- 
-    <!-- Bootstrap JavaScript -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
- 
+
+<body class="d-flex flex-column min-vh-100">
+<nav class="navbar navbar-expand-xl navbar-dark site-navbar sticky-top">
+  <div class="container-fluid container-xxl px-3 px-lg-4">
+    <a class="navbar-brand fw-bold fs-4" href="{{ url_for('natyukatu.top') }}">なちゅ活</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#siteMenu" aria-controls="siteMenu" aria-expanded="false" aria-label="メニューを開く">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="siteMenu">
+      <ul class="navbar-nav ms-auto align-items-xl-center gap-xl-1 py-2 py-xl-0">
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('natyukatu.top') }}">ホーム</a></li>
+        {% if current_user.is_authenticated %}
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('natyukatu.participation_history') }}">参加履歴</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('natyukatu.recruitment_history') }}">募集履歴</a></li>
+          {% if current_user.role == 2 %}
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('natyukatu.recruitment_register') }}">新規募集登録</a></li>
+          {% elif current_user.role == 1 %}
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('natyukatu.admin') }}">管理画面</a></li>
+          {% endif %}
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('natyukatu.userDetail') }}">マイページ</a></li>
+        {% else %}
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.signup') }}">新規登録</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.login') }}">ログイン</a></li>
+        {% endif %}
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('natyukatu.ranking') }}">ランキング</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('natyukatu.contact') }}">お問い合わせ</a></li>
+        {% if current_user.is_authenticated %}
+          <li class="nav-item"><span class="nav-link text-info fw-semibold">{{ current_user.username }}</span></li>
+          {% if current_user.usertitle %}<li class="nav-item px-xl-1"><span class="badge rounded-pill text-bg-warning">{{ current_user.usertitle }}</span></li>{% endif %}
+          <li class="nav-item"><a class="btn btn-outline-light btn-sm ms-xl-2 mt-2 mt-xl-0" href="{{ url_for('auth.logout') }}">ログアウト</a></li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<main class="container-fluid container-xxl flex-grow-1 py-4 px-3 px-md-4">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-area mb-3">
+        {% for category, message in messages %}
+          <div class="alert alert-{{ 'danger' if category == 'error' else 'info' }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="閉じる"></button>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+  {% block content %}{% endblock %}
+</main>
+
+<footer class="site-footer mt-auto py-4">
+  <div class="container text-center">
+    <div class="d-flex flex-wrap justify-content-center gap-3 mb-2">
+      <a href="{{ url_for('natyukatu.top') }}">ホーム</a>
+      <a href="{{ url_for('natyukatu.contact') }}">お問い合わせ</a>
+      {% if current_user.is_authenticated %}<a href="{{ url_for('natyukatu.userDetail') }}">マイページ</a>{% endif %}
+    </div>
+    <small>© 2026 なちゅ活</small>
+    <div><a class="small" href="#">ページ上部へ戻る ↑</a></div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll("input:not([type=checkbox]):not([type=radio]):not([type=hidden]):not([type=submit]):not([type=button]):not([type=file]), textarea").forEach(el => {
+    if (!el.classList.contains("form-control")) el.classList.add("form-control");
+  });
+  document.querySelectorAll("select").forEach(el => {
+    if (!el.classList.contains("form-select")) el.classList.add("form-select");
+  });
+  document.querySelectorAll("input[type=checkbox], input[type=radio]").forEach(el => el.classList.add("form-check-input"));
+  document.querySelectorAll("input[type=file]").forEach(el => el.classList.add("form-control"));
+  document.querySelectorAll("button:not(.navbar-toggler):not(.btn-close), input[type=submit]").forEach(el => {
+    if (!el.classList.contains("btn")) el.classList.add("btn", "btn-primary");
+  });
+  document.querySelectorAll("table").forEach(table => {
+    table.classList.add("table", "table-striped", "table-hover", "align-middle");
+    if (!table.parentElement.classList.contains("table-responsive")) {
+      const wrapper = document.createElement("div");
+      wrapper.className = "table-responsive";
+      table.parentNode.insertBefore(wrapper, table);
+      wrapper.appendChild(table);
+    }
+  });
+});
+</script>
 </body>
 </html>

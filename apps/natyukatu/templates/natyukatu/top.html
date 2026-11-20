@@ -1,237 +1,422 @@
 {% extends "natyukatu/base.html" %}
-{% block title %}トップページ | なちゅ活{% endblock %}
- 
 
-{% block page_css %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/top.css') }}" />
-{% endblock %}
+{% block title %}トップページ | なちゅ活{% endblock %}
+
 {% block content %}
-<h1>ボランティア・体験活動を探そう</h1>
-<p>地域の活動に参加して、新しい体験を見つけましょう。</p>
- 
-<h2>活動を検索</h2>
- 
-<form action="{{ url_for('natyukatu.top') }}" method="post">
-    {{ form.hidden_tag() }}
- 
-    <p>
-        <label for="keyword">キーワード</label>
-        {{ form.keyword(id="keyword", placeholder="活動名・内容を入力") }}
-    </p>
- 
- 
-<details>
-    <summary>活動タグを選択する</summary>
- 
-    <p>タグを選択してください（複数選択可）</p>
- 
-    <fieldset>
-        <legend>産業種別</legend>
-        {% for tag in tag_groups[1] %}
-            <label>
-                <input type="checkbox"
-                       name="{{ form.tag_id.name }}"
-                       value="{{ tag.id }}"
-                       {% if tag.id in (form.tag_id.data or []) %}checked{% endif %}>
-                {{ tag.tag_name }}
-            </label>&nbsp;
-        {% else %}
-            <p>選択できるタグはありません。</p>
-        {% endfor %}
-    </fieldset>
- 
-    <fieldset>
-        <legend>作業内容・参加条件・その他</legend>
-        {% for tag in tag_groups[2] %}
-            <label>
-                <input type="checkbox"
-                       name="{{ form.tag_id.name }}"
-                       value="{{ tag.id }}"
-                    {% if tag.id in (form.tag_id.data or []) %}checked{% endif %}>
-                {{ tag.tag_name }}
-            </label>&nbsp;
-        {% else %}
-            <p>選択できるタグはありません。</p>
-        {% endfor %}
-    </fieldset>
- 
-   
-    <fieldset>
-        <legend>都道府県</legend>
- 
-        <p>北海道・東北地方</p>
-        {% for tag in tag_groups[3] %}
-            {% if tag.tag_name in ['北海道', '青森県', '岩手県', '宮城県', '秋田県', '山形県', '福島県'] %}
-                <label>
-                    <input type="checkbox" name="{{ form.tag_id.name }}" value="{{ tag.id }}"
-                        {% if tag.id in (form.tag_id.data or []) %}checked{% endif %}>
-                    {{ tag.tag_name }}
-                </label>&nbsp;
-            {% endif %}
-        {% endfor %}
- 
-        <p>関東地方</p>
-        {% for tag in tag_groups[3] %}
-            {% if tag.tag_name in ['茨城県', '栃木県', '群馬県', '埼玉県', '千葉県', '東京都', '神奈川県'] %}
-                <label>
-                    <input type="checkbox" name="{{ form.tag_id.name }}" value="{{ tag.id }}"
-                        {% if tag.id in (form.tag_id.data or []) %}checked{% endif %}>
-                    {{ tag.tag_name }}
-                </label>&nbsp;
-            {% endif %}
-        {% endfor %}
- 
-        <p>中部地方</p>
-        {% for tag in tag_groups[3] %}
-            {% if tag.tag_name in ['新潟県', '富山県', '石川県', '福井県', '山梨県', '長野県', '岐阜県', '静岡県', '愛知県'] %}
-                <label>
-                    <input type="checkbox" name="{{ form.tag_id.name }}" value="{{ tag.id }}"
-                        {% if tag.id in (form.tag_id.data or []) %}checked{% endif %}>
-                    {{ tag.tag_name }}
-                </label>&nbsp;
-            {% endif %}
-        {% endfor %}
- 
-        <p>近畿地方</p>
-        {% for tag in tag_groups[3] %}
-            {% if tag.tag_name in ['三重県', '滋賀県', '京都府', '大阪府', '兵庫県', '奈良県', '和歌山県'] %}
-                <label>
-                    <input type="checkbox" name="{{ form.tag_id.name }}" value="{{ tag.id }}"
-                        {% if tag.id in (form.tag_id.data or []) %}checked{% endif %}>
-                    {{ tag.tag_name }}
-                </label>&nbsp;
-            {% endif %}
-        {% endfor %}
- 
-        <p>中国地方</p>
-        {% for tag in tag_groups[3] %}
-            {% if tag.tag_name in ['鳥取県', '島根県', '岡山県', '広島県', '山口県'] %}
-                <label>
-                    <input type="checkbox" name="{{ form.tag_id.name }}" value="{{ tag.id }}"
-                        {% if tag.id in (form.tag_id.data or []) %}checked{% endif %}>
-                    {{ tag.tag_name }}
-                </label>&nbsp;
-            {% endif %}
-        {% endfor %}
- 
-        <p>四国地方</p>
-        {% for tag in tag_groups[3] %}
-            {% if tag.tag_name in ['徳島県', '香川県', '愛媛県', '高知県'] %}
-                <label>
-                    <input type="checkbox" name="{{ form.tag_id.name }}" value="{{ tag.id }}"
-                        {% if tag.id in (form.tag_id.data or []) %}checked{% endif %}>
-                    {{ tag.tag_name }}
-                </label>&nbsp;
-            {% endif %}
-        {% endfor %}
- 
-        <p>九州・沖縄地方</p>
-        {% for tag in tag_groups[3] %}
-            {% if tag.tag_name in ['福岡県', '佐賀県', '長崎県', '熊本県', '大分県', '宮崎県', '鹿児島県', '沖縄県'] %}
-                <label>
-                    <input type="checkbox" name="{{ form.tag_id.name }}" value="{{ tag.id }}"
-                        {% if tag.id in (form.tag_id.data or []) %}checked{% endif %}>
-                    {{ tag.tag_name }}
-                </label>&nbsp;
-            {% endif %}
-        {% endfor %}
- 
-    </fieldset>
- 
-    <fieldset>
-        <legend>市区町村</legend>
-        {% for tag in tag_groups[4] %}
-            <label>
-                <input type="checkbox"
-                    name="{{ form.tag_id.name }}"
-                    value="{{ tag.id }}"
-                    {% if tag.id in (form.tag_id.data or []) %}checked{% endif %}>
-                {{ tag.tag_name }}
-            </label>&nbsp;
-        {% else %}
-            <p>選択できるタグはありません。</p>
-        {% endfor %}
-    </fieldset>
-</details>
- 
- 
-    <button type="submit" name="search-submit" value="1">検索する</button>
-</form>
- 
-<h2>募集一覧</h2>
-{% if recruitments %}
+
+<section class="hero-panel mb-4">
+
+  <div class="row align-items-center g-3">
+
+    <div class="col-lg-8">
+
+      <span class="badge text-bg-primary mb-2">地域のボランティア・体験活動</span>
+
+      <h1 class="display-6 fw-bold mb-2">ボランティア・体験活動を探そう</h1>
+
+      <p class="lead mb-0">地域の活動に参加して、新しい体験を見つけましょう。</p>
+
+    </div>
+
+    <div class="col-lg-4 text-lg-end">
+
+      {% if current_user.is_authenticated and current_user.role == 2 %}
+
+      <a class="btn btn-primary btn-lg" href="{{ url_for('natyukatu.recruitment_register') }}">募集を登録する</a>
+
+      {% else %}
+
+      <a class="btn btn-primary btn-lg" href="#recruitment-list">活動を探す</a>
+
+      {% endif %}
+
+    </div>
+
+  </div>
+
+</section>
+
+
+
+<section class="card border-0 shadow-sm mb-4">
+
+  <div class="card-body p-3 p-md-4">
+
+    <h2 class="h4 section-title mb-3">活動を検索</h2>
+
+    <form action="{{ url_for('natyukatu.top') }}" method="post">
+
+      {{ form.hidden_tag() }}
+
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+      <div class="row g-3 align-items-end">
+
+        <div class="col-12 col-lg-6">
+
+          <label class="form-label fw-semibold" for="keyword">キーワード</label>
+
+          {{ form.keyword(id="keyword", class="form-control", placeholder="活動名・内容を入力") }}
+
+        </div>
+
+        <div class="col-12 col-lg-3">
+
+          <label class="form-label fw-semibold" for="sort_order">募集一覧の並び替え</label>
+
+          <select class="form-select" id="sort_order" name="sort_order">
+
+            <option value="newest" {% if sort_order == 'newest' %}selected{% endif %}>登録日：新しい順</option>
+
+            <option value="oldest" {% if sort_order == 'oldest' %}selected{% endif %}>登録日：古い順</option>
+
+            <option value="start_asc" {% if sort_order == 'start_asc' %}selected{% endif %}>開催日：早い順（昇順）</option>
+
+            <option value="start_desc" {% if sort_order == 'start_desc' %}selected{% endif %}>開催日：遅い順（降順）</option>
+
+            <option value="title_asc" {% if sort_order == 'title_asc' %}selected{% endif %}>タイトル：昇順</option>
+
+            <option value="title_desc" {% if sort_order == 'title_desc' %}selected{% endif %}>タイトル：降順</option>
+
+            <option value="capacity_asc" {% if sort_order == 'capacity_asc' %}selected{% endif %}>募集人数：少ない順</option>
+
+            <option value="capacity_desc" {% if sort_order == 'capacity_desc' %}selected{% endif %}>募集人数：多い順</option>
+
+          </select>
+
+        </div>
+
+        <div class="col-12 col-lg-3 d-grid">
+
+          <button class="btn btn-primary" type="submit" name="search-submit" value="1">検索・並び替え</button>
+
+        </div>
+
+      </div>
+
+
+
+      <details class="mt-4">
+
+        <summary class="fw-semibold text-primary">活動タグを選択する（複数選択可）</summary>
+
+        <div class="row g-3 mt-1">
+
+          <div class="col-12 col-md-6">
+
+            <fieldset class="tag-group">
+
+              <legend class="h6">産業種別</legend>
+
+              <div class="d-flex flex-wrap gap-2">
+
+                {% for tag in tag_groups[1] %}
+
+                <label class="tag-option">
+
+                  <input class="form-check-input" type="checkbox" name="{{ form.tag_id.name }}" value="{{ tag.id }}" {% if tag.id in (form.tag_id.data or []) %}checked{% endif %}>
+
+                  <span>{{ tag.tag_name }}</span>
+
+                </label>
+
+                {% else %}<span class="text-secondary small">選択できるタグはありません。</span>{% endfor %}
+
+              </div>
+
+            </fieldset>
+
+          </div>
+
+          <div class="col-12 col-md-6">
+
+            <fieldset class="tag-group">
+
+              <legend class="h6">作業内容・参加条件・その他</legend>
+
+              <div class="d-flex flex-wrap gap-2">
+
+                {% for tag in tag_groups[2] %}
+
+                <label class="tag-option">
+
+                  <input class="form-check-input" type="checkbox" name="{{ form.tag_id.name }}" value="{{ tag.id }}" {% if tag.id in (form.tag_id.data or []) %}checked{% endif %}>
+
+                  <span>{{ tag.tag_name }}</span>
+
+                </label>
+
+                {% else %}<span class="text-secondary small">選択できるタグはありません。</span>{% endfor %}
+
+              </div>
+
+            </fieldset>
+
+          </div>
+
+          <div class="col-12">
+
+            <fieldset class="tag-group">
+
+              <legend class="h6">都道府県</legend>
+
+              {% set regions = [
+
+                ('北海道・東北地方', ['北海道','青森県','岩手県','宮城県','秋田県','山形県','福島県']),
+
+                ('関東地方', ['茨城県','栃木県','群馬県','埼玉県','千葉県','東京都','神奈川県']),
+
+                ('中部地方', ['新潟県','富山県','石川県','福井県','山梨県','長野県','岐阜県','静岡県','愛知県']),
+
+                ('近畿地方', ['三重県','滋賀県','京都府','大阪府','兵庫県','奈良県','和歌山県']),
+
+                ('中国地方', ['鳥取県','島根県','岡山県','広島県','山口県']),
+
+                ('四国地方', ['徳島県','香川県','愛媛県','高知県']),
+
+                ('九州・沖縄地方', ['福岡県','佐賀県','長崎県','熊本県','大分県','宮崎県','鹿児島県','沖縄県'])
+
+              ] %}
+
+              {% for region_name, prefectures in regions %}
+
+              <div class="mb-2">
+
+                <div class="small fw-semibold text-secondary mb-1">{{ region_name }}</div>
+
+                <div class="d-flex flex-wrap gap-2">
+
+                  {% for tag in tag_groups[3] if tag.tag_name in prefectures %}
+
+                  <label class="tag-option">
+
+                    <input class="form-check-input" type="checkbox" name="{{ form.tag_id.name }}" value="{{ tag.id }}" {% if tag.id in (form.tag_id.data or []) %}checked{% endif %}>
+
+                    <span>{{ tag.tag_name }}</span>
+
+                  </label>
+
+                  {% endfor %}
+
+                </div>
+
+              </div>
+
+              {% endfor %}
+
+            </fieldset>
+
+          </div>
+
+          <div class="col-12">
+
+            <fieldset class="tag-group">
+
+              <legend class="h6">市区町村</legend>
+
+              <div class="d-flex flex-wrap gap-2">
+
+                {% for tag in tag_groups[4] %}
+
+                <label class="tag-option">
+
+                  <input class="form-check-input" type="checkbox" name="{{ form.tag_id.name }}" value="{{ tag.id }}" {% if tag.id in (form.tag_id.data or []) %}checked{% endif %}>
+
+                  <span>{{ tag.tag_name }}</span>
+
+                </label>
+
+                {% else %}<span class="text-secondary small">選択できるタグはありません。</span>{% endfor %}
+
+              </div>
+
+            </fieldset>
+
+          </div>
+
+        </div>
+
+      </details>
+
+    </form>
+
+  </div>
+
+</section>
+
+
+
+<section id="recruitment-list" class="mb-5">
+
+  <div class="d-flex flex-wrap align-items-end justify-content-between gap-2 mb-3">
+
+    <div><h2 class="h3 section-title mb-1">募集一覧</h2><p class="text-secondary small mb-0">{{ recruitments|length }}件の募集</p></div>
+
+    {% if current_user.is_authenticated and current_user.role == 2 %}
+
+    <a class="btn btn-outline-primary btn-sm" href="{{ url_for('natyukatu.recruitment_register') }}">＋ 新規募集</a>
+
+    {% endif %}
+
+  </div>
+
+  {% if recruitments %}
+
+  <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-3">
+
     {% for item in recruitments %}
-        <article>
-            <h3>{{ item.title }}</h3>
-            <p>{{ item.description }}</p>
-            <p>開催日時：{{ item.start_at }}</p>
-            <p>場所：{{ item.location_prefecture }}{{ item.location_city }}{{ item.location_detail }}</p>
-            <p>募集人数：{{ item.capacity }}人</p>
-            <a href="{{ url_for('natyukatu.recruitment_detail', recruitment_id=item.id) }}">詳細を見る</a>
- 
+
+    <div class="col">
+
+      <article class="card h-100 border-0 shadow-sm recruitment-card">
+
+        {% if item.photo %}
+
+        <img class="card-img-top recruitment-thumb" src="{{ url_for('natyukatu.recruitment_photo', recruitment_id=item.id) }}" alt="{{ item.title }}">
+
+        {% else %}
+
+        <div class="recruitment-thumb placeholder-thumb d-flex align-items-center justify-content-center">画像なし</div>
+
+        {% endif %}
+
+        <div class="card-body d-flex flex-column">
+
+          <h3 class="h5 card-title">{{ item.title }}</h3>
+
+          <p class="card-text text-secondary flex-grow-1">{{ item.description|truncate(110) }}</p>
+          {% set item_tags = recruitment_tags.get(item.id, []) %}
+          {% if item_tags %}
+          <div class="d-flex flex-wrap gap-2 mb-3" aria-label="募集タグ">
+            {% for tag in item_tags %}
+            <a class="badge rounded-pill text-bg-light border text-decoration-none"
+               href="{{ url_for('natyukatu.top', tag_id=tag.id) }}">{{ tag.tag_name }}</a>
+            {% endfor %}
+          </div>
+          {% endif %}
+
+          <dl class="small mb-3">
+
+            <div><dt class="d-inline">開催日時：</dt><dd class="d-inline">{{ item.start_at.strftime('%Y/%m/%d %H:%M') if item.start_at else '未設定' }}</dd></div>
+
+            <div><dt class="d-inline">場所：</dt><dd class="d-inline">{{ item.location_prefecture }}{{ item.location_city }}{{ item.location_detail }}</dd></div>
+
+            <div><dt class="d-inline">募集人数：</dt><dd class="d-inline">{{ item.capacity }}人</dd></div>
+
+          </dl>
+
+          <div class="d-flex flex-wrap gap-2 mt-auto">
+
+            <a class="btn btn-primary flex-grow-1" href="{{ url_for('natyukatu.recruitment_detail', recruitment_id=item.id) }}">詳細を見る</a>
+
             {% if current_user.is_authenticated %}
-                <form action="{{ url_for('natyukatu.top') }}" method="post">
-                    {{ like_form.csrf_token }}
-                    {{ like_form.recruitment_id(value=item.id) }}
-                    <button name="like-submit" type="submit" value="1">
-                       お気に入り登録・解除
-                    </button>
-                </form>
+
+            <form action="{{ url_for('natyukatu.top') }}" method="post">
+
+              {{ like_form.csrf_token }}
+
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+              {{ like_form.recruitment_id(value=item.id) }}
+
+              <button class="btn btn-outline-primary" name="like-submit" type="submit" value="1">♡ お気に入り</button>
+
+            </form>
+
             {% endif %}
-        </article>
+
+          </div>
+
+        </div>
+
+      </article>
+
+    </div>
+
     {% endfor %}
-{% else %}
-    <p>現在掲載されている募集はありません。</p>
+
+  </div>
+
+  {% else %}
+
+  <div class="alert alert-info">条件に一致する募集はありません。</div>
+
+  {% endif %}
+
+</section>
+
+
+
+{% if current_user.is_authenticated %}
+
+<section class="mb-5">
+
+  <h2 class="h3 section-title mb-3">お気に入り一覧</h2>
+
+  {% if like_list %}
+
+  <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-3">
+
+    {% for item in like_list %}
+
+    <div class="col">
+
+      <article class="card h-100 border-0 shadow-sm">
+
+        {% if item.photo %}<img class="card-img-top recruitment-thumb" src="{{ url_for('natyukatu.recruitment_photo', recruitment_id=item.id) }}" alt="{{ item.title }}">{% endif %}
+
+        <div class="card-body">
+
+          <h3 class="h5">{{ item.title }}</h3>
+
+          <p class="text-secondary">{{ item.description|truncate(100) }}</p>
+
+          <a class="btn btn-outline-primary btn-sm" href="{{ url_for('natyukatu.recruitment_detail', recruitment_id=item.id) }}">詳細を見る</a>
+
+          <form class="d-inline" action="{{ url_for('natyukatu.top') }}" method="post">
+
+            {{ like_form.csrf_token }}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{{ like_form.recruitment_id(value=item.id) }}
+
+            <button class="btn btn-outline-danger btn-sm" name="like-submit" type="submit" value="1">解除</button>
+
+          </form>
+
+        </div>
+
+      </article>
+
+    </div>
+
+    {% endfor %}
+
+  </div>
+
+  {% else %}<p class="text-secondary">お気に入りはありません。</p>{% endif %}
+
+</section>
+
+
+
+<section class="mb-5">
+
+  <h2 class="h3 section-title mb-3">閲覧履歴</h2>
+
+  {% if view_history_list %}
+
+  <div class="list-group">
+
+    {% for item in view_history_list %}
+
+    <a class="list-group-item list-group-item-action" href="{{ url_for('natyukatu.recruitment_detail', recruitment_id=item.id) }}">{{ item.title }}</a>
+
+    {% endfor %}
+
+  </div>
+
+  {% else %}<p class="text-secondary">閲覧履歴はありません。</p>{% endif %}
+
+</section>
+
 {% endif %}
- 
-<h2>お気に入り一覧</h2>
-{% if like_list %}
-    <ul>
-        {% for item in like_list %}
-            <li>
-                <article>
-                    <!-- 募集画像 -->
-                    {% if item.photo %}
-                        <img
-                            src="{{ url_for(
-                                'natyukatu.recruitment_photo',
-                                recruitment_id=item.id
-                            ) }}"
-                            alt="{{ item.title }}"
-                            width="250"
-                        >
-                    {% endif %}
-                    <h3>{{ item.title }}</h3>
-                    <p>{{ item.description }}</p>
-                    <p>開催日時：{{ item.start_at }}</p>
-                    <p>場所：{{ item.location_prefecture }}{{ item.location_city }}{{ item.location_detail }}</p>
-                    <p>募集人数：{{ item.capacity }}人</p>
-                    <a href="{{ url_for('natyukatu.recruitment_detail', recruitment_id=item.id) }}">詳細を見る</a>
- 
-                    {% if current_user.is_authenticated %}
-                        <form action="{{ url_for('natyukatu.top') }}" method="post">
-                            {{ like_form.csrf_token }}
-                            {{ like_form.recruitment_id(value=item.id) }}
-                            <button name="like-submit" type="submit" value="1">お気に入り登録・解除</button>
-                        </form>
-                    {% endif %}
-                </article>
-            </li>
-        {% endfor %}
-    </ul>
-{% else %}
-    <p>お気に入りはありません。</p>
-{% endif %}
- 
-<h2>閲覧履歴</h2>
-{% if view_history_list %}
-    <ul>
-        {% for item in view_history_list %}
-            <li>{{ item.title }}</li>
-        {% endfor %}
-    </ul>
-{% else %}
-    <p>閲覧履歴はありません。</p>
-{% endif %}
+
 {% endblock %}
- 

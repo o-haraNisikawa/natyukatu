@@ -1,18 +1,9 @@
 {% extends "natyukatu/base.html" %}
 
 
-{% block page_css %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/recruitment_delete_complete.css') }}" />
-{% endblock %}
+
 {% block content %}
 <section class="complete-card" aria-labelledby="completeTitle">
-  <div class="success-wrap" aria-hidden="true">
-    <div class="success-mark">
-      <svg viewBox="0 0 64 64">
-        <path d="m10 34 15 15L55 17"></path>
-      </svg>
-    </div>
-  </div>
 
   <h1 class="complete-title" id="completeTitle">
     募集情報削除完了

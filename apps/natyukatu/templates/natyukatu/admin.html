@@ -1,0 +1,70 @@
+{% extends "natyukatu/base.html" %}
+{% block title %}管理画面 | なちゅ活{% endblock %}
+{% block content %}
+<section class="page-heading">
+    <h1>管理画面</h1>
+    <p>募集・申込・ユーザーを管理します。</p>
+</section>
+<section class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+        <h2 class="h4 section-title">募集一覧</h2>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>募集名</th>
+                        <th>募集者</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in recruitments %} 
+                    <tr>
+                        <td>{{ item.id }}</td>
+                        <td>{{ item.title }}</td>
+                        <td>{{ item.user.username if item.user else '不明' }}</td>
+                        <td>
+                            <form method="post" action="{{ url_for('natyukatu.admin_delete_recruitment', active_id=item.id) }}" onsubmit="return confirm('この募集を削除しますか？')">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button class="btn btn-sm btn-outline-danger">削除</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %} 
+                    <tr>
+                        <td colspan="4">募集はありません。</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+<section class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+        <h2 class="h4 section-title">ユーザー一覧</h2>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr><th>ID</th><th>ユーザー名</th><th>メール</th><th>権限</th></tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>{{ user.id }}</td>
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.role }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4">ユーザーはいません。</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+{% endblock %}

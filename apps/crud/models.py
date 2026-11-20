@@ -20,12 +20,22 @@ class User(db.Model, UserMixin):
     create_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
     update_at = db.Column(db.DateTime, nullable=False, default=datetime.now, onupdate=datetime.now)
     title_id = db.Column(db.Integer,db.ForeignKey("titles.id"))  # FK
-    tanks_point = db.Column(db.Integer, nullable=False)
+    tanks_point = db.Column(db.Integer, nullable=False, default=0)
     ranking_id = db.Column(db.Integer)
     group_name = db.Column(db.String, nullable=False)
     representative_name = db.Column(db.String, nullable=False)
     contact_email = db.Column(db.String, nullable=False)
     group_type = db.Column(db.String, nullable=False)
+
+    title = db.relationship("Title", lazy="joined")
+
+    @property
+    def usertitle(self):
+        return self.title.title_name if self.title else ""
+
+    @property
+    def users_title(self):
+        return self.title
 
     recruitments = db.relationship("Recruitment", back_populates="user", cascade="all, delete-orphan")
     likes = db.relationship("Like", back_populates="user", cascade="all, delete-orphan")

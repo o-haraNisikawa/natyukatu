@@ -1,9 +1,7 @@
 {% extends "natyukatu/base.html" %}
 
 
-{% block page_css %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/recruitment_history.css') }}" />
-{% endblock %}
+
 {% block content %}
 <section class="page-heading">
   <h1 class="page-title">募集履歴</h1>
@@ -57,15 +55,8 @@
             </div>
           </td>
           <td>
-              <a
-                class="action-link"
-                href="{{ url_for(
-                  'natyukatu.for_active',
-                  recruitment_id=history.recruitment_id
-                ) }}"
-              >
-                活動用画面へ
-              </a>
+              <a class="btn btn-sm btn-outline-primary" href="{{ url_for('natyukatu.for_active', recruitment_id=history.recruitment_id) }}">活動用画面</a>
+              <a class="btn btn-sm btn-outline-info" href="{{ url_for('natyukatu.application_management', recruitment_id=history.recruitment_id) }}">申込管理</a>
           </td> 
           <td>   
             <div>

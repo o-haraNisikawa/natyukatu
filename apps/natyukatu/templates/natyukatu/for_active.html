@@ -1,8 +1,6 @@
 {% extends "natyukatu/base.html" %}
 
-{% block page_css %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/for_active.css') }}" />
-{% endblock %}
+
 
 {% block content %}
 <section class="page-heading">
@@ -34,6 +32,23 @@
   </form>
 </section>
 
+<section class="content-section mb-4" aria-label="活動メッセージ">
+  <h2>投稿されたメッセージ</h2>
+  {% if messages %}
+    <div class="list-group">
+      {% for message in messages %}
+      <div class="list-group-item">
+        <div class="d-flex flex-wrap justify-content-between gap-2">
+          <strong>{{ message.user.username if message.user else "ユーザー" }}</strong>
+          <small class="text-secondary">{{ message.post_at.strftime("%Y/%m/%d %H:%M") }}</small>
+        </div>
+        <p class="mb-0">{{ message.message }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  {% else %}<p class="text-secondary">メッセージはまだありません。</p>{% endif %}
+</section>
+
 <!-- 参加者一覧・削除セクション -->
 <section class="content-section" aria-label="参加者一覧">
   <h2>参加者一覧</h2>
@@ -43,10 +58,18 @@
       {% for entry in entries %}
         <li>
           {# ユーザー名の表示方法はモデルの定義に合わせて調整してください #}
-          <span>{{ entry.user.username }}</span>
+          <span class="fw-semibold">{{ entry.user.username }}</span>
+          <span class="text-secondary small ms-2">{{ entry.participant_count or 1 }}人</span>
+
+          {% if recruitment.user_id == current_user.id %}
+            {% if not entry.thanks_sent %}
+            <form class="d-inline" action="{{ url_for('natyukatu.thanks', active_id=recruitment.id, user_id=entry.user_id) }}" method="post">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="btn btn-sm btn-outline-warning">ありがとうを送る</button>
+            </form>
+            {% else %}<span class="badge text-bg-success">送信済み</span>{% endif %}
 
           {# 募集作成者本人の場合のみ削除ボタンを表示 #}
-          {% if recruitment.user_id == current_user.id %}
             <form
               action="{{ url_for('natyukatu.for_active', recruitment_id=recruitment.id) }}"
               method="post"

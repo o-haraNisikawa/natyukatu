@@ -314,4 +314,162 @@ class ApplicantDecisionForm(FlaskForm):
 
     submit = SubmitField("決定する")
 
+ 
+#ユーザー情報更新
+class UserUpdateForm(FlaskForm):
+    username = StringField(
+        "ユーザー名",
+        validators=[
+            DataRequired(message="ユーザー名は必須です。"),
+            Length(max=30, message="30文字以内で入力してください。"),
+        ],
+    )
+    email = StringField(
+        "メールアドレス",
+        validators=[
+            DataRequired(message="メールアドレスは必須です。"),
+            Email(message="メールアドレスの形式で入力してください。"),
+        ],
+    )
+    # 編集時は空欄でも通るように Optional() をつける（入力されたときだけ更新する想定）
+    password = PasswordField(
+        "パスワード（変更する場合のみ）",
+        validators=[Optional()],
+    )
+    age = IntegerField(
+        "年齢",
+        validators=[DataRequired(message="必須です。")],
+    )
+    phone_number = StringField(
+        "電話番号",
+        validators=[DataRequired(message="必須です。")],
+    )
+    nickname = StringField(
+        "ニックネーム",
+        validators=[DataRequired(message="必須です。")],
+    )
+    submit = SubmitField("変更")
+ 
+#募集更新
+class RecruitmentUpdateForm(FlaskForm):
+ 
+    kind = RadioField(
+        "募集種類",
+        choices=[("#農業", "農業"), ("#漁業", "漁業"),("#林業","林業")],
+        validators=[DataRequired()]
+    )
+ 
+    title = StringField(
+        "募集タイトル",
+        validators=[
+            DataRequired(),
+            Length(max=100)
+        ]
+    )
+ 
+    description = TextAreaField(
+        "募集内容",
+        validators=[
+            DataRequired(),
+            Length(max=400)
+        ]
+    )
+ 
+    photo = MultipleFileField(
+        "募集画像（複数選択可能）",
+        validators=[Optional()]
+    )
+ 
+    # 募集動画（任意）
+    video = FileField(
+        "募集動画（任意）",
+        validators=[
+            Optional(),
+            FileAllowed(
+                ["mp4", "webm"],
+                "MP4またはWebM形式の動画を選択してください"
+            )
+        ]
+    )
+ 
+    tag = StringField(
+        "タグ（スペース区切りで入力）",
+        validators=[
+            Optional()
+        ])
+ 
+    location_prefecture = SelectField(
+            "都道府県",
+            default="岩手県",
+            validators=[
+                DataRequired(),
+            ]
+        )
+ 
+    location_city = SelectField(
+        "市区町村",
+        validators=[
+            DataRequired(),
+        ]
+    )
+ 
+    location_detail = StringField(
+        "詳しい住所",
+        validators=[
+            DataRequired(),
+            Length(max=100)
+        ]
+    )
+ 
+    start_at = DateTimeLocalField(
+        "活動開始日時",
+        format="%Y-%m-%dT%H:%M",
+        validators=[DataRequired()]
+    )
+ 
+    end_at = DateTimeLocalField(
+        "活動終了日時",
+        format="%Y-%m-%dT%H:%M",
+        validators=[DataRequired()]
+    )
+ 
+    application_start_at = DateTimeLocalField(
+        "募集開始日時",
+        format="%Y-%m-%dT%H:%M",
+        validators=[DataRequired()]
+    )
+ 
+    application_end_at = DateTimeLocalField(
+        "募集終了日時",
+        format="%Y-%m-%dT%H:%M",
+        validators=[DataRequired()]
+    )
+ 
+    capacity = IntegerField(
+        "募集人数",
+        validators=[
+            DataRequired(),
+            NumberRange(min=1)
+        ]
+    )
+ 
+    eligibility = StringField(
+        "参加条件",
+        validators=[
+            DataRequired(),
+            Length(max=100)
+        ]
+    )
+ 
+    required_items = StringField(
+        "持ち物",
+        validators=[
+            DataRequired(),
+            Length(max=100)
+        ]
+    )
+ 
+    submit = SubmitField("募集を登録")
+ 
+ 
 

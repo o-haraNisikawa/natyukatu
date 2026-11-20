@@ -50,6 +50,8 @@ from apps.natyukatu.forms import (
     SearchForm,
     ApplicantDecisionForm,
     WithdrawalForm,
+    UserUpdateForm,
+    RecruitmentUpdateForm,
 )
 
 from apps.crud.forms import UserForm
@@ -129,77 +131,62 @@ def recruitment_video(recruitment_id):
 #トップ画面
 @dt.route("/", methods=["GET", "POST"])
 def top():
- 
-    # 各メソッドを持ってくる
-    # ユーザーID取得
     user_id = get_user_id()
- 
-    # データベース初期登録
-    
-    #delete()
-    #init_data()
-    
-    # 検索フォーム
     search_form = SearchForm(prefix="search")
- 
-    # タグ検索用
     set_tag_choices(search_form)
- 
-    # タグを分類ごとに取得
+
     tag_groups = {
-        # 1：産業種別
-        1: RecruitmentTag.query.filter_by(tag_kinds=1).all(),
- 
-        # 2：作業内容・参加条件・その他
-        2: RecruitmentTag.query.filter_by(tag_kinds=2).all(),
- 
-        # 3：都道府県
-        3: RecruitmentTag.query.filter_by(tag_kinds=3).all(),
- 
-        # 4：市区町村
-        4: RecruitmentTag.query.filter_by(tag_kinds=4).all(),
+        1: RecruitmentTag.query.filter_by(tag_kinds=1).order_by(RecruitmentTag.tag_name).all(),
+        2: RecruitmentTag.query.filter_by(tag_kinds=2).order_by(RecruitmentTag.tag_name).all(),
+        3: RecruitmentTag.query.filter_by(tag_kinds=3).order_by(RecruitmentTag.tag_name).all(),
+        4: RecruitmentTag.query.filter_by(tag_kinds=4).order_by(RecruitmentTag.tag_name).all(),
     }
- 
-    # お気に入りフォーム
+
     like_form = LikeForm(prefix="like")
- 
-    # POSTリクエスト時の処理
+
     if request.method == "POST":
- 
-        # お気に入りボタンが押された場合
         if "like-submit" in request.form and like_form.validate_on_submit():
+            if not current_user.is_authenticated:
+                abort(403)
             recruitment_id = int(like_form.recruitment_id.data)
- 
             existing_like = Like.query.filter_by(
                 user_id=user_id,
                 recruitment_id=recruitment_id
             ).first()
- 
             if existing_like:
                 delete_like(user_id, recruitment_id)
             else:
                 add_like(user_id, recruitment_id)
- 
             return redirect(url_for("natyukatu.top"))
- 
-    # 入力されたタグIDを取得
-    selected_tag_ids = search_form.tag_id.data or []
- 
-    # 入力された検索ワード取得
-    keyword = search_form.keyword.data if hasattr(search_form, 'keyword') else None
- 
-    # 絞り込み条件を反映した募集一覧を取得
+
+    # タグリンクからGETで来た場合も、通常の検索フォームと同じ条件で検索する
+    if request.method == "GET" and request.args.get("tag_id"):
+        try:
+            selected_tag_ids = [int(value) for value in request.args.getlist("tag_id")]
+        except (TypeError, ValueError):
+            selected_tag_ids = []
+        search_form.tag_id.data = selected_tag_ids
+    else:
+        selected_tag_ids = search_form.tag_id.data or []
+
+    keyword = (search_form.keyword.data or request.args.get("keyword", "")).strip()
+    sort_order = request.form.get("sort_order") or request.args.get("sort_order", "newest")
+    allowed_sorts = {
+        "newest", "oldest", "start_asc", "start_desc",
+        "title_asc", "title_desc", "capacity_asc", "capacity_desc"
+    }
+    if sort_order not in allowed_sorts:
+        sort_order = "newest"
+
     recruitments = get_recruitment_list(
         keyword=keyword,
-        tag_ids=selected_tag_ids
+        tag_ids=selected_tag_ids,
+        sort_order=sort_order
     )
- 
-    # お気に入り一覧取得
-    like_list = get_like_list(user_id)
- 
-    # 閲覧履歴取得
-    view_history_list = get_view_history_list(user_id)
- 
+    like_list = get_like_list(user_id) if user_id else []
+    view_history_list = get_view_history_list(user_id) if user_id else []
+    recruitment_tags = get_recruitment_tag_map([item.id for item in recruitments])
+
     return render_template(
         "natyukatu/top.html",
         form=search_form,
@@ -208,29 +195,73 @@ def top():
         like_list=like_list,
         view_history_list=view_history_list,
         tag_groups=tag_groups,
+        sort_order=sort_order,
+        recruitment_tags=recruitment_tags,
     )
- 
-# 募集一覧取得（タグとワードで絞り込み有）
-def get_recruitment_list(keyword=None, tag_ids=None):
-    query = db.session.query(Recruitment).outerjoin(
-        Tag,
-        Recruitment.id == Tag.recruitment_id
-    )
-    
-    # キーワード検索がある場合
+
+
+# 募集一覧取得（キーワード・タグ・並び順で絞り込み）
+def get_recruitment_list(keyword=None, tag_ids=None, sort_order="newest"):
+    query = Recruitment.query
+
     if keyword:
-        query = query.filter(Recruitment.title.like(f"%{keyword}%"))
-        
-    # タグIDをリスト形式に統一
-    if tag_ids is None:
-        tag_ids = []
-    elif isinstance(tag_ids, (int, str)):
-        tag_ids = [int(tag_ids)] if str(tag_ids).isdigit() else []
-    else:
-        tag_ids = [int(tag_id) for tag_id in tag_ids if str(tag_id).isdigit()]
-           
-        recruitments = query.distinct().order_by(desc(Recruitment.created_at)).all()
-        return recruitments
+        query = query.filter(
+            db.or_(
+                Recruitment.title.ilike(f"%{keyword}%"),
+                Recruitment.description.ilike(f"%{keyword}%"),
+                Recruitment.location_prefecture.ilike(f"%{keyword}%"),
+                Recruitment.location_city.ilike(f"%{keyword}%")
+            )
+        )
+
+    normalized_ids = []
+    for tag_id in (tag_ids or []):
+        try:
+            value = int(tag_id)
+            if value > 0 and value not in normalized_ids:
+                normalized_ids.append(value)
+        except (TypeError, ValueError):
+            continue
+
+    if normalized_ids:
+        query = query.join(Tag, Recruitment.id == Tag.recruitment_id).filter(
+            Tag.tag_id.in_(normalized_ids)
+        )
+
+    sort_columns = {
+        "newest": Recruitment.created_at.desc(),
+        "oldest": Recruitment.created_at.asc(),
+        "start_asc": Recruitment.start_at.asc(),
+        "start_desc": Recruitment.start_at.desc(),
+        "title_asc": Recruitment.title.asc(),
+        "title_desc": Recruitment.title.desc(),
+        "capacity_asc": Recruitment.capacity.asc(),
+        "capacity_desc": Recruitment.capacity.desc(),
+    }
+    return query.distinct().order_by(
+        sort_columns.get(sort_order, Recruitment.created_at.desc()),
+        Recruitment.id.desc()
+    ).all()
+
+# 募集ごとのタグを取得（トップ一覧・募集詳細で共通利用）
+def get_recruitment_tag_map(recruitment_ids):
+    if not recruitment_ids:
+        return {}
+
+    rows = (
+        db.session.query(Tag.recruitment_id, RecruitmentTag)
+        .join(RecruitmentTag, Tag.tag_id == RecruitmentTag.id)
+        .filter(Tag.recruitment_id.in_(recruitment_ids))
+        .order_by(RecruitmentTag.tag_kinds, RecruitmentTag.tag_name)
+        .all()
+    )
+
+    tag_map = {}
+    for recruitment_id, tag in rows:
+        tag_map.setdefault(recruitment_id, []).append(tag)
+
+    return tag_map
+
 
 #タグ取得
 def set_tag_choices(form):
@@ -397,7 +428,7 @@ def recruitment_register():
             db.session.add(image)
 
         # 種類（農業、漁業、林業）
-        selected_kind = form.kind.data
+        selected_kind = form.kind.data.lstrip("#") if form.kind.data else ""
         selected_kind_id = RecruitmentTag.query.filter_by(tag_name=selected_kind, tag_kinds=1).first()
         if selected_kind_id:
             search_tag = Tag(
@@ -407,7 +438,7 @@ def recruitment_register():
             db.session.add(search_tag)
 
         # 県（岩手県固定で紐付け）
-        pref_tag = RecruitmentTag.query.filter_by(tag_name="岩手県", tag_kinds=3).first()
+        pref_tag = RecruitmentTag.query.filter_by(tag_name=selected_pref, tag_kinds=3).first()
         if pref_tag:
             db.session.add(Tag(tag_id=pref_tag.id, recruitment_id=recruitment.id))
 
@@ -417,7 +448,7 @@ def recruitment_register():
             db.session.add(Tag(tag_id=city_tag.id, recruitment_id=recruitment.id))
 
         # スペース区切りで分割
-        tags = form.tag.data.strip().split()
+        tags = (form.tag.data or "").strip().split()
         for tag in tags:
             tag_obj = RecruitmentTag.query.filter_by(tag_name=tag).first()
             if not tag_obj:
@@ -466,7 +497,7 @@ def userDetail():
 )
 @login_required
 def edit_profile():
-    form = UserForm()
+    form = UserUpdateForm()
  
     user = User.query.filter_by(
         id=get_user_id()
@@ -541,7 +572,6 @@ def withdrawal():
 
 #退会完了
 @dt.route("/mypage/withdrawal-complete")
-@login_required
 def withdrawal_complete():
     return render_template("natyukatu/withdrawal_complete.html")
 
@@ -550,13 +580,11 @@ def withdrawal_complete():
     "/contact",
     methods=["GET", "POST"]
 )
-@login_required
 def contact():
     form = ContactForm()
  
     if form.validate_on_submit():
         contact_history = ContactHistory(
-            id=get_user_id(),
             name=form.name.data,
             email=form.email.data,
             subject=form.subject.data,
@@ -592,9 +620,12 @@ def recruitment_detail(recruitment_id):
         db.session.add(history)
         db.session.commit()
  
+    recruitment_tags = get_recruitment_tag_map([recruitment.id]).get(recruitment.id, [])
+
     return render_template(
         "natyukatu/recruitment_detail.html",
         recruitment=recruitment,
+        recruitment_tags=recruitment_tags,
     )
  
 #参加申し込み
@@ -621,6 +652,9 @@ def participation_application(recruitment_id):
         ))
     
     if form.validate_on_submit():
+        if recruitment.application_start_at and datetime.now() < recruitment.application_start_at:
+            flash("募集開始前のため申し込みできません")
+            return redirect(url_for("natyukatu.recruitment_detail", recruitment_id=recruitment_id))
         if recruitment.application_end_at < datetime.now():
             flash("募集期間が終了しています")
             return redirect(url_for(
@@ -628,9 +662,23 @@ def participation_application(recruitment_id):
                 recruitment_id=recruitment_id
             ))
  
+        requested_count = form.participant_count.data or 1
+        accepted_entries = ParticipationHistory.query.filter_by(
+            recruitment_id=recruitment_id
+        ).all()
+        occupied = sum(
+            item.participant_count or 1
+            for item in accepted_entries
+            if not item.status or item.status.status_name != "否"
+        )
+        if occupied + requested_count > recruitment.capacity:
+            flash("募集人数を超えるため申し込みできません")
+            return redirect(url_for("natyukatu.recruitment_detail", recruitment_id=recruitment_id))
+
         entry = ParticipationHistory(
             recruitment_id=recruitment_id,
             user_id=get_user_id(),
+            participant_count=requested_count,
             message=form.message.data,
             status_id=3,
         )
@@ -655,7 +703,7 @@ def participation_application_complete():
     return render_template("natyukatu/participation_application_complete.html")
 
 #申込済み画面
-@dt.route("/natyukatu.participation_application_already/<recruitment_id>",methods=["GET"])
+@dt.route("/participation_application_already/<recruitment_id>", methods=["GET"])
 @login_required
 def participation_application_already(recruitment_id):
     recruitment = get_recruitment(recruitment_id)
@@ -702,7 +750,7 @@ def recruitment_update(recruitment_id):
     if recruitment.user_id != get_user_id():
         abort(403)
 
-    form = RecruitmentForm()
+    form = RecruitmentUpdateForm()
 
     # 都道府県(tag_kinds=3)の choices をセット
     prefecture_tags = RecruitmentTag.query.filter_by(tag_kinds=3).all()
@@ -725,8 +773,35 @@ def recruitment_update(recruitment_id):
         recruitment.title = form.title.data
         recruitment.description = form.description.data
 
-        if form.photo.data:
-            recruitment.photo = form.photo.data.read()
+        update_photos = [
+            photo for photo in (form.photo.data or [])
+            if photo and getattr(photo, "filename", "")
+        ]
+        if update_photos:
+            allowed_extensions = {"jpg", "jpeg", "png"}
+            for photo in update_photos:
+                extension = photo.filename.rsplit(".", 1)[-1].lower()
+                if extension not in allowed_extensions:
+                    flash("画像はjpg、jpeg、png形式で選択してください")
+                    return render_template("natyukatu/recruitment_update.html", form=form, recruitment=recruitment)
+            recruitment.photo = update_photos[0].read()
+            recruitment.photo_mimetype = update_photos[0].mimetype or "image/jpeg"
+            RecruitmentImage.query.filter_by(recruitment_id=recruitment.id).delete()
+            for index, photo in enumerate(update_photos[1:], start=1):
+                db.session.add(RecruitmentImage(
+                    recruitment_id=recruitment.id,
+                    image_data=photo.read(),
+                    mimetype=photo.mimetype or "image/jpeg",
+                    display_order=index
+                ))
+
+        if form.video.data and form.video.data.filename:
+            extension = form.video.data.filename.rsplit(".", 1)[-1].lower()
+            if extension not in {"mp4", "webm"}:
+                flash("動画はMP4またはWebM形式を選択してください")
+                return render_template("natyukatu/recruitment_update.html", form=form, recruitment=recruitment)
+            recruitment.video = form.video.data.read()
+            recruitment.video_mimetype = form.video.data.mimetype or "video/mp4"
 
         recruitment.location_prefecture = selected_pref
         recruitment.location_city = selected_city
@@ -850,14 +925,16 @@ def recruitment_update_complete():
 @login_required
 def recruitment_delete(recruitment_id):
     recruitment = get_recruitment(recruitment_id)
- 
     if recruitment.user_id != get_user_id():
         abort(403)
- 
+    if request.form.get("confirm_check") != "on":
+        flash("削除に同意するチェックを入れてください")
+        return redirect(url_for("natyukatu.recruitment_history"))
     db.session.delete(recruitment)
     db.session.commit()
- 
+    flash("募集を削除しました")
     return redirect(url_for("natyukatu.recruitment_delete_complete"))
+
 
 #募集削除完了画面
 @dt.route("/recruitment_delete_complete")
@@ -866,6 +943,43 @@ def recruitment_delete_complete():
     return render_template("natyukatu/recruitment_delete_complete.html")
 
 #活動用画面
+@dt.route("/application_management/<int:recruitment_id>")
+@login_required
+def application_management(recruitment_id):
+    recruitment = get_recruitment(recruitment_id)
+    if recruitment.user_id != get_user_id():
+        abort(403)
+    entries = ParticipationHistory.query.filter_by(
+        recruitment_id=recruitment_id
+    ).order_by(ParticipationHistory.added_at.desc()).all()
+    return render_template(
+        "natyukatu/application_management.html",
+        recruitment=recruitment,
+        entries=entries
+    )
+
+
+@dt.route("/applicant_decision/<int:applicant_id>", methods=["POST"])
+@login_required
+def applicant_decision(applicant_id):
+    entry = ParticipationHistory.query.get_or_404(applicant_id)
+    recruitment = get_recruitment(entry.recruitment_id)
+    if recruitment.user_id != get_user_id():
+        abort(403)
+    decision = request.form.get("status")
+    if decision not in {"可", "否"}:
+        abort(400)
+    status = Status.query.filter_by(status_name=decision).first()
+    if status is None:
+        status = Status(status_name=decision)
+        db.session.add(status)
+        db.session.flush()
+    entry.status_id = status.id
+    db.session.commit()
+    flash(f"申込を「{decision}」に変更しました")
+    return redirect(url_for("natyukatu.application_management", recruitment_id=recruitment.id))
+
+
 @dt.route("/for_active/<recruitment_id>", methods=["GET", "POST"])
 @login_required
 def for_active(recruitment_id):
@@ -904,17 +1018,21 @@ def for_active(recruitment_id):
             db.session.delete(entry)
             db.session.commit()
             flash("申込者を削除しました")
-            return redirect(url_for("dt.for_active", recruitment_id=recruitment_id))
+            return redirect(url_for("natyukatu.for_active", recruitment_id=recruitment_id))
 
     # 参加者一覧を取得
     entries = ParticipationHistory.query.filter_by(
         recruitment_id=recruitment_id
     ).all()
+    messages = ActiveMessage.query.filter_by(
+        recruitment_id=recruitment_id
+    ).order_by(ActiveMessage.post_at.asc()).all()
 
     return render_template(
         "natyukatu/for_active.html",
         recruitment=recruitment,
         entries=entries,
+        messages=messages,
         form=form,
     )
 
@@ -955,68 +1073,52 @@ def messages(recruitment_id):
 # ⑱ サンクスボタン
 # =====================================
  
-@dt.route(
-    "/thanks/<active_id>/<user_id>",
-    methods=["POST"]
-)
+@dt.route("/thanks/<active_id>/<user_id>", methods=["POST"])
 @login_required
 def thanks(active_id, user_id):
     recruitment = get_recruitment(active_id)
- 
     if recruitment.user_id != get_user_id():
         abort(403)
- 
-    point = ThanksPoint(
-        point_id=make_id(),
-        user_id=user_id,
-        activity_id=active_id,
-        record_id=make_id(),
-        point_count=1
-    )
- 
-    db.session.add(point)
+
+    entry = ParticipationHistory.query.filter_by(
+        recruitment_id=active_id,
+        user_id=user_id
+    ).first_or_404()
+    if entry.thanks_sent:
+        flash("この参加者にはすでにありがとうを送っています")
+        return redirect(url_for("natyukatu.for_active", recruitment_id=active_id))
+
+    recipient = User.query.get_or_404(user_id)
+    recipient.tanks_point = (recipient.tanks_point or 0) + 1
+    entry.thanks_sent = True
     db.session.commit()
- 
     flash("サンクスポイントを送りました")
- 
-    return redirect(url_for(
-        "natyukatu.participations"
-    ))
- 
- 
+    return redirect(url_for("natyukatu.for_active", recruitment_id=active_id))
+
+
 # =====================================
 # ⑲ ランキング生成
 # =====================================
  
 @dt.route("/ranking")
 def ranking():
-    results = db.session.query(
-        ThanksPoint.user_id,
-        db.func.sum(ThanksPoint.point_count).label("total_points")
-    ).group_by(
-        ThanksPoint.user_id
+    results = User.query.filter(
+        User.tanks_point > 0
     ).order_by(
-        db.func.sum(ThanksPoint.point_count).desc()
+        User.tanks_point.desc(),
+        User.nickname.asc()
     ).all()
- 
-    return render_template(
-        "natyukatu/ranking.html",
-        rankings=results
-    )
- 
+    return render_template("natyukatu/ranking.html", rankings=results)
 
- 
-# =====================================
-# ㉒ 管理者用削除
-# =====================================
- 
+
 @dt.route(
     "/admin/recruitments/<active_id>/delete",
     methods=["POST"]
 )
 @login_required
 def admin_delete_recruitment(active_id):
-    # 管理者権限の確認をここに追加する
+    if getattr(current_user, "role", None) != 1:
+        abort(403)
     recruitment = get_recruitment(active_id)
  
     db.session.delete(recruitment)
@@ -1030,14 +1132,14 @@ def admin_delete_recruitment(active_id):
 @dt.route("/admin")
 @login_required
 def admin():
-    recruitments = Recruitment.query.all()
-    entries = Entry.query.all()
-    users = User.query.all()
- 
+    if getattr(current_user, "role", None) != 1:
+        abort(403)
+    recruitments = Recruitment.query.order_by(Recruitment.created_at.desc()).all()
+    entries = ParticipationHistory.query.order_by(ParticipationHistory.added_at.desc()).all()
+    users = User.query.order_by(User.id.asc()).all()
     return render_template(
         "natyukatu/admin.html",
         recruitments=recruitments,
         entries=entries,
         users=users
     )
- 

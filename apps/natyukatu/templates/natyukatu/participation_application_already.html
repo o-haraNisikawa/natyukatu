@@ -1,16 +1,9 @@
 {% extends "natyukatu/base.html" %}
 
 
-{% block page_css %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/participation_application.css') }}" />
-{% endblock %}
+
 {% block content %}
 <section class="complete-card" aria-labelledby="completeTitle">
-  <div class="success-mark" aria-hidden="true">
-    <svg viewBox="0 0 64 64">
-      <path d="m9 34 15 15L56 16"></path>
-    </svg>
-  </div>
 
   <p class="message">すでに申し込み済みです。</p>
   <a href="{{ url_for('natyukatu.recruitment_detail', recruitment_id=recruitment.id) }}">

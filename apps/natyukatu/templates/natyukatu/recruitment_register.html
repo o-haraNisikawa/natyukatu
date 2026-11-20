@@ -2,9 +2,7 @@
 {% extends "natyukatu/base.html" %}
 {% block title %}新規募集登録 | なちゅ活{% endblock %}
 
-{% block page_css %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/recruitment_register.css') }}" />
-{% endblock %}
+
 
 {% block content %}
 <section class="page-heading">
@@ -36,9 +34,9 @@
       {{ field.label(class_="form-label") }}
 
       {% if field.type in ['FileField', 'MultipleFileField'] %}
-        {{ field(class_="form-input-file") }}
+        {{ field(class_="form-control") }}
       {% else %}
-        {{ field(class_="form-input") }}
+        {{ field(class_="form-control") }}
       {% endif %}
 
       {% if field.name == 'photo' %}
@@ -56,7 +54,7 @@
   {% endfor %}
 
   <div class="form-actions">
-    {{ form.submit(class_="button primary-button") }}
+    {{ form.submit(class_="btn btn-primary") }}
   </div>
 </form>
 {% endblock %}

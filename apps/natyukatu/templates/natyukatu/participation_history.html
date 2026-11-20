@@ -1,9 +1,7 @@
 {% extends "natyukatu/base.html" %}
 
 
-{% block page_css %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/participation_history.css') }}" />
-{% endblock %}
+
 {% block content %}
 <section class="page-heading">
   <h1 class="page-title">参加履歴</h1>
@@ -17,6 +15,7 @@
         <tr>
           <th scope="col">開催日時</th>
           <th scope="col">募集名</th>
+          <th scope="col">参加人数</th>
           <th scope="col">詳細</th>
           <th scope="col">状態</th>
           
@@ -30,6 +29,7 @@
             {{ history.recruitment.start_at.strftime("%Y/%m/%d %H:%M") }}
           </td>
           <td>{{ history.recruitment.title }}</td>
+          <td>{{ history.participant_count }}人</td>
           <td>
             <a
               class="detail-link"
@@ -42,7 +42,7 @@
             </a>
           </td>
           <td>
-            {{ history.status.status_name }}
+            {{ history.status.status_name if history.status else '未設定' }}
           </td>
         </tr>
         {% endfor %}

@@ -1,16 +1,9 @@
 {% extends "natyukatu/base.html" %}
  
 
-{% block page_css %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/withdrawal_complete.css') }}" />
-{% endblock %}
+
 {% block content %}
 <section class="complete-card" aria-labelledby="completeTitle">
-  <div class="success-mark" aria-hidden="true">
-    <svg viewBox="0 0 64 64">
-      <path d="m10 34 15 15L55 17"></path>
-    </svg>
-  </div>
  
   <h1 class="complete-title" id="completeTitle">
     退会完了

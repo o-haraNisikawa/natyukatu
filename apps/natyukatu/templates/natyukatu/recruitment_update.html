@@ -3,9 +3,7 @@
 {% block title %}募集情報変更 | なちゅ活{% endblock %}
 
 
-{% block page_css %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/recruitment_update.css') }}" />
-{% endblock %}
+
 {% block content %}
 <section class="page-heading">
   <h1>募集情報変更</h1>
@@ -19,6 +17,7 @@
     form.title,
     form.description,
     form.photo,
+    form.video,
     form.tag,
     form.location_prefecture,
     form.location_city,
@@ -35,16 +34,16 @@
       {{ field.label(class_="form-label") }}
 
       {% if field.type == "FileField" %}
-        {{ field(class_="form-input-file", accept=".jpg,.jpeg,.png") }}
+        {{ field(class_="form-control", accept=".jpg,.jpeg,.png") }}
         <small>画像を変更する場合だけ選択してください。選択しなければ現在の画像を使います。</small>
       {% elif field.type == "TextAreaField" %}
-        {{ field(class_="form-input") }}
+        {{ field(class_="form-control") }}
       {% elif field.type == "RadioField" %}
         <div class="radio-group">
           {{ field(class_="form-radio") }}
         </div>
       {% else %}
-        {{ field(class_="form-input") }}
+        {{ field(class_="form-control") }}
       {% endif %}
 
       {% if field.errors %}

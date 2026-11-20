@@ -1,12 +1,5 @@
-<!DOCTYPE html>
-<html lang="ja">
-    <head>
-        <meta charset="UTF-8" />
-        <title>404 Not Found (detector)</title>
-    </head>
-
-    <body>
-        <h1>404 Not Found (detector)</h1>
-        <p><a href="/">アプリケーショントップへ</a></p>
-    </body>
-</html>
+{% extends "natyukatu/base.html" %}
+{% block title %}エラー | なちゅ活{% endblock %}
+{% block content %}<div class="card card-body shadow-sm text-center mx-auto" style="max-width:640px">
+<h1 class="display-5 text-primary">エラー</h1><p>ページを表示できませんでした。</p>
+<a class="btn btn-primary" href="{{ url_for('natyukatu.top') }}">トップページへ戻る</a></div>{% endblock %}

@@ -1,9 +1,7 @@
 {% extends "natyukatu/base.html" %}
 
 
-{% block page_css %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/application_management.css') }}" />
-{% endblock %}
+
 {% block content %}
 <section class="page-heading">
   <h1>申し込み管理</h1>
@@ -19,6 +17,7 @@
         <thead>
           <tr>
             <th scope="col">申込者</th>
+            <th scope="col">参加人数</th>
             <th scope="col">申込内容</th>
             <th scope="col">状態</th>
             <th scope="col">審査</th>
@@ -31,8 +30,9 @@
               <td>
                 {{ entry.user.username if entry.user else "ユーザー情報なし" }}
               </td>
+              <td>{{ entry.participant_count }}人</td>
               <td>{{ entry.message or "－" }}</td>
-              <td>{{ entry.status }}</td>
+              <td>{{ entry.status.status_name if entry.status else '未設定' }}</td>
               <td>
                 <div class="review-actions">
                   <form
@@ -42,7 +42,7 @@
                     ) }}"
                     method="post"
                   >
-                    {{ csrf_token() }}
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <input type="hidden" name="applicant_id" value="{{ entry.id }}">
                     <input type="hidden" name="status" value="可">
                     <button class="review-button approve" type="submit">可</button>
@@ -55,7 +55,7 @@
                     ) }}"
                     method="post"
                   >
-                    {{ csrf_token() }}
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <input type="hidden" name="applicant_id" value="{{ entry.id }}">
                     <input type="hidden" name="status" value="否">
                     <button class="review-button" type="submit">否</button>
