@@ -1,98 +1,29 @@
-* { box-sizing: border-box; }
-html { min-height: 100%; }
-body { margin: 0; min-height: 100vh; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans JP", sans-serif; color: #102b55; background: #f4f8fc; }
-a { color: #0788f5; }
-.navbar { width: 100%; background: #102b55; color: #fff; padding: 14px 24px; }
-.navbar .container { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
-.navbar-brand { color: #fff; font-size: 22px; font-weight: 700; text-decoration: none; white-space: nowrap; }
-.navbar-nav { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px 20px; margin: 0; padding: 0; list-style: none; }
-.site-nav-link { display: inline-flex; align-items: center; color: #eaf4ff; text-decoration: none; padding: 7px 2px; }
-.site-nav-link:hover, .navbar-brand:hover { color: #75d8d1; }
-.container { width: min(1200px, calc(100% - 40px)); margin-left: auto; margin-right: auto; }
-section.container { min-height: 65vh; padding-top: 28px; padding-bottom: 40px; }
-footer.text-muted { color: #7185a2; background: #eaf1f8; padding: 24px 0; }
-footer .container { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
-footer p { margin: 0; }
-button, input, select, textarea { font: inherit; }
-@media (max-width: 700px) { .navbar { padding: 12px 16px; } .navbar .container { align-items: flex-start; flex-direction: column; gap: 8px; } .navbar-nav { justify-content: flex-start; gap: 4px 14px; } .container { width: calc(100% - 28px); } }
-
-/* Flaskテンプレート共通のフォーム・カード部品 */
-section.container > h1, section.container > .page-heading h1 { color: #102b55; font-size: clamp(1.65rem, 3vw, 2.25rem); margin: 0 0 18px; }
-section.container > h2 { color: #102b55; font-size: 1.35rem; margin: 30px 0 14px; }
-section.container form { margin: 16px 0 28px; padding: 22px; background: #fff; border: 1px solid #dce6f2; border-radius: 14px; box-shadow: 0 5px 18px rgba(16,43,85,.05); }
-section.container form p { margin: 0 0 14px; }
-section.container label { color: #29466c; font-weight: 600; }
-section.container input:not([type="checkbox"]):not([type="radio"]), section.container select, section.container textarea { max-width: 100%; padding: 10px 12px; border: 1px solid #cbd8e8; border-radius: 8px; background: #fff; color: #102b55; }
-section.container input:focus, section.container select:focus, section.container textarea:focus { outline: 3px solid rgba(7,136,245,.16); border-color: #0788f5; }
-section.container details { margin: 16px 0; padding: 14px 16px; border: 1px solid #dce6f2; border-radius: 10px; background: #f8fbff; }
-section.container details > summary { color: #076fce; font-weight: 700; cursor: pointer; }
-section.container fieldset { margin: 14px 0; padding: 14px; border: 1px solid #dce6f2; border-radius: 10px; }
-section.container legend { padding: 0 8px; color: #102b55; font-weight: 700; }
-section.container fieldset label { display: inline-flex; align-items: center; gap: 5px; margin: 5px 10px 5px 0; padding: 5px 8px; border-radius: 7px; background: #edf6ff; }
-section.container button, section.container input[type="submit"] { padding: 10px 20px; border: 0; border-radius: 8px; background: #0788f5; color: #fff; font-weight: 700; cursor: pointer; }
-section.container button:hover, section.container input[type="submit"]:hover { background: #006dcc; }
-section.container article { margin: 14px 0; padding: 20px; border: 1px solid #dce6f2; border-radius: 12px; background: #fff; box-shadow: 0 4px 15px rgba(16,43,85,.045); }
-section.container article h3 { margin-top: 0; color: #102b55; }
-section.container ul { padding-left: 24px; }
-section.container a { color: #0676d5; font-weight: 600; }
-@media (max-width: 700px) { section.container form { padding: 15px; } section.container fieldset label { margin-right: 4px; } }
-
-
-/* ヘッダー専用ナビゲーション：各ページCSSとのクラス名競合を防止 */
-.navbar .container {
-  min-width: 0;
-  flex-wrap: wrap;
-}
-.navbar .navbar-nav {
-  flex: 1 1 auto;
-  min-width: 0;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 4px 16px;
-}
-.navbar .navbar-nav > li {
-  flex: 0 0 auto;
-  min-width: 0;
-}
-.navbar .site-nav-link {
-  min-height: 0;
-  height: auto;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 7px 3px;
-  margin: 0;
-  border-radius: 0;
-  color: #eaf4ff;
-  font-size: 14px;
-  font-weight: 600;
-  line-height: 1.5;
-  white-space: nowrap;
-  text-decoration: none;
-}
-.navbar .site-nav-link:hover {
-  color: #75d8d1;
-}
-.navbar .navbar-brand {
-  flex: 0 0 auto;
-}
-@media (max-width: 900px) {
-  .navbar .container {
-    align-items: flex-start;
+ 
+/* ページ全体 */
+body {
+    min-height: 100vh;
+    display: flex;
     flex-direction: column;
-    gap: 8px;
-  }
-  .navbar .navbar-nav {
-    width: 100%;
-    flex: 0 1 auto;
-    justify-content: flex-start;
-    gap: 4px 14px;
-  }
 }
-@media (max-width: 700px) {
-  .navbar .site-nav-link {
-    padding: 6px 2px;
-    font-size: 13px;
-  }
+ 
+/* メインコンテンツ */
+main {
+    flex: 1;
 }
+ 
+/* ナビゲーションリンク */
+.navbar .nav-link {
+    color: white;
+    transition: 0.2s;
+}
+ 
+.navbar .nav-link:hover {
+    color: #dbeafe;
+}
+ 
+/* フッター */
+footer {
+    margin-top: auto;
+}
+ 
+ 
