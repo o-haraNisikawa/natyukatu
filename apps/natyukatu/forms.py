@@ -236,7 +236,6 @@ class ParticipationForm(FlaskForm):
     submit = SubmitField("参加申し込み")
 
 #募集削除フォーム
-
 class RecruitmentDeleteForm(FlaskForm):
     recruitment_id = HiddenField(
         "募集ID",
@@ -250,10 +249,12 @@ class RecruitmentDeleteForm(FlaskForm):
 
     submit = SubmitField("募集を削除")
 
-# =====================================
-# ⑧ 参加・募集履歴更新フォーム(分ける)
-# =====================================
+class ParticipationQuitForm(FlaskForm):
+    """参加辞退の確認フォーム"""
 
+    submit = SubmitField("辞退する")
+
+#参加・募集履歴更新フォーム(分ける)
 class HistoryUpdateForm(FlaskForm):
     status = SelectField(
         "履歴状態",
@@ -278,10 +279,8 @@ class HistoryUpdateForm(FlaskForm):
 
     submit = SubmitField("履歴を更新")
 
-# =====================================
-# ⑤ メッセージフォーム
-# =====================================
 
+#メッセージフォーム
 class MessageForm(FlaskForm):
     message = StringField(
         "メッセージ",
@@ -293,10 +292,7 @@ class MessageForm(FlaskForm):
 
     submit = SubmitField("投稿する")
 
-# =====================================
-# ⑩ 申込者一覧・可否ボタンフォーム
-# =====================================
-
+#申込者一覧・可否ボタンフォーム
 class ApplicantDecisionForm(FlaskForm):
     applicant_id = HiddenField(
         "申込者ID",
@@ -470,6 +466,3 @@ class RecruitmentUpdateForm(FlaskForm):
     )
  
     submit = SubmitField("募集を登録")
- 
- 
-

@@ -60,6 +60,17 @@
               -
             {% endif %}
           </td>
+                    <td>
+            <a
+              class="detail-link"
+              href="{{ url_for(
+                'natyukatu.participation_quit',
+                recruitment_id=history.recruitment_id
+              ) }}"
+            >
+              辞退
+            </a>
+          </td>
         </tr>
         {% endfor %}
 

@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: ed377fa40b69
+Revision ID: 622fcc001391
 Revises: 
-Create Date: 2026-11-20 09:45:25.189389
+Create Date: 2026-11-24 14:50:38.350079
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'ed377fa40b69'
+revision = '622fcc001391'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -69,7 +69,6 @@ def upgrade():
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.Column('title', sa.String(), nullable=False),
     sa.Column('description', sa.String(), nullable=False),
-    sa.Column('photo', sa.LargeBinary(), nullable=False),
     sa.Column('location_prefecture', sa.String(), nullable=False),
     sa.Column('location_city', sa.String(), nullable=False),
     sa.Column('location_detail', sa.String(), nullable=False),
@@ -83,6 +82,7 @@ def upgrade():
     sa.Column('status', sa.String(), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
+    sa.Column('photo', sa.LargeBinary(), nullable=True),
     sa.Column('photo_mimetype', sa.String(length=50), nullable=True),
     sa.Column('video', sa.LargeBinary(), nullable=True),
     sa.Column('video_mimetype', sa.String(length=50), nullable=True),
@@ -113,6 +113,7 @@ def upgrade():
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.Column('recruitment_id', sa.Integer(), nullable=False),
     sa.Column('status_id', sa.Integer(), nullable=False),
+    sa.Column('participant_count', sa.Integer(), nullable=False),
     sa.Column('message', sa.Text(), nullable=True),
     sa.Column('added_at', sa.DateTime(), nullable=False),
     sa.ForeignKeyConstraint(['recruitment_id'], ['recruitments.id'], ),

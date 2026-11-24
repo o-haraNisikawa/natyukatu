@@ -1,0 +1,23 @@
+{% extends "natyukatu/base.html" %}
+
+
+
+{% block content %}
+<section class="complete-card" aria-labelledby="completeTitle">
+
+  <h1 class="complete-title" id="completeTitle">
+      参加辞退完了
+  </h1>
+
+  <p class="message">
+    辞退しました。
+  </p>
+
+  <a
+    class="top-link"
+    href="{{ url_for('natyukatu.participation_history') }}"
+  >
+    募集履歴画面へ
+  </a>
+</section>
+{% endblock %}

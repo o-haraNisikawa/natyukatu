@@ -67,7 +67,7 @@ def init_data():
         Status(status_name="参加申込中"),
         Status(status_name="参加中"),
         Status(status_name="辞退"),
-        Status(status_name="参加済み"),
+        Status(status_name="活動終了"),
     ]
 
     db.session.add_all(init)
@@ -76,7 +76,7 @@ def init_data():
 def delete():
     try:
         # テーブルの全件削除
-        Status.query.delete()
+        ParticipationHistory.query.delete()
         db.session.commit()
     except Exception as e:
         db.session.rollback()

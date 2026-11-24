@@ -12,7 +12,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 from apps.natyukatu.data_init import init_data,delete
 import io
 from flask import send_file
- 
+from sqlalchemy.exc import SQLAlchemyError
 from flask import(
     Blueprint,
     current_app,
@@ -52,7 +52,8 @@ from apps.natyukatu.forms import (
     WithdrawalForm,
     UserUpdateForm,
     RecruitmentUpdateForm,
-)
+    ParticipationQuitForm,
+    )
 
 from apps.crud.forms import UserForm
  
@@ -131,6 +132,11 @@ def recruitment_video(recruitment_id):
 #トップ画面
 @dt.route("/", methods=["GET", "POST"])
 def top():
+
+    # データベース初期登録
+    #delete()
+    #init_data()
+
     user_id = get_user_id()
     search_form = SearchForm(prefix="search")
     set_tag_choices(search_form)
@@ -410,7 +416,7 @@ def recruitment_register():
             capacity=form.capacity.data,
             eligibility=form.eligibility.data,
             required_items=form.required_items.data,
-            status="",
+            status=1,
         )
 
         db.session.add(recruitment)
@@ -680,7 +686,7 @@ def participation_application(recruitment_id):
             user_id=get_user_id(),
             participant_count=requested_count,
             message=form.message.data,
-            status_id=3,
+            status_id=4,
         )
  
         db.session.add(entry)
@@ -732,10 +738,10 @@ def recruitment_history():
     histories = RecruitmentHistory.query.filter_by(
         user_id=get_user_id()
     ).all()
- 
+
     return render_template(
         "natyukatu/recruitment_history.html",
-        histories=histories
+        histories=histories,
     )
 
 #募集情報更新
@@ -925,22 +931,71 @@ def recruitment_update_complete():
 @login_required
 def recruitment_delete(recruitment_id):
     recruitment = get_recruitment(recruitment_id)
+ 
     if recruitment.user_id != get_user_id():
         abort(403)
-    if request.form.get("confirm_check") != "on":
-        flash("削除に同意するチェックを入れてください")
-        return redirect(url_for("natyukatu.recruitment_history"))
+ 
     db.session.delete(recruitment)
     db.session.commit()
-    flash("募集を削除しました")
+ 
     return redirect(url_for("natyukatu.recruitment_delete_complete"))
-
 
 #募集削除完了画面
 @dt.route("/recruitment_delete_complete")
 @login_required
 def recruitment_delete_complete():
     return render_template("natyukatu/recruitment_delete_complete.html")
+
+# 参加辞退（確認画面表示 & 辞退処理）
+@dt.route("/participation_quit/<int:recruitment_id>", methods=["GET", "POST"])
+@login_required
+def participation_quit(recruitment_id):
+    recruitment = get_recruitment(recruitment_id)
+    user_id = get_user_id()
+
+    # 自分の参加履歴を取得
+    history = ParticipationHistory.query.filter_by(
+        user_id=user_id,
+        recruitment_id=recruitment.id,
+    ).first()
+
+    if history is None:
+        flash("参加履歴が見つかりませんでした。")
+        return redirect(url_for("natyukatu.recruitment_history"))
+
+    form = ParticipationQuitForm()
+
+    # POST送信 かつ CSRF検証OKの場合
+    if form.validate_on_submit():
+        # ※ステータス更新方式の場合（「辞退」のStatusレコードを取得）
+        quit_status = Status.query.filter_by(id=5).first()  
+        if quit_status is None:
+            flash("辞退ステータスの設定が見つかりません。")
+            return redirect(url_for("natyukatu.recruitment_history"))
+
+        try:
+            history.status_id = quit_status.id
+            db.session.commit()
+            flash("参加を辞退しました。")
+            return redirect(url_for("natyukatu.participation_quit_complete"))
+        except SQLAlchemyError:
+            db.session.rollback()
+            flash("辞退処理に失敗しました。時間をおいて再度お試しください。")
+            return redirect(url_for("natyukatu.recruitment_history"))
+
+    # GETアクセス時は確認画面を表示
+    return render_template(
+        "natyukatu/participation_quit.html",
+        recruitment=recruitment,
+        history=history,
+        form=form,
+    )
+
+# 参加辞退完了画面
+@dt.route("/participation_quit_complete")
+@login_required
+def participation_quit_complete():
+    return render_template("natyukatu/participation_quit_complete.html")
 
 #活動用画面
 @dt.route("/application_management/<int:recruitment_id>")
@@ -1090,11 +1145,8 @@ def messages(recruitment_id):
         db.session.commit()
  
         flash("メッセージを投稿しました")
- 
-# =====================================
-# ⑱ サンクスボタン
-# =====================================
- 
+
+#サンクスボタン
 @dt.route("/thanks/<active_id>/<user_id>", methods=["POST"])
 @login_required
 def thanks(active_id, user_id):
@@ -1118,10 +1170,8 @@ def thanks(active_id, user_id):
     return redirect(url_for("natyukatu.for_active", recruitment_id=active_id))
 
 
-# =====================================
-# ⑲ ランキング生成
-# =====================================
- 
+
+#ランキング生成
 @dt.route("/ranking")
 def ranking():
     results = User.query.filter(
@@ -1165,3 +1215,42 @@ def admin():
         entries=entries,
         users=users
     )
+
+
+# 時間での情報更新(1:募集中 2:募集終了 4:参加中 6:活動終了)
+@dt.before_request
+def auto_update_statuses():
+    """画面遷移のたびに期限切れの募集・参加ステータスを自動更新する"""
+    now = datetime.now()
+    updated = False
+
+    # 募集終了時間（application_end_at）を過ぎた募集を「募集終了（2）」にする
+    expired_recruitments = Recruitment.query.filter(
+        Recruitment.application_end_at <= now,
+        Recruitment.status == 1,
+    ).all()
+
+    for rec in expired_recruitments:
+        rec.status = 2
+        updated = True
+
+    # 活動終了時間（end_at）を過ぎた「参加中（4）」の参加履歴を「活動終了（6）」にする
+    expired_histories = (
+        ParticipationHistory.query.join(Recruitment)
+        .filter(
+            Recruitment.end_at <= now,
+            ParticipationHistory.status_id == 4,
+        )
+        .all()
+    )
+
+    for hist in expired_histories:
+        hist.status_id = 6
+        updated = True
+
+    # 変更があった場合のみコミットする
+    if updated:
+        try:
+            db.session.commit()
+        except SQLAlchemyError:
+            db.session.rollback()

@@ -103,7 +103,7 @@ class ParticipationHistory(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     recruitment_id = db.Column(db.Integer, db.ForeignKey("recruitments.id"), nullable=False)
     status_id = db.Column(db.Integer, db.ForeignKey("status.id"), nullable=False)
-    #participant_count = db.Column(db.Integer, nullable=False, default=1)
+    participant_count = db.Column(db.Integer, nullable=False, default=1)
     #thanks_sent = db.Column(db.Boolean, nullable=False, default=False)
     message = db.Column(db.Text)
     added_at = db.Column(db.DateTime, nullable=False, default=datetime.now, onupdate=datetime.now)

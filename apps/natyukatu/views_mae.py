@@ -652,9 +652,6 @@ def participation_application(recruitment_id):
         ))
     
     if form.validate_on_submit():
-        if recruitment.application_start_at and datetime.now() < recruitment.application_start_at:
-            flash("募集開始前のため申し込みできません")
-            return redirect(url_for("natyukatu.recruitment_detail", recruitment_id=recruitment_id))
         if recruitment.application_end_at < datetime.now():
             flash("募集期間が終了しています")
             return redirect(url_for(
@@ -662,25 +659,11 @@ def participation_application(recruitment_id):
                 recruitment_id=recruitment_id
             ))
  
-        requested_count = form.participant_count.data or 1
-        accepted_entries = ParticipationHistory.query.filter_by(
-            recruitment_id=recruitment_id
-        ).all()
-        occupied = sum(
-            item.participant_count or 1
-            for item in accepted_entries
-            if not item.status or item.status.status_name != "否"
-        )
-        if occupied + requested_count > recruitment.capacity:
-            flash("募集人数を超えるため申し込みできません")
-            return redirect(url_for("natyukatu.recruitment_detail", recruitment_id=recruitment_id))
-
         entry = ParticipationHistory(
             recruitment_id=recruitment_id,
             user_id=get_user_id(),
-            participant_count=requested_count,
             message=form.message.data,
-            status_id=3,
+            status_id=4,
         )
  
         db.session.add(entry)
@@ -695,7 +678,7 @@ def participation_application(recruitment_id):
         form=form,
         recruitment=recruitment
     )
- 
+
 #申込完了画面
 @dt.route("/participation_application_complete")
 @login_required

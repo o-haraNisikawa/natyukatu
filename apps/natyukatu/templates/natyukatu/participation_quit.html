@@ -1,0 +1,36 @@
+{% extends "natyukatu/base.html" %}
+
+
+
+{% block content %}
+<section class="confirm-card" aria-labelledby="confirmTitle">
+  <h1 class="confirm-title" id="confirmTitle">
+    参加辞退
+  </h1>
+
+  <p class="question">
+        「{{ recruitment.title }}」への参加を辞退します。よろしいですか？
+  </p>
+
+  <form
+    class="actions"
+    action="{{ url_for(
+      'natyukatu.participation_quit',
+      recruitment_id=recruitment.id
+    ) }}"
+    method="post"
+  >
+    <!-- CSRFトークン -->
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <button type="submit" class="button quit">辞退する</button>
+
+    <a
+      class="button"
+      href="{{ url_for('natyukatu.recruitment_history') }}"
+    >
+      キャンセル
+    </a>
+  </form>
+</section>
+{% endblock %}
