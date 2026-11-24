@@ -998,43 +998,6 @@ def participation_quit_complete():
     return render_template("natyukatu/participation_quit_complete.html")
 
 #活動用画面
-@dt.route("/application_management/<int:recruitment_id>")
-@login_required
-def application_management(recruitment_id):
-    recruitment = get_recruitment(recruitment_id)
-    if recruitment.user_id != get_user_id():
-        abort(403)
-    entries = ParticipationHistory.query.filter_by(
-        recruitment_id=recruitment_id
-    ).order_by(ParticipationHistory.added_at.desc()).all()
-    return render_template(
-        "natyukatu/application_management.html",
-        recruitment=recruitment,
-        entries=entries
-    )
-
-
-@dt.route("/applicant_decision/<int:applicant_id>", methods=["POST"])
-@login_required
-def applicant_decision(applicant_id):
-    entry = ParticipationHistory.query.get_or_404(applicant_id)
-    recruitment = get_recruitment(entry.recruitment_id)
-    if recruitment.user_id != get_user_id():
-        abort(403)
-    decision = request.form.get("status")
-    if decision not in {"可", "否"}:
-        abort(400)
-    status = Status.query.filter_by(status_name=decision).first()
-    if status is None:
-        status = Status(status_name=decision)
-        db.session.add(status)
-        db.session.flush()
-    entry.status_id = status.id
-    db.session.commit()
-    flash(f"申込を「{decision}」に変更しました")
-    return redirect(url_for("natyukatu.application_management", recruitment_id=recruitment.id))
-
-
 @dt.route("/for_active/<recruitment_id>", methods=["GET", "POST"])
 @login_required
 def for_active(recruitment_id):

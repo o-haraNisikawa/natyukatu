@@ -52,7 +52,6 @@
   </div>
   {% if current_user.is_authenticated and recruitment.user_id == current_user.id %}
   <div class="d-flex flex-wrap gap-2 mt-3">
-    <a class="btn btn-outline-primary" href="{{ url_for('natyukatu.application_management', recruitment_id=recruitment.id) }}">申し込み管理</a>
     <a class="btn btn-outline-secondary" href="{{ url_for('natyukatu.recruitment_update', recruitment_id=recruitment.id) }}">募集内容を編集</a>
     <a class="btn btn-outline-danger" href="{{ url_for('natyukatu.recruitment_history') }}">募集履歴</a>
   </div>
