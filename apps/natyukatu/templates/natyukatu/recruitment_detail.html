@@ -31,10 +31,12 @@
       </video>
       {% endif %}
 
-      <h2 class="tags-title">関連タグ</h2>
+      <!--<h2 class="tags-title">関連タグ</h2>-->
       <div class="tag-list">
         {% for tag in recruitment.tags %}
-          {% if tag.recruitment_tags %}<span class="tag">{{ tag.recruitment_tags.tag_name }}</span>{% endif %}
+          {% if tag.recruitment_tags %}
+            <a class="tag" href="{{ url_for('natyukatu.top', tag_id=tag.recruitment_tags.id) }}">{{ tag.recruitment_tags.tag_name }}</a>
+          {% endif %}
         {% else %}<span>タグはありません。</span>{% endfor %}
       </div>
     </div>
