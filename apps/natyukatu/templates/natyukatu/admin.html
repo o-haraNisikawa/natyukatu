@@ -67,4 +67,42 @@
         </div>
     </div>
 </section>
+<section class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+        <h2 class="h4 section-title">お問い合わせ一覧</h2>
+        {% for item in contacts %}
+        <div class="border rounded p-3 mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <strong>#{{ item.id }} {{ item.subject }}</strong>
+                <span class="badge bg-secondary">{{ item.status }}</span>
+            </div>
+            <p class="mb-2 small text-muted">
+                送信者: {{ item.name }}（{{ item.email }}）
+            </p>
+
+            <div class="bg-light p-2 rounded mb-2">
+                {% for msg in item.messages %}
+                <div class="mb-2">
+                    <strong>{{ '管理者' if msg.sender_role == 'admin' else item.name }}:</strong>
+                    <span>{{ msg.body }}</span>
+                    <div class="text-muted small">{{ msg.created_at }}</div>
+                </div>
+                {% else %}
+                <div>{{ item.body }}</div>
+                {% endfor %}
+            </div>
+
+            <form method="post" action="{{ url_for('natyukatu.contact_reply', contact_id=item.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="input-group">
+                    <input type="text" name="reply_body" class="form-control" placeholder="返信を入力してください" required>
+                    <button type="submit" class="btn btn-primary">返信</button>
+                </div>
+            </form>
+        </div>
+        {% else %}
+        <p class="mb-0">お問い合わせはありません。</p>
+        {% endfor %}
+    </div>
+</section>
 {% endblock %}

@@ -80,4 +80,43 @@
     退会
   </a>
 </div>
+<section class="card border-0 shadow-sm mb-4" aria-label="お問い合わせ履歴">
+  <div class="card-body">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h2 class="h4 section-title mb-0">お問い合わせ履歴</h2>
+      <a href="{{ url_for('natyukatu.contact') }}" class="btn btn-sm btn-outline-primary">
+        お問い合わせする
+      </a>
+    </div>
+
+    {% for item in my_contacts %}
+    <div class="border rounded p-3 mb-3">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <strong>#{{ item.id }} {{ item.subject }}</strong>
+        <span class="badge bg-secondary">{{ item.status }}</span>
+      </div>
+      <p class="mb-2 small text-muted">
+        送信日時: {{ item.created_at }}
+      </p>
+
+      <div class="bg-light p-2 rounded">
+        {% for msg in item.messages %}
+        <div class="mb-2">
+          <strong>{{ '管理者' if msg.sender_role == 'admin' else item.name }}:</strong>
+          <span>{{ msg.body }}</span>
+          <div class="text-muted small">{{ msg.created_at }}</div>
+        </div>
+        {% else %}
+        <div>
+          <strong>{{ item.name }}:</strong>
+          <span>{{ item.body }}</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% else %}
+    <p class="mb-0">お問い合わせ履歴はありません。</p>
+    {% endfor %}
+  </div>
+</section>
 {% endblock %}
