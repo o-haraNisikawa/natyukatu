@@ -17,6 +17,7 @@ class User(db.Model, UserMixin):
     password_hash = db.Column(db.String, nullable=False)
     phone_number = db.Column(db.String(11), nullable=False)
     role = db.Column(db.Integer, nullable=False)
+    is_approved = db.Column(db.Boolean,nullable=False,default=True,server_default="1")
     create_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
     update_at = db.Column(db.DateTime, nullable=False, default=datetime.now, onupdate=datetime.now)
     title_id = db.Column(db.Integer,db.ForeignKey("titles.id"))  # FK

@@ -43,6 +43,54 @@
 </section>
 <section class="card border-0 shadow-sm mb-4">
     <div class="card-body">
+        <h2 class="h4 section-title">募集者の承認待ち</h2>
+        <div class="table-responsive">
+            <table class="table table-striped align-middle">
+                <thead><tr><th>ID</th><th>ユーザー名</th><th>メール</th><th>登録日</th><th>操作</th></tr></thead>
+                <tbody>
+                {% for user in pending_users %}
+                    <tr>
+                        <td>{{ user.id }}</td>
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.create_at.strftime('%Y-%m-%d %H:%M') if user.create_at else '' }}</td>
+                        <td>
+                            <form method="post" action="{{ url_for('natyukatu.admin_approve_user', user_id=user.id) }}" onsubmit="return confirm('この募集者を承認しますか？')">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-sm btn-success">承認する</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="5">承認待ちの募集者はいません。</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<section class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+        <h2 class="h4 section-title">管理者アカウントの新規作成</h2>
+        <p class="text-muted small">管理者だけがこの画面から管理者アカウントを作成できます。</p>
+        <form method="post" action="{{ url_for('natyukatu.admin_create_admin') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="row g-3">
+                <div class="col-md-6"><label class="form-label">ユーザー名</label><input class="form-control" name="username" maxlength="30" required></div>
+                <div class="col-md-6"><label class="form-label">ニックネーム</label><input class="form-control" name="nickname" maxlength="30" required></div>
+                <div class="col-md-6"><label class="form-label">メールアドレス</label><input class="form-control" type="email" name="email" required></div>
+                <div class="col-md-6"><label class="form-label">パスワード（8文字以上）</label><input class="form-control" type="password" name="password" minlength="8" required></div>
+                <div class="col-md-6"><label class="form-label">年齢</label><input class="form-control" type="number" name="age" min="0" max="120" required></div>
+                <div class="col-md-6"><label class="form-label">電話番号</label><input class="form-control" name="phone_number" maxlength="11" required></div>
+            </div>
+            <button type="submit" class="btn btn-primary mt-3">管理者を作成</button>
+        </form>
+    </div>
+</section>
+
+<section class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
         <h2 class="h4 section-title">ユーザー一覧</h2>
         <div class="table-responsive">
             <table class="table table-striped">
@@ -55,7 +103,7 @@
                         <td>{{ user.id }}</td>
                         <td>{{ user.username }}</td>
                         <td>{{ user.email }}</td>
-                        <td>{{ user.role }}</td>
+                        <td>{{ {1: "管理者", 2: "募集者", 3: "参加者"}.get(user.role, "不明") }} / {{ "承認済み" if user.is_approved else "承認待ち" }}</td>
                     </tr>
                     {% else %}
                     <tr>
@@ -67,42 +115,5 @@
         </div>
     </div>
 </section>
-<section class="card border-0 shadow-sm mb-4">
-    <div class="card-body">
-        <h2 class="h4 section-title">お問い合わせ一覧</h2>
-        {% for item in contacts %}
-        <div class="border rounded p-3 mb-3">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <strong>#{{ item.id }} {{ item.subject }}</strong>
-                <span class="badge bg-secondary">{{ item.status }}</span>
-            </div>
-            <p class="mb-2 small text-muted">
-                送信者: {{ item.name }}（{{ item.email }}）
-            </p>
 
-            <div class="bg-light p-2 rounded mb-2">
-                {% for msg in item.messages %}
-                <div class="mb-2">
-                    <strong>{{ '管理者' if msg.sender_role == 'admin' else item.name }}:</strong>
-                    <span>{{ msg.body }}</span>
-                    <div class="text-muted small">{{ msg.created_at }}</div>
-                </div>
-                {% else %}
-                <div>{{ item.body }}</div>
-                {% endfor %}
-            </div>
-
-            <form method="post" action="{{ url_for('natyukatu.contact_reply', contact_id=item.id) }}">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <div class="input-group">
-                    <input type="text" name="reply_body" class="form-control" placeholder="返信を入力してください" required>
-                    <button type="submit" class="btn btn-primary">返信</button>
-                </div>
-            </form>
-        </div>
-        {% else %}
-        <p class="mb-0">お問い合わせはありません。</p>
-        {% endfor %}
-    </div>
-</section>
 {% endblock %}

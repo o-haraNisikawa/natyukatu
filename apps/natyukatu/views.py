@@ -1297,23 +1297,126 @@ def admin_delete_recruitment(active_id):
  
     return redirect(url_for("natyukatu.admin"))
  
+
+
+@dt.route("/admin/users/<int:user_id>/approve", methods=["POST"])
+@login_required
+def admin_approve_user(user_id):
+    if getattr(current_user, "role", None) != 1:
+        abort(403)
+
+    user = User.query.get_or_404(user_id)
+    if user.role != 2:
+        abort(400)
+
+    user.is_approved = True
+    db.session.commit()
+    flash(f"{user.username}さんの募集者登録を承認しました。")
+    return redirect(url_for("natyukatu.admin"))
+
+
+@dt.route("/admin/users/create-admin", methods=["POST"])
+@login_required
+def admin_create_admin():
+    if getattr(current_user, "role", None) != 1:
+        abort(403)
+
+    username = request.form.get("username", "").strip()
+    nickname = request.form.get("nickname", "").strip()
+    email = request.form.get("email", "").strip().lower()
+    password = request.form.get("password", "")
+    age_raw = request.form.get("age", "").strip()
+    phone_number = request.form.get("phone_number", "").strip()
+
+    if not all([username, nickname, email, password, age_raw, phone_number]):
+        flash("管理者の登録に必要な項目をすべて入力してください。")
+        return redirect(url_for("natyukatu.admin"))
+
+    try:
+        age = int(age_raw)
+        if not 0 <= age <= 120:
+            raise ValueError
+    except ValueError:
+        flash("年齢は0〜120の整数で入力してください。")
+        return redirect(url_for("natyukatu.admin"))
+
+    if len(password) < 8:
+        flash("パスワードは8文字以上にしてください。")
+        return redirect(url_for("natyukatu.admin"))
+
+    if User.query.filter_by(email=email).first():
+        flash("そのメールアドレスはすでに登録されています。")
+        return redirect(url_for("natyukatu.admin"))
+
+    admin_user = User(
+        username=username,
+        nickname=nickname,
+        age=age,
+        email=email,
+        password=password,
+        phone_number=phone_number,
+        role=1,
+        is_approved=True,
+        tanks_point=0,
+        group_name="",
+        representative_name="",
+        contact_email="",
+        group_type="",
+    )
+    db.session.add(admin_user)
+    db.session.commit()
+    flash("管理者アカウントを作成しました。")
+    return redirect(url_for("natyukatu.admin"))
  
+ 
+
+
 @dt.route("/admin")
 @login_required
 def admin():
+
+    # 管理者以外はアクセス禁止
     if getattr(current_user, "role", None) != 1:
         abort(403)
-    recruitments = Recruitment.query.order_by(Recruitment.created_at.desc()).all()
-    entries = ParticipationHistory.query.order_by(ParticipationHistory.added_at.desc()).all()
-    users = User.query.order_by(User.id.asc()).all()
-    contacts = ContactHistory.query.order_by(ContactHistory.id.desc()).all()
+
+    # 募集一覧
+    recruitments = Recruitment.query.order_by(
+        Recruitment.created_at.desc()
+    ).all()
+
+    # 参加履歴
+    entries = ParticipationHistory.query.order_by(
+        ParticipationHistory.added_at.desc()
+    ).all()
+
+    # 全ユーザー
+    users = User.query.order_by(
+        User.id.asc()
+    ).all()
+
+    # 承認待ちの募集者
+    pending_users = User.query.filter(
+        User.role == 2,
+        User.is_approved.is_(False)
+    ).order_by(
+        User.id.asc()
+    ).all()
+
+    # 既存のお問い合わせデータ取得処理
+    contacts = ContactHistory.query.order_by(
+        ContactHistory.id.desc()
+    ).all()
+
     return render_template(
         "natyukatu/admin.html",
         recruitments=recruitments,
         entries=entries,
         users=users,
-        contacts=contacts,
+        pending_users=pending_users,
+        contacts=contacts
     )
+
+
 
 # 時間での情報更新(1:募集中 2:募集終了 4:参加中 6:活動終了)
 @dt.before_request

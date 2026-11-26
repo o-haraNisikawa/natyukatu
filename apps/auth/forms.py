@@ -42,10 +42,10 @@ class SignUpForm(FlaskForm):
     #ロール
     role = SelectField(
         choices=[
-        (1, "管理者"),
-        (2, "募集者"),
-        (3, "参加者"),
+            (2, "募集者（管理者の承認が必要）"),
+            (3, "参加者"),
         ],
+        default=3,
 
     coerce=int,
     validators=[
