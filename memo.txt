@@ -10,8 +10,5 @@ flask db upgrade
 flask run
 
 
-
-
-
 ・活動用画面への遷移のしやすさ
 ・わかりやすいレイアウト
