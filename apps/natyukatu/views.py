@@ -40,6 +40,7 @@ from apps.natyukatu.models import (
     Status,
     RecruitmentImage,
     ContactMessage,
+    Title,
 )
  
 from apps.natyukatu.forms import (
@@ -582,12 +583,21 @@ def userDetail():
         .order_by(ContactHistory.id.desc())
         .all()
     )
+
+    title = get_title(current_user)
+
     return render_template(
         "natyukatu/user_detail.html",
         my_contacts=my_contacts,
+        title=title
     )
- 
- 
+
+#ヘッダーにも称号だしたい
+@dt.context_processor
+def inject_header_title():
+    if current_user.is_authenticated:
+        return {"header_title": get_title(current_user)}
+    return {"header_title": None}
 
 #ユーザー情報変更 
 @dt.route(
@@ -632,6 +642,34 @@ def edit_profile():
 @login_required
 def user_detail_update_complete():
     return render_template('natyukatu/user_detail_update_complete.html')
+
+#称号
+def get_title(user_or_id):
+    """User オブジェクトまたは user_id からポイントに応じた Title を返す"""
+    if not user_or_id:
+        return None
+
+    if isinstance(user_or_id, User):
+        user = user_or_id
+    else:
+        user = User.query.get(user_or_id)
+
+    if not user:
+        return None
+
+    points = getattr(user, "tanks_point", None)
+    if points is None:
+        points = getattr(user, "thanks_point", 0) or 0
+
+
+    if points >= 10:
+        target_title_id = 3
+    elif points >= 5:
+        target_title_id = 2
+    else:
+        target_title_id = 1
+
+    return Title.query.get(target_title_id)
 
 #退会
 @dt.route("/mypage/withdrawal", methods=["GET", "POST"])

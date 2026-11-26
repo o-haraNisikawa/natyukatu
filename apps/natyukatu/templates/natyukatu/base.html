@@ -58,6 +58,12 @@
           {% if current_user.usertitle %}<li class="nav-item px-xl-1"><span class="badge rounded-pill text-bg-warning">{{ current_user.usertitle }}</span></li>{% endif %}
           <li class="nav-item"><a class="btn btn-outline-light btn-sm ms-xl-2 mt-2 mt-xl-0" href="{{ url_for('auth.logout') }}">ログアウト</a></li>
         {% endif %}
+        {% if current_user.is_authenticated %}
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('natyukatu.ranking') }}">
+            称号:{{ header_title.title_name if header_title else "称号なし" }}
+            </a>
+          </li>
+        {% endif %}
       </ul>
     </div>
   </div>

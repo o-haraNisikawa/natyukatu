@@ -64,9 +64,11 @@
   <div class="summary-card">
     <span class="summary-label">称号</span>
     <span>
-      {{ current_user.users_title.title_name
-         if current_user.users_title
-         else "未設定" }}
+      {% if title %}
+        {{ title.title_name }}
+      {% else %}
+        未設定
+      {% endif %}
     </span>
   </div>
 </section>

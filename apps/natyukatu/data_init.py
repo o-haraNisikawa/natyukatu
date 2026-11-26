@@ -71,10 +71,10 @@ def init_data():
         Status(status_name="活動終了"),
 
         #称号
-        Title(titel_name="にとうへい",title_explaination="よわい"),
-        Title(titel_name="ぐんそう",title_explaination="ふつう"),
-        Title(titel_name="しょうい",title_explaination="つよい"),
-    ]
+        Title(title_name="にとうへい", title_explanation="よわい"),
+        Title(title_name="ぐんそう", title_explanation="ふつう"),
+        Title(title_name="しょうい", title_explanation="つよい"),
+            ]
 
     db.session.add_all(init)
     db.session.commit()  # 最後にまとめてコミット
