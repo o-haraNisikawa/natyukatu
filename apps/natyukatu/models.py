@@ -202,11 +202,6 @@ class ActiveMessageRead(db.Model):
     recruitment_id = db.Column(db.Integer, db.ForeignKey("recruitments.id"), nullable=False)
     last_read_at = db.Column(db.DateTime, default=datetime.now, nullable=False)
 
-#class Ranking(db.Model):
-#    __tablename__ = "rankings"
- 
-#    id = db.Column(db.Integer, primary_key=True)
-
 class ContactHistory(db.Model):
     """お問い合わせ履歴テーブル"""
     __tablename__ = "contact_histories"
