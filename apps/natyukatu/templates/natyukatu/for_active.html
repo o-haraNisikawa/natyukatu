@@ -8,6 +8,23 @@
   <p>{{ recruitment.title }}</p>
 </section>
 
+<section class="content-section mb-4" aria-label="活動メッセージ">
+  <h2>投稿されたメッセージ</h2>
+  {% if messages %}
+    <div class="list-group">
+      {% for message in messages %}
+      <div class="list-group-item">
+        <div class="d-flex flex-wrap justify-content-between gap-2">
+          <strong>{{ message.user.username if message.user else "ユーザー" }}</strong>
+          <small class="text-secondary">{{ message.post_at.strftime("%Y/%m/%d %H:%M") }}</small>
+        </div>
+        <p class="mb-0">{{ message.message }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  {% else %}<p class="text-secondary">メッセージはまだありません。</p>{% endif %}
+</section>
+
 <!-- メッセージ投稿セクション -->
 <section class="content-section" aria-label="メッセージ投稿">
   <h2>メッセージ</h2>
@@ -30,23 +47,6 @@
     {# Python側で判別するために name="submit_message" を指定 #}
     {{ form.submit(class_="button primary-button") }}
   </form>
-</section>
-
-<section class="content-section mb-4" aria-label="活動メッセージ">
-  <h2>投稿されたメッセージ</h2>
-  {% if messages %}
-    <div class="list-group">
-      {% for message in messages %}
-      <div class="list-group-item">
-        <div class="d-flex flex-wrap justify-content-between gap-2">
-          <strong>{{ message.user.username if message.user else "ユーザー" }}</strong>
-          <small class="text-secondary">{{ message.post_at.strftime("%Y/%m/%d %H:%M") }}</small>
-        </div>
-        <p class="mb-0">{{ message.message }}</p>
-      </div>
-      {% endfor %}
-    </div>
-  {% else %}<p class="text-secondary">メッセージはまだありません。</p>{% endif %}
 </section>
 
 <!-- 参加者一覧・削除セクション -->

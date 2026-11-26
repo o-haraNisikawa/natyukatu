@@ -1,5 +1,6 @@
 from datetime import datetime
 import os
+from math import ceil
 import numpy as np
 from pathlib import Path
 from apps.app import db
@@ -209,17 +210,62 @@ def top():
     view_history_list = get_view_history_list(user_id, limit=10) if user_id else []
     recruitment_tags = get_recruitment_tag_map([item.id for item in recruitments])
 
+
+    page = request.args.get("page", 1, type=int)
+    if page < 1:
+        page = 1
+    per_page = 9  # 1ページあたりの表示件数
+
+    total = len(recruitments)
+    pages = max(1, ceil(total / per_page)) if total > 0 else 1
+    if page > pages:
+        page = pages
+
+    start = (page - 1) * per_page
+    end = start + per_page
+    paged_recruitments = recruitments[start:end]
+
+    # ページネーション用の軽量オブジェクト
+    class SimplePagination:
+        def __init__(self, page, per_page, total, items):
+            self.page = page
+            self.per_page = per_page
+            self.total = total
+            self.items = items
+            self.pages = max(1, ceil(total / per_page)) if total > 0 else 1
+            self.has_prev = page > 1
+            self.has_next = page < self.pages
+            self.prev_num = page - 1 if self.has_prev else None
+            self.next_num = page + 1 if self.has_next else None
+
+        def iter_pages(self, left_edge=1, right_edge=1, left_current=2, right_current=2):
+            last = 0
+            for num in range(1, self.pages + 1):
+                if (
+                    num <= left_edge
+                    or (num >= self.page - left_current and num <= self.page + right_current)
+                    or num > self.pages - right_edge
+                ):
+                    if last + 1 != num:
+                        yield None
+                    yield num
+                    last = num
+
+    pagination = SimplePagination(page=page, per_page=per_page, total=total, items=paged_recruitments)
+    recruitment_tags = get_recruitment_tag_map([item.id for item in paged_recruitments])
+
     return render_template(
         "natyukatu/top.html",
         form=search_form,
         like_form=like_form,
-        recruitments=recruitments,
+        recruitments=paged_recruitments,
+        pagination=pagination,
         like_list=like_list,
         view_history_list=view_history_list,
         tag_groups=tag_groups,
         sort_order=sort_order,
         recruitment_tags=recruitment_tags,
-        list_type=list_type,  # ← 追加
+        list_type=list_type,
     )
 
 

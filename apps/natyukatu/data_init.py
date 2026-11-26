@@ -8,7 +8,8 @@ from apps.natyukatu.models import (
     ContactHistory,
     ParticipationHistory,
     RecruitmentHistory,
-    Status
+    Status,
+    Title
 )
 from apps.app import db
 
@@ -68,6 +69,11 @@ def init_data():
         Status(status_name="参加中"),
         Status(status_name="辞退"),
         Status(status_name="活動終了"),
+
+        #称号
+        Title(titel_name="にとうへい",title_explaination="よわい"),
+        Title(titel_name="ぐんそう",title_explaination="ふつう"),
+        Title(titel_name="しょうい",title_explaination="つよい"),
     ]
 
     db.session.add_all(init)
