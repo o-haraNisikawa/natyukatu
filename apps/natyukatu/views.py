@@ -619,6 +619,7 @@ def withdrawal_complete():
 
 # お問い合わせ送信（既存処理をベースに最小限拡張）
 @dt.route("/contact", methods=["GET", "POST"])
+@login_required
 def contact():
     form = ContactForm()
  
@@ -648,6 +649,7 @@ def contact():
  
  
 @dt.route("/contact/complete")
+@login_required
 def contact_complate():
     return render_template("natyukatu/contact_complate.html")
  
