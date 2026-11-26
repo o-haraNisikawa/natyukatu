@@ -46,11 +46,6 @@ class SearchForm(FlaskForm):
 class LikeForm(FlaskForm):
     recruitment_id = HiddenField(validators=[DataRequired()])
     submit = SubmitField("お気に入り登録/解除")
-
-def not_in_past(form, field):
-    if field.data and field.data < datetime.now():
-        raise ValidationError("過去の日時は選択できません。")
-
  
 #新規募集登録
 class RecruitmentForm(FlaskForm):
@@ -126,25 +121,25 @@ class RecruitmentForm(FlaskForm):
     start_at = DateTimeLocalField(
         "活動開始日時",
         format="%Y-%m-%dT%H:%M",
-        validators=[DataRequired(), not_in_past]
+        validators=[DataRequired()]
     )
 
     end_at = DateTimeLocalField(
         "活動終了日時",
         format="%Y-%m-%dT%H:%M",
-        validators=[DataRequired(), not_in_past]
+        validators=[DataRequired()]
     )
 
     application_start_at = DateTimeLocalField(
         "募集開始日時",
         format="%Y-%m-%dT%H:%M",
-        validators=[DataRequired(), not_in_past]
+        validators=[DataRequired()]
     )
 
     application_end_at = DateTimeLocalField(
         "募集終了日時",
         format="%Y-%m-%dT%H:%M",
-        validators=[DataRequired(), not_in_past]
+        validators=[DataRequired()]
     )
 
     capacity = IntegerField(

@@ -215,7 +215,7 @@ def top():
     page = request.args.get("page", 1, type=int)
     if page < 1:
         page = 1
-    per_page = 9  # 1ページあたりの表示件数
+    per_page = 2  # 1ページあたりの表示件数
 
     total = len(recruitments)
     pages = max(1, ceil(total / per_page)) if total > 0 else 1
