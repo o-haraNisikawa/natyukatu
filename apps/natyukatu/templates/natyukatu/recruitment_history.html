@@ -55,8 +55,13 @@
             </div>
           </td>
           <td>
+            <div class="d-inline-flex align-items-center gap-2">
               <a class="btn btn-sm btn-outline-primary" href="{{ url_for('natyukatu.for_active', recruitment_id=history.recruitment_id) }}">活動用画面</a>
-          </td> 
+              {% if history.recruitment_id in unread_recruitment_ids %}
+              <span class="badge rounded-pill text-bg-danger">新着</span>
+              {% endif %}
+            </div>
+          </td>
           <td>   
             <div>
               <form action="{{ url_for('natyukatu.recruitment_delete', recruitment_id=history.recruitment_id) }}" method="post" style="display: inline;">

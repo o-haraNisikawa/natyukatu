@@ -16,17 +16,30 @@
 <nav class="navbar navbar-expand-xl navbar-dark site-navbar sticky-top">
   <div class="container-fluid container-xxl px-3 px-lg-4">
     <a class="navbar-brand fw-bold fs-4" href="{{ url_for('natyukatu.top') }}">なちゅ活</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#siteMenu" aria-controls="siteMenu" aria-expanded="false" aria-label="メニューを開く">
+    <button class="navbar-toggler position-relative" type="button" data-bs-toggle="collapse" data-bs-target="#siteMenu" aria-controls="siteMenu" aria-expanded="false" aria-label="メニューを開く">
       <span class="navbar-toggler-icon"></span>
+      {% if has_unread_messages %}
+      <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle">
+        <span class="visually-hidden">新着メッセージあり</span>
+      </span>
+      {% endif %}
     </button>
     <div class="collapse navbar-collapse" id="siteMenu">
       <ul class="navbar-nav ms-auto align-items-xl-center gap-xl-1 py-2 py-xl-0">
         <li class="nav-item"><a class="nav-link" href="{{ url_for('natyukatu.top') }}">ホーム</a></li>
         {% if current_user.is_authenticated %}
           {% if current_user.role == 3 %}
-            <li class="nav-item"><a class="nav-link" href="{{ url_for('natyukatu.participation_history') }}">参加履歴</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('natyukatu.participation_history') }}">参加履歴
+              {% if has_unread_messages %}
+                <span class="badge rounded-pill text-bg-danger">新着</span>
+              {% endif %}
+            </a></li>
           {% elif current_user.role == 2 %}
-            <li class="nav-item"><a class="nav-link" href="{{ url_for('natyukatu.recruitment_history') }}">募集履歴</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('natyukatu.recruitment_history') }}">募集履歴
+              {% if has_unread_messages %}
+                <span class="badge rounded-pill text-bg-danger">新着</span>
+              {% endif %}
+            </a></li>
             <li class="nav-item"><a class="nav-link" href="{{ url_for('natyukatu.recruitment_register') }}">新規募集登録</a></li>
           {% elif current_user.role == 1 %}
             <li class="nav-item"><a class="nav-link" href="{{ url_for('natyukatu.admin') }}">管理画面</a></li>

@@ -194,20 +194,74 @@ class ActiveMessage(db.Model):
     user = db.relationship("User", back_populates="active_messages")
     recruitment = db.relationship("Recruitment", back_populates="active_messages")
  
+class ActiveMessageRead(db.Model):
+    __tablename__ = "active_message_reads"
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    recruitment_id = db.Column(db.Integer, db.ForeignKey("recruitments.id"), nullable=False)
+    last_read_at = db.Column(db.DateTime, default=datetime.now, nullable=False)
 
 #class Ranking(db.Model):
 #    __tablename__ = "rankings"
  
 #    id = db.Column(db.Integer, primary_key=True)
- 
+
 class ContactHistory(db.Model):
     """お問い合わせ履歴テーブル"""
     __tablename__ = "contact_histories"
  
     id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
     name = db.Column(db.String, nullable=False)
     email = db.Column(db.String, nullable=False)
     subject = db.Column(db.String, nullable=False)
     body = db.Column(db.Text, nullable=False)
+    status = db.Column(db.String, nullable=False, default="open")
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
  
+    messages = db.relationship(
+        "ContactMessage",
+        back_populates="contact",
+        cascade="all, delete-orphan",
+        order_by="ContactMessage.created_at.asc()",
+    )
+
+class ContactHistory(db.Model):
+    """お問い合わせ履歴テーブル"""
+    __tablename__ = "contact_histories"
+ 
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
+    name = db.Column(db.String, nullable=False)
+    email = db.Column(db.String, nullable=False)
+    subject = db.Column(db.String, nullable=False)
+    body = db.Column(db.Text, nullable=False)
+    status = db.Column(db.String, nullable=False, default="open")
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
+ 
+    messages = db.relationship(
+        "ContactMessage",
+        back_populates="contact",
+        cascade="all, delete-orphan",
+        order_by="ContactMessage.created_at.asc()",
+    )
+ 
+ 
+class ContactMessage(db.Model):
+    """お問い合わせやり取りメッセージテーブル"""
+    __tablename__ = "contact_messages"
+ 
+    id = db.Column(db.Integer, primary_key=True)
+    contact_id = db.Column(
+        db.Integer,
+        db.ForeignKey("contact_histories.id"),
+        nullable=False,
+    )
+    sender_role = db.Column(db.String(20), nullable=False, default="user")
+    body = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.now)
+ 
+    contact = db.relationship("ContactHistory", back_populates="messages")
    
+ 

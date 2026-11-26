@@ -249,15 +249,27 @@
 <section id="recruitment-list" class="mb-5">
 
   <div class="d-flex flex-wrap align-items-end justify-content-between gap-2 mb-3">
+    <div>
+      <h2 class="h3 section-title mb-1">
+        {% if list_type == 'likes' %}
+          お気に入り一覧（全件）
+        {% elif list_type == 'history' %}
+          閲覧履歴一覧（全件）
+        {% else %}
+          募集一覧
+        {% endif %}
+      </h2>
+      <p class="text-secondary small mb-0">{{ recruitments|length }}件の募集</p>
+    </div>
 
-    <div><h2 class="h3 section-title mb-1">募集一覧</h2><p class="text-secondary small mb-0">{{ recruitments|length }}件の募集</p></div>
-
-    {% if current_user.is_authenticated and current_user.role == 2 %}
-
-    <a class="btn btn-outline-primary btn-sm" href="{{ url_for('natyukatu.recruitment_register') }}">＋ 新規募集</a>
-
-    {% endif %}
-
+    <div class="d-flex gap-2">
+      {% if list_type != 'all' %}
+      <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('natyukatu.top') }}#recruitment-list">すべての募集に戻る</a>
+      {% endif %}
+      {% if current_user.is_authenticated and current_user.role == 2 %}
+      <a class="btn btn-outline-primary btn-sm" href="{{ url_for('natyukatu.recruitment_register') }}">＋ 新規募集</a>
+      {% endif %}
+    </div>
   </div>
 
   {% if recruitments %}
@@ -346,77 +358,71 @@
 </section>
 
 
-
 {% if current_user.is_authenticated %}
 
-<section class="mb-5">
+<div class="row g-4 mb-5">
+  <!-- お気に入り（コンパクト表示・最新10件） -->
+  <div class="col-12 col-lg-6">
+    <section>
+      <div class="d-flex align-items-center justify-content-between mb-2">
+        <h2 class="h4 section-title mb-0">お気に入り（最新10件）</h2>
+        {% if like_list %}
+        <a class="btn btn-outline-primary btn-sm" href="{{ url_for('natyukatu.top', list_type='likes') }}#recruitment-list">もっと見る</a>
+        {% endif %}
+      </div>
 
-  <h2 class="h3 section-title mb-3">お気に入り一覧</h2>
-
-  {% if like_list %}
-
-  <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-3">
-
-    {% for item in like_list %}
-
-    <div class="col">
-
-      <article class="card h-100 border-0 shadow-sm">
-
-        {% if item.photo %}<img class="card-img-top recruitment-thumb" src="{{ url_for('natyukatu.recruitment_photo', recruitment_id=item.id) }}" alt="{{ item.title }}">{% endif %}
-
-        <div class="card-body">
-
-          <h3 class="h5">{{ item.title }}</h3>
-
-          <p class="text-secondary">{{ item.description|truncate(100) }}</p>
-
-          <a class="btn btn-outline-primary btn-sm" href="{{ url_for('natyukatu.recruitment_detail', recruitment_id=item.id) }}">詳細を見る</a>
-
-          <form class="d-inline" action="{{ url_for('natyukatu.top') }}" method="post">
-
-            {{ like_form.csrf_token }}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{{ like_form.recruitment_id(value=item.id) }}
-
-            <button class="btn btn-outline-danger btn-sm" name="like-submit" type="submit" value="1">解除</button>
-
+      {% if like_list %}
+      <div class="list-group shadow-sm">
+        {% for item in like_list %}
+        <div class="list-group-item d-flex align-items-center justify-content-between gap-2 py-2">
+          <a class="text-decoration-none text-dark text-truncate flex-grow-1" href="{{ url_for('natyukatu.recruitment_detail', recruitment_id=item.id) }}">
+            <span class="fw-semibold">{{ item.title }}</span>
+            <span class="text-secondary small ms-2">
+              {{ item.start_at.strftime('%Y/%m/%d') if item.start_at else '' }}
+            </span>
+          </a>
+          <form class="m-0 flex-shrink-0" action="{{ url_for('natyukatu.top') }}" method="post">
+            {{ like_form.hidden_tag() }}
+            <input type="hidden" name="{{ like_form.recruitment_id.name }}" value="{{ item.id }}">
+            <button class="btn btn-outline-danger btn-sm py-0 px-2" name="like-submit" type="submit" value="1">解除</button>
           </form>
-
         </div>
-
-      </article>
-
-    </div>
-
-    {% endfor %}
-
+        {% endfor %}
+      </div>
+      {% else %}
+      <p class="text-secondary small">お気に入りはありません。</p>
+      {% endif %}
+    </section>
   </div>
 
-  {% else %}<p class="text-secondary">お気に入りはありません。</p>{% endif %}
+  <!-- 閲覧履歴（コンパクト表示・最新10件） -->
+  <div class="col-12 col-lg-6">
+    <section>
+      <div class="d-flex align-items-center justify-content-between mb-2">
+        <h2 class="h4 section-title mb-0">閲覧履歴（最新10件）</h2>
+        {% if view_history_list %}
+        <a class="btn btn-outline-primary btn-sm" href="{{ url_for('natyukatu.top', list_type='history') }}#recruitment-list">もっと見る</a>
+        {% endif %}
+      </div>
 
-</section>
-
-
-
-<section class="mb-5">
-
-  <h2 class="h3 section-title mb-3">閲覧履歴</h2>
-
-  {% if view_history_list %}
-
-  <div class="list-group">
-
-    {% for item in view_history_list %}
-
-    <a class="list-group-item list-group-item-action" href="{{ url_for('natyukatu.recruitment_detail', recruitment_id=item.id) }}">{{ item.title }}</a>
-
-    {% endfor %}
-
+      {% if view_history_list %}
+      <div class="list-group shadow-sm">
+        {% for item in view_history_list %}
+        <a class="list-group-item list-group-item-action d-flex align-items-center justify-content-between gap-2 py-2"
+           href="{{ url_for('natyukatu.recruitment_detail', recruitment_id=item.id) }}">
+          <span class="fw-semibold text-truncate">{{ item.title }}</span>
+          <span class="text-secondary small flex-shrink-0">
+            {{ item.start_at.strftime('%Y/%m/%d') if item.start_at else '' }}
+          </span>
+        </a>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p class="text-secondary small">閲覧履歴はありません。</p>
+      {% endif %}
+    </section>
   </div>
-
-  {% else %}<p class="text-secondary">閲覧履歴はありません。</p>{% endif %}
-
-</section>
+</div>
 
 {% endif %}
-
 {% endblock %}
