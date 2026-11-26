@@ -32,11 +32,13 @@ from apps.natyukatu.models import (
     RecruitmentTag,
     Tag,
     ActiveMessage,
+    ActiveMessageRead,
     ContactHistory,
     ParticipationHistory,
     RecruitmentHistory,
     Status,
     RecruitmentImage,
+    ContactMessage,
 )
  
 from apps.natyukatu.forms import (
@@ -53,6 +55,7 @@ from apps.natyukatu.forms import (
     UserUpdateForm,
     RecruitmentUpdateForm,
     ParticipationQuitForm,
+
     )
 
 from apps.crud.forms import UserForm
@@ -184,13 +187,26 @@ def top():
     if sort_order not in allowed_sorts:
         sort_order = "newest"
 
-    recruitments = get_recruitment_list(
-        keyword=keyword,
-        tag_ids=selected_tag_ids,
-        sort_order=sort_order
-    )
-    like_list = get_like_list(user_id) if user_id else []
-    view_history_list = get_view_history_list(user_id) if user_id else []
+    # ▼ 追加：募集一覧エリアに何を表示するかのモード判定（all / likes / history）
+    list_type = request.args.get("list_type", "all")
+    if list_type not in {"all", "likes", "history"}:
+        list_type = "all"
+
+    if list_type == "likes" and user_id:
+        recruitments = get_like_list(user_id)
+    elif list_type == "history" and user_id:
+        recruitments = get_view_history_list(user_id)
+    else:
+        list_type = "all"
+        recruitments = get_recruitment_list(
+            keyword=keyword,
+            tag_ids=selected_tag_ids,
+            sort_order=sort_order
+        )
+
+    # ▼ 変更：下部セクション用に「最新順10件まで」を取得（件数判定用にlimit=10を指定）
+    like_list = get_like_list(user_id, limit=10) if user_id else []
+    view_history_list = get_view_history_list(user_id, limit=10) if user_id else []
     recruitment_tags = get_recruitment_tag_map([item.id for item in recruitments])
 
     return render_template(
@@ -203,6 +219,7 @@ def top():
         tag_groups=tag_groups,
         sort_order=sort_order,
         recruitment_tags=recruitment_tags,
+        list_type=list_type,  # ← 追加
     )
 
 
@@ -275,28 +292,29 @@ def set_tag_choices(form):
         (tag.id, tag.tag_name) 
         for tag in RecruitmentTag.query.all()
     ]
-
 # お気に入り一覧取得
-def get_like_list(user_id):
+def get_like_list(user_id, limit=None):
     query = (
         db.session.query(Recruitment)
-        .join(Like, Recruitment.id == Like.recruitment_id)  # Likeテーブルと結合
-        .filter(Like.user_id == user_id)  # ログイン中のユーザーIDで絞り込み
-        .order_by(desc(Recruitment.created_at))
+        .join(Like, Recruitment.id == Like.recruitment_id)
+        .filter(Like.user_id == user_id)
+        .order_by(desc(Like.id))  # お気に入り登録が新しい順
     )
-    recruitments = query.all()
-    return recruitments
- 
-#閲覧履歴一覧取得
-def get_view_history_list(user_id):
+    if limit:
+        query = query.limit(limit)
+    return query.all()
+
+# 閲覧履歴一覧取得
+def get_view_history_list(user_id, limit=None):
     query = (
         db.session.query(Recruitment)
-        .join(ViewHistory, Recruitment.id == ViewHistory.recruitment_id)  
-        .filter(ViewHistory.user_id == user_id)  # ログイン中のユーザーIDで絞り込み
-        .order_by(desc(Recruitment.updated_at))
+        .join(ViewHistory, Recruitment.id == ViewHistory.recruitment_id)
+        .filter(ViewHistory.user_id == user_id)
+        .order_by(desc(ViewHistory.id))  # 閲覧が新しい順（updated_at等があればそちらでも可）
     )
-    recruitments = query.all()
-    return recruitments
+    if limit:
+        query = query.limit(limit)
+    return query.all()
 
 #お気に入り登録
 def add_like(user_id,recruitment_id):
@@ -494,7 +512,25 @@ def recruitment_register_complete():
 @dt.route("/user_detail")
 @login_required
 def userDetail():
-    return render_template("natyukatu/user_detail.html")
+    my_contacts = (
+        ContactHistory.query.filter(
+            db.or_(
+                ContactHistory.user_id == current_user.id,
+                db.and_(
+                    ContactHistory.user_id.is_(None),
+                    ContactHistory.email == current_user.email,
+                ),
+            )
+        )
+        .order_by(ContactHistory.id.desc())
+        .all()
+    )
+    return render_template(
+        "natyukatu/user_detail.html",
+        my_contacts=my_contacts,
+    )
+ 
+ 
 
 #ユーザー情報変更 
 @dt.route(
@@ -581,34 +617,70 @@ def withdrawal():
 def withdrawal_complete():
     return render_template("natyukatu/withdrawal_complete.html")
 
-#お問い合わせ 
-@dt.route(
-    "/contact",
-    methods=["GET", "POST"]
-)
+# お問い合わせ送信（既存処理をベースに最小限拡張）
+@dt.route("/contact", methods=["GET", "POST"])
 def contact():
     form = ContactForm()
  
     if form.validate_on_submit():
         contact_history = ContactHistory(
+            user_id=get_user_id(),
             name=form.name.data,
             email=form.email.data,
             subject=form.subject.data,
-            body=form.body.data
+            body=form.body.data,
         )
- 
         db.session.add(contact_history)
+        db.session.flush()
+ 
+        first_message = ContactMessage(
+            contact_id=contact_history.id,
+            sender_role="user",
+            body=form.body.data,
+        )
+        db.session.add(first_message)
         db.session.commit()
  
         flash("お問い合わせを送信しました")
+        return redirect(url_for("natyukatu.contact_complate"))
  
-        return redirect(url_for("natyukatu.top"))
+    return render_template("natyukatu/contact.html", form=form)
  
-    return render_template(
-        "natyukatu/contact.html",
-        form=form
+ 
+@dt.route("/contact/complete")
+def contact_complate():
+    return render_template("natyukatu/contact_complate.html")
+ 
+ 
+# 管理者・利用者がやり取りするための詳細ルート例
+@dt.route("/contact/<int:contact_id>/reply", methods=["POST"])
+@login_required
+def contact_reply(contact_id):
+    contact_item = ContactHistory.query.get_or_404(contact_id)
+    is_admin = getattr(current_user, "role", None) == 1
+    is_owner = contact_item.user_id is not None and contact_item.user_id == get_user_id()
+ 
+    if not is_admin and not is_owner:
+        abort(403)
+ 
+    reply_body = (request.form.get("reply_body") or "").strip()
+    if not reply_body:
+        flash("返信内容を入力してください")
+        return redirect(url_for("natyukatu.admin" if is_admin else "natyukatu.contact"))
+ 
+    msg = ContactMessage(
+        contact_id=contact_item.id,
+        sender_role="admin" if is_admin else "user",
+        body=reply_body,
     )
+    if is_admin:
+        contact_item.status = "answered"
  
+    db.session.add(msg)
+    db.session.commit()
+    flash("メッセージを送信しました")
+    return redirect(url_for("natyukatu.admin" if is_admin else "natyukatu.contact"))
+
 
 #募集詳細
 @dt.route("/recruitment_detail/<recruitment_id>")
@@ -1005,18 +1077,14 @@ def for_active(recruitment_id):
     recruitment = get_recruitment(recruitment_id)
     user_id = get_user_id()
 
-    # 募集者本人、または参加承認済みのユーザーだけアクセス可能
+# 募集者本人、または参加履歴があるユーザー（辞退済みは除く場合あり）がアクセス可能
     is_owner = recruitment.user_id == user_id
-    approved_entry = ParticipationHistory.query.join(
-        Status,
-        ParticipationHistory.status_id == Status.id
-    ).filter(
-        ParticipationHistory.recruitment_id == recruitment.id,
-        ParticipationHistory.user_id == user_id,
-        Status.status_name == "可"
-    ).first()
+    has_entry = ParticipationHistory.query.filter_by(
+        recruitment_id=recruitment.id,
+        user_id=user_id
+    ).first() is not None
 
-    if not is_owner and approved_entry is None:
+    if not is_owner and not has_entry:
         abort(403)
 
     # メッセージ投稿フォーム
@@ -1064,6 +1132,23 @@ def for_active(recruitment_id):
     entries = ParticipationHistory.query.filter_by(
         recruitment_id=recruitment.id
     ).all()
+
+    # 既読日時を更新（この画面を開いたら未読マークを消す）
+    read_record = ActiveMessageRead.query.filter_by(
+        user_id=user_id,
+        recruitment_id=recruitment.id
+    ).first()
+
+    if read_record:
+        read_record.last_read_at = datetime.now()
+    else:
+        db.session.add(ActiveMessageRead(
+            user_id=user_id,
+            recruitment_id=recruitment.id,
+            last_read_at=datetime.now()
+        ))
+    db.session.commit()
+
     messages = ActiveMessage.query.filter_by(
         recruitment_id=recruitment.id
     ).order_by(ActiveMessage.post_at.asc()).all()
@@ -1108,6 +1193,55 @@ def messages(recruitment_id):
         db.session.commit()
  
         flash("メッセージを投稿しました")
+
+#メッセージ既読判定
+# 未読メッセージがある募集IDのセットを取得
+def get_unread_recruitment_ids(user_id):
+    if not user_id:
+        return set()
+
+    # 自分が関わっている募集ID（主催している募集 + 参加履歴がある募集）
+    owned_ids = {
+        r.id for r in Recruitment.query.filter_by(user_id=user_id).all()
+    }
+    joined_ids = {
+        p.recruitment_id
+        for p in ParticipationHistory.query.filter_by(user_id=user_id).all()
+    }
+    target_ids = owned_ids | joined_ids
+
+    # ユーザーの最終閲覧日時マップ {recruitment_id: last_read_at}
+    reads = ActiveMessageRead.query.filter(
+        ActiveMessageRead.user_id == user_id,
+        ActiveMessageRead.recruitment_id.in_(target_ids),
+    ).all()
+    read_map = {r.recruitment_id: r.last_read_at for r in reads}
+
+    # 自分以外のメッセージで、最終閲覧日時より新しいものがあるか確認
+    unread_ids = set()
+    messages = ActiveMessage.query.filter(
+        ActiveMessage.recruitment_id.in_(target_ids),
+        ActiveMessage.user_id != user_id,
+    ).all()
+
+    for msg in messages:
+        last_read = read_map.get(msg.recruitment_id)
+        if last_read is None or msg.post_at > last_read:
+            unread_ids.add(msg.recruitment_id)
+
+    return unread_ids
+
+@dt.app_context_processor
+def inject_unread_notifications():
+    user_id = get_user_id()
+    if not user_id:
+        return {"has_unread_messages": False, "unread_recruitment_ids": set()}
+
+    unread_ids = get_unread_recruitment_ids(user_id)
+    return {
+        "has_unread_messages": len(unread_ids) > 0,
+        "unread_recruitment_ids": unread_ids,
+    }
 
 #サンクスボタン
 @dt.route("/thanks/<active_id>/<user_id>", methods=["POST"])
@@ -1172,13 +1306,14 @@ def admin():
     recruitments = Recruitment.query.order_by(Recruitment.created_at.desc()).all()
     entries = ParticipationHistory.query.order_by(ParticipationHistory.added_at.desc()).all()
     users = User.query.order_by(User.id.asc()).all()
+    contacts = ContactHistory.query.order_by(ContactHistory.id.desc()).all()
     return render_template(
         "natyukatu/admin.html",
         recruitments=recruitments,
         entries=entries,
-        users=users
+        users=users,
+        contacts=contacts,
     )
-
 
 # 時間での情報更新(1:募集中 2:募集終了 4:参加中 6:活動終了)
 @dt.before_request
