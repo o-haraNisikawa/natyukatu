@@ -350,6 +350,12 @@ def delete_like(user_id,recruitment_id):
 @dt.route("/recruitment_register", methods=["GET", "POST"])
 @login_required
 def recruitment_register():
+    # 募集登録は管理者、または承認済みの募集者だけに許可する
+    if current_user.role != 1 and not (
+        current_user.role == 2 and current_user.is_approved
+    ):
+        abort(403)
+
     form = RecruitmentForm()
 
     # 都道府県(tag_kinds=3)の choices をセット
@@ -506,6 +512,11 @@ def recruitment_register():
 @dt.route('/recruitment_register_complete')
 @login_required
 def recruitment_register_complete():
+    # 完了画面へのURL直打ちも権限チェックする
+    if current_user.role != 1 and not (
+        current_user.role == 2 and current_user.is_approved
+    ):
+        abort(403)
     return render_template('natyukatu/recruitment_register_complete.html')
 
 #ユーザー詳細画面

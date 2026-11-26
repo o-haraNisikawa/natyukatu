@@ -20,7 +20,7 @@
 
     <div class="col-lg-4 text-lg-end">
 
-      {% if current_user.is_authenticated and current_user.role == 2 %}
+      {% if current_user.is_authenticated and (current_user.role == 1 or (current_user.role == 2 and current_user.is_approved)) %}
 
       <a class="btn btn-primary btn-lg" href="{{ url_for('natyukatu.recruitment_register') }}">募集を登録する</a>
 
@@ -266,7 +266,7 @@
       {% if list_type != 'all' %}
       <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('natyukatu.top') }}#recruitment-list">すべての募集に戻る</a>
       {% endif %}
-      {% if current_user.is_authenticated and current_user.role == 2 %}
+      {% if current_user.is_authenticated and (current_user.role == 1 or (current_user.role == 2 and current_user.is_approved)) %}
       <a class="btn btn-outline-primary btn-sm" href="{{ url_for('natyukatu.recruitment_register') }}">＋ 新規募集</a>
       {% endif %}
     </div>
